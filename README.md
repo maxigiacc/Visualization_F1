@@ -1,6 +1,7 @@
 # Visualization_F1
 
 ## Main idea
+
 The main goal would be to visualize the unnecessary travel that F1 teams currently make during a world championship season. For instance, the calendar sometimes sends teams from Saudi Arabia to Miami and then back to Europe, which creates a lot of back-and-forth movement.
 
 In this project, we could:
@@ -15,10 +16,12 @@ In this project, we could:
 
 - Propose an optimized calendar by reordering the races to minimize total travel distance. Using a simple proportional model, we could then compare the environmental impact of the optimized route against the actual one.
 
-## Extra-idea
+## Extra-idea
+
 Game interactive map, in order to obtain the least environmental impact.
 
-## Main steps
+## Main steps
+
 1. Find a lot of data about (championship logistics, travel solution , …)
 
 2. Define a database structure and technology (Relational DB, Spatial DB , Time series DB)
