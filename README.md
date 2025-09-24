@@ -37,10 +37,10 @@ Game interactive map, in order to obtain the least environmental impact.
 Championship information:
 Logistics overview : F1 logistics involve moving cars, equipment, and staff across five continents using cargo planes, ships, and trucks, making it one of the most complex operations in sport. 
 
-Calendar: Wikipedia {https://en.wikipedia.org/wiki/2023_Formula_One_World_Championship}
+Calendar: https://en.wikipedia.org/wiki/2023_Formula_One_World_Championship
 
 
-Logistics specification:   [resource]
+Logistics specification: https://f1destinations.com/the-logistics-of-formula-1/
 Main partner : DHL
 50 tons of cargo estimated 
 DHL cargo travels upwards of 130,000km over the course of a season, in up to six or seven Boeing 747 cargo planes per event.
@@ -50,9 +50,10 @@ The cargo crates are specially designed to effectively fill all the space availa
 There’s around 100 people involved in the logistics overall, including people from DHL, team personnel and locals to each event who aid the operation.
 Each team has around three pallets worth of priority cargo. This will be the first cargo that arrives at the circuit, allowing teams to begin setting up their cars and garages. It’s up to the teams what equipment goes in these pallets.
 
-Useful tools:
-Airplane carbon calculator: Website & Api
-…
+## Useful tools:
+
+1. Airplane carbon calculator: Website & Api
+2. ...
 
 
 
