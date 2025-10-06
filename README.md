@@ -37,7 +37,7 @@ Game interactive map, in order to obtain the least environmental impact.
 Championship information:
 Logistics overview : F1 logistics involve moving cars, equipment, and staff across five continents using cargo planes, ships, and trucks, making it one of the most complex operations in sport. 
 
-Calendar: https://en.wikipedia.org/wiki/2023_Formula_One_World_Championship
+Sources: https://corp.formula1.com/wp-content/uploads/2025/08/F1-Sustainability-Update.pdf
 
 
 Logistics specification: https://f1destinations.com/the-logistics-of-formula-1/
