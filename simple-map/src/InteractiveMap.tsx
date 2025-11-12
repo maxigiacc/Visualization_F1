@@ -26,7 +26,7 @@ const InteractiveMap: React.FC = () => {
   const [selectedCircuitId, setSelectedCircuitId] = useState<number | null>(null);
   const [popupXY, setPopupXY] = useState<{ x: number; y: number } | null>(null);
 
-  // marker UI / zoom refs (leave zoom to library)
+  // marker UI / zoom refs
   const zoomRef = useRef<number>(1);
   const [markerScale, setMarkerScale] = useState<number>(1);
   const [showLabels, setShowLabels] = useState<boolean>(false);
@@ -129,7 +129,6 @@ const InteractiveMap: React.FC = () => {
 
               return (
                 <Marker key={`${circuit.circuitId}-${idx}`} coordinates={createCoordinates(circuit.lng, circuit.lat)}>
-                  {/* attach click on the <g> and read the mouse event */}
                   <g
                     transform={`scale(${invZoom})`}
                     style={{ transformOrigin: "0 0", pointerEvents: "auto", cursor: "pointer" }}
@@ -148,7 +147,6 @@ const InteractiveMap: React.FC = () => {
           </ZoomableGroup>
         </ComposableMap>
 
-        {/* Popup is absolute positioned relative to the page; we render it here so it appears over the map */}
         {selectedCircuit && popupXY && (
           <CircuitPopup circuit={selectedCircuit} races={selectedRaces} x={popupXY.x} y={popupXY.y} onClose={() => { setSelectedCircuitId(null); setPopupXY(null); }} />
         )}
