@@ -17,10 +17,15 @@ export interface Circuit {
  */
 export function fromStringCircuit(obj: { [k: string]: string }): Circuit {
     return {
-        ...obj,
-        alt: parseInt(obj.alt),
-        circuitId: parseInt(obj.circuitId),
-        lat: parseFloat(obj.lat),
-        lng: parseFloat(obj.lng),
-    };
+    circuitId: parseInt(String(obj.circuitId || "0"), 10),
+    circuitRef: obj.circuitRef || "",
+    name: obj.name || "",
+    location: obj.location || "",
+    country: obj.country || "",
+    lat: parseFloat(obj.lat),
+    lng: parseFloat(obj.lng),
+    alt: Number.isNaN(parseInt(obj.alt, 10)) ? 0 : parseInt(String(obj.alt || "0"), 10),
+    url: obj.url || "",
+  } as Circuit;
 }
+

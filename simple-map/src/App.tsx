@@ -10,9 +10,10 @@ function App() {
     return (
         <>
             <h1>F1 Visualisation</h1>
-            <Map />
+            <InteractiveMap />
             <ApexCsvRealtimeChart csvUrl="/emission_factors_2000_2025.csv" />.
             <TravelKmPerYearChart />
+            
         </>
     );
 }
