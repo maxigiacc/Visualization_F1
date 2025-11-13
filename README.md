@@ -1,5 +1,11 @@
 # Visualization_F1
 
+## How to run
+
+1. `cd simple-map`
+2. `npm install`
+3. `npm run dev`
+
 ## Main idea
 
 The main goal would be to visualize the unnecessary travel that F1 teams currently make during a world championship season. For instance, the calendar sometimes sends teams from Saudi Arabia to Miami and then back to Europe, which creates a lot of back-and-forth movement.
