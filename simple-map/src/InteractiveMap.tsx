@@ -1,4 +1,3 @@
-// File: src/components/InteractiveMap.tsx
 import React, { useEffect, useState, useRef } from "react";
 import {
   ComposableMap,
@@ -10,7 +9,6 @@ import {
   createScaleExtent,
   createTranslateExtent,
 } from "@vnedyalk0v/react19-simple-maps";
-import type { Feature, Geometry } from "geojson";
 import { csv } from "d3-fetch";
 import { fromStringCircuit, type Circuit } from "./Circuit";
 import { fromStringRace, type Race } from "./Race";
@@ -47,6 +45,7 @@ const InteractiveMap: React.FC = () => {
       const map = new Map<number, Race[]>();
       const circuits = (circuitsRaw as any[]).map((r) => fromStringCircuit(r));
       setData(circuits);
+      console.log(`Loaded ${circuits.length} circuits and ${races.length} races`);
 
       for (const race of races) {
         const arr = map.get(race.circuitId) ?? [];

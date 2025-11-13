@@ -3,8 +3,8 @@ import Map from "./Map";
 import "./App.css";
 import InteractiveMap from "./InteractiveMap";
 
-import ApexCsvRealtimeChart from './components/ApexCsvRealtimeChart.jsx';
-import TravelKmPerYearChart from './components/TravelKmPerYearChart.jsx';
+import ApexCsvRealtimeChart from './components/ApexCsvRealtimeChart.js';
+import TravelKmPerYearChart from './components/TravelKmPerYearChart.tsx';
 
 function App() {
     return (
