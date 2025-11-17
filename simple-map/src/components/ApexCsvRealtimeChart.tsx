@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import { csv } from "d3-fetch";
 import type { ApexOptions } from "apexcharts";
@@ -181,7 +181,7 @@ export default function ApexCsvRealtimeChart({ csvUrl = "" }: Props) {
 
       <div id="chart">
         <Chart
-          options={{ ...options, annotations, xaxis: { ...options.xaxis, type: "datetime" } }}
+          options={{ ...options, annotations, xaxis: { ...options.xaxis, type: "datetime", categories: xCategories } }}
           series={series as any}
           type="line"
           height={350}

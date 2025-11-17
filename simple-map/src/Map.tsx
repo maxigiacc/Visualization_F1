@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     ComposableMap,
     createCoordinates,
@@ -6,13 +6,10 @@ import {
     Geography,
     Marker,
 } from "@vnedyalk0v/react19-simple-maps";
-import { scaleLinear } from "d3-scale";
 import { csv } from "d3-fetch";
 import { fromStringCircuit, type Circuit } from "./Circuit";
 
 const geoUrl = "https://unpkg.com/world-atlas@2/countries-110m.json";
-
-const colorScale = scaleLinear([-1, 2], ["red", "blue"]);
 
 export default function Map() {
     const [data, setData] = useState<Circuit[]>([]);
@@ -30,9 +27,9 @@ export default function Map() {
         <ComposableMap>
             <Geographies geography={geoUrl}>
                 {({ geographies }) =>
-                    geographies.map((geo) => (
+                    geographies.map((geo, idx) => (
                         <Geography
-                            key={geo.rsmKey}
+                            key={`${geo.id ?? "geo"}-${idx}`}
                             geography={geo}
                             fill="#FEE1C7"
                             stroke="black"
@@ -45,6 +42,7 @@ export default function Map() {
             {data.map((circuit) => {
                 return (
                     <Marker
+                        key={circuit.circuitId}
                         coordinates={createCoordinates(
                             circuit.lng,
                             circuit.lat,

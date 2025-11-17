@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import { csv } from "d3-fetch";
-import type { DSVRowString } from "d3-dsv";
 import type { ApexOptions } from "apexcharts";
 import { fromStringCircuit, type Circuit } from "../Circuit";
 import { fromStringRace, type Race } from "../Race";
@@ -17,9 +16,6 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
-
-type CsvCircuitRow = DSVRowString<string>;
-type CsvRaceRow = DSVRowString<string>;
 
 export default function TravelKmPerYearChart() {
   const [series, setSeries] = useState<{ name: string; data: { x: number; y: number }[] }[]>([]);
