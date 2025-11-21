@@ -4,26 +4,15 @@ import type { ApexOptions } from "apexcharts";
 import { csv } from "d3-fetch";
 import { fromStringCircuit, type Circuit } from "../Circuit";
 import { fromStringRace, type Race } from "../Race";
+import { haversine } from "./utils";
 
 type ChartData = {
   categories: string[];
   values: number[];
 };
 
-const AVERAGE_CARGO_MASS_TONNES = 660;
+const AVERAGE_CARGO_MASS_TONNES = 50; // Approximate average mass of F1 logistics cargo
 const EARLIEST_YEAR = 1950;
-
-function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371;
-  const toRad = (v: number) => (v * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
 
 export default function BarChartEmissions() {
   const [chartData, setChartData] = useState<ChartData>({ categories: [], values: [] });
