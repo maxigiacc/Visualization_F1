@@ -1,7 +1,7 @@
 // File: src/components/CircuitPopup.tsx
 import React from "react";
-import type { Race } from "./Race";
-import type { Circuit } from "./Circuit";
+import type { Race } from "./components/models/Race";
+import type { Circuit } from "./components/models/Circuit";
 
 type Props = {
   circuit: Circuit;

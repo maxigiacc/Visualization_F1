@@ -7,7 +7,7 @@ import {
     Marker,
 } from "@vnedyalk0v/react19-simple-maps";
 import { csv } from "d3-fetch";
-import { fromStringCircuit, type Circuit } from "./Circuit";
+import { fromStringCircuit, type Circuit } from "./components/models/Circuit";
 
 const geoUrl = "https://unpkg.com/world-atlas@2/countries-110m.json";
 

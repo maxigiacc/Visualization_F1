@@ -13,8 +13,8 @@ import {
   useMapContext,
 } from "@vnedyalk0v/react19-simple-maps";
 import { csv } from "d3-fetch";
-import { fromStringCircuit, type Circuit } from "./Circuit";
-import { fromStringRace, type Race } from "./Race";
+import { fromStringCircuit, type Circuit } from "./components/models/Circuit";
+import { fromStringRace, type Race } from "./components/models/Race";
 import CircuitPopup from "./CircuitPopup";
 
 const geoUrl = "https://unpkg.com/world-atlas@2/countries-50m.json";

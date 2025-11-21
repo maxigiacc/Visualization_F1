@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
 import { csv } from "d3-fetch";
-import { fromStringCircuit, type Circuit } from "../Circuit";
-import { fromStringRace, type Race } from "../Race";
+import { fromStringCircuit, type Circuit } from "./models/Circuit";
+import { fromStringRace, type Race } from "./models/Race";
 import { haversine } from "./utils";
 
 type ChartData = {

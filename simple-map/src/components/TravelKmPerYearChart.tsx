@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import { csv } from "d3-fetch";
 import type { ApexOptions } from "apexcharts";
-import { fromStringCircuit, type Circuit } from "../Circuit";
-import { fromStringRace, type Race } from "../Race";
+import { fromStringCircuit, type Circuit } from "./models/Circuit";
+import { fromStringRace, type Race } from "./models/Race";
 import { haversine } from "./utils";
 
 export default function TravelKmPerYearChart() {
