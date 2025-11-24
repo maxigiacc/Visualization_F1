@@ -1,8 +1,9 @@
 import "./App.css";
 import InteractiveMap from "./InteractiveMap";
-import ApexCsvRealtimeChart from "./components/ApexCsvRealtimeChart.js";
-import TravelKmPerYearChart from "./components/TravelKmPerYearChart.tsx";
+import ApexCsvRealtimeChart from "./components/ApexCsvRealtimeChart";
+import TravelKmPerYearChart from "./components/TravelKmPerYearChart";
 import BarChartEmissions from "./components/BarChartEmissions";
+import InteractiveCountriesMap from "./components/InteractiveCountriesMap";
 
 function App() {
     return (
@@ -12,6 +13,7 @@ function App() {
             <ApexCsvRealtimeChart csvUrl="/emission_factors_2000_2025.csv" />
             <TravelKmPerYearChart />
             <BarChartEmissions />
+            <InteractiveCountriesMap />
         </>
     );
 }

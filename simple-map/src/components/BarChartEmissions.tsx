@@ -4,7 +4,7 @@ import type { ApexOptions } from "apexcharts";
 import { csv } from "d3-fetch";
 import { fromStringCircuit, type Circuit } from "./models/Circuit";
 import { fromStringRace, type Race } from "./models/Race";
-import { haversine } from "./utils";
+import { haversine } from "./utils/utils";
 
 type ChartData = {
   categories: string[];

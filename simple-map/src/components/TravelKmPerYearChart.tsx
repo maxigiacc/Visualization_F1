@@ -4,7 +4,7 @@ import { csv } from "d3-fetch";
 import type { ApexOptions } from "apexcharts";
 import { fromStringCircuit, type Circuit } from "./models/Circuit";
 import { fromStringRace, type Race } from "./models/Race";
-import { haversine } from "./utils";
+import { haversine } from "./utils/utils";
 
 export default function TravelKmPerYearChart() {
   const [series, setSeries] = useState<{ name: string; data: { x: number; y: number }[] }[]>([]);
