@@ -9,11 +9,20 @@ type Props = {
   onClose: () => void;
   country: string | null;
   circuits: Circuit[];
-  onSelectCircuit: (c: Circuit) => void;
   selectedCircuit: Circuit | null;
+  onSelectCircuit: (circuit: Circuit | null) => void;
 };
 
-const SidePanelDrawer: React.FC<Props> = ({ open, onClose, country, circuits, onSelectCircuit, selectedCircuit }) => {
+const SidePanelDrawer: React.FC<Props> = ({ 
+  open, 
+  onClose, 
+  country, 
+  circuits, 
+  selectedCircuit, 
+  onSelectCircuit 
+}) => {
+  const displayCountry = country === "USA" ? "United States of America" : country;
+ 
   return (
     <div
       style={{
@@ -32,15 +41,54 @@ const SidePanelDrawer: React.FC<Props> = ({ open, onClose, country, circuits, on
       role="dialog"
       aria-hidden={!open}
     >
-      <button onClick={onClose} style={{ float: "right", border: "none", background: "transparent", fontSize: 20 }}>✕</button>
-      <h3 style={{ marginTop: 6 }}>{country ?? "Select a country"}</h3>
-
-      {!country && <div style={{ color: "#666" }}>Click on a country to see its circuits.</div>}
-
-      {country && (
+      <button 
+        onClick={onClose} 
+        style={{ 
+          float: "right", 
+          border: "none", 
+          background: "transparent", 
+          fontSize: 20,
+          cursor: "pointer"
+        }}
+      >
+        ✕
+      </button>
+      
+      <h3 style={{ marginTop: 6 }}>{displayCountry ?? "Select a country"}</h3>
+      
+      {/* First case: country not selected */}
+      {!country && (
+        <div style={{ color: "#666" }}>
+          Click on a country to see its circuits.
+        </div>
+      )}
+      
+      {/* Country selected, no circuit selected --> show list */}
+      {country && !selectedCircuit && (
+        <CountryCircuitList 
+          circuits={circuits} 
+          onSelectCircuit={onSelectCircuit}
+        />
+      )}
+      
+      {/* Circuit selected --> show details */}
+      {selectedCircuit && (
         <>
-          <CountryCircuitList circuits={circuits} onSelectCircuit={onSelectCircuit} />
-          {selectedCircuit && <CircuitDetails circuit={selectedCircuit} />}
+          <button
+            onClick={() => onSelectCircuit(null)}
+            style={{
+              marginTop: 8,
+              padding: "4px 12px",
+              background: "#f0f0f0",
+              border: "1px solid #ccc",
+              borderRadius: 4,
+              cursor: "pointer",
+              fontSize: 13
+            }}
+          >
+            ← Back to {displayCountry}
+          </button>
+          <CircuitDetails circuit={selectedCircuit} />
         </>
       )}
     </div>

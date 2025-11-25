@@ -5,47 +5,72 @@ import type { Circuit } from "./models/Circuit";
 
 type Props = {
   data: Circuit[];
-  markerScale: number;      // = 1 / zoom
+  markerScale: number;
   showLabels: boolean;
-  handleMarkerClick: (e: React.MouseEvent, circuit: Circuit) => void;
 };
 
-const BASE_R = 6;
+const BASE_MARKER_RADIUS_PX = 3;
+const BASE_FONT_PX = 10;
 
-const MapMarkers: React.FC<Props> = ({ data, markerScale, showLabels, handleMarkerClick }) => {
-  const scale = Math.max(0.0001, markerScale);
+const MapMarkers: React.FC<Props> = ({ data, markerScale, showLabels}) => {
+  // DEBUG: stampa i primi 3 circuiti
+  React.useEffect(() => {
+    console.log('=== MapMarkers DEBUG ===');
+    console.log('Total circuits:', data.length);
+    console.log('First 3 circuits:', data.slice(0, 3).map(c => ({
+      name: c.name,
+      lat: c.lat,
+      lng: c.lng,
+      latType: typeof c.lat,
+      lngType: typeof c.lng
+    })));
+  }, [data]);
 
   return (
     <>
-      {data.map((c) => {
-        if (!c || Number.isNaN(c.lat) || Number.isNaN(c.lng)) return null;
-
-        const r = Math.max(1, Math.round(BASE_R * scale));
-
-        // #### TRY both orders (comment/uncomment depending on test result)
-        // option 1 (common): createCoordinates(lon, lat)
-        const coordsA = createCoordinates(c.lng, c.lat);
-        // option 2 (in case library expects lat,lon): createCoordinates(lat, lon)
-        const coordsB = createCoordinates(c.lat, c.lng);
-
-        // Use coordsA by default — if debug shows coordsB is correct, swap to coordsB.
-        const coordsToUse = coordsA; // << change to coordsB if the "B" markers were correct in the debug test
-
+      {data.map((c, idx) => {
+        if (!c) return null;
+        
+        const invZoom = markerScale;
+        
+        // DEBUG: stampa Monaco (dovrebbe essere in Europa)
+        if (c.name.includes('Monaco')) {
+          console.log('Monaco circuit:', {
+            name: c.name,
+            lat: c.lat,
+            lng: c.lng,
+            coords: createCoordinates(c.lng, c.lat)
+          });
+        }
+        
         return (
-          <Marker key={c.circuitId} coordinates={coordsToUse}>
+          <Marker key={`${c.circuitId}-${idx}`} coordinates={createCoordinates(c.lng, c.lat)}>
             <g
-              style={{ pointerEvents: "auto", cursor: "pointer" }}
-              onClick={(e) => handleMarkerClick(e, c)}
+              transform={`scale(${invZoom})`}
+              style={{ transformOrigin: "0 0", pointerEvents: "auto", cursor: "pointer" }}
             >
-              <circle r={r} fill="#F44174" stroke="#fff" strokeWidth={Math.max(0.5, r * 0.08)} />
+              <circle 
+                r={BASE_MARKER_RADIUS_PX} 
+                fill="#F44174" 
+                stroke="#fff" 
+                strokeWidth={Math.max(0.5, BASE_MARKER_RADIUS_PX * 0.08)} 
+              />
               {showLabels && (
-                <text x={0} y={-r - 6} textAnchor="middle" style={{ fontSize: `${Math.max(8, Math.round(10 * scale))}px`, fill: "#333", pointerEvents: "none", userSelect: "none", whiteSpace: "nowrap" }}>
+                <text
+                  x={0}
+                  y={-BASE_MARKER_RADIUS_PX - 4}
+                  textAnchor="middle"
+                  style={{
+                    fontSize: `${BASE_FONT_PX}px`,
+                    fill: "#333",
+                    pointerEvents: "none",
+                    userSelect: "none",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {c.name}
                 </text>
               )}
-
-              {/* DEBUG attr: remove in production */}
-              <title>{`id:${c.circuitId} lat:${c.lat} lng:${c.lng}`}</title>
             </g>
           </Marker>
         );

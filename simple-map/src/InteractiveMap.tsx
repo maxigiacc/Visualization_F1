@@ -16,14 +16,10 @@ import { csv } from "d3-fetch";
 import { fromStringCircuit, type Circuit } from "./components/models/Circuit";
 import { fromStringRace, type Race } from "./components/models/Race";
 import CircuitPopup from "./CircuitPopup";
+import type { RaceWithCircuit } from "./components/models/RaceWithCircuit";
+import type { RouteSegment } from "./components/models/RouteSegment";
 
 const geoUrl = "https://unpkg.com/world-atlas@2/countries-50m.json";
-
-type RaceWithCircuit = Race & {
-  circuit: Circuit;
-  coordinates: Coordinates;
-  label: string;
-};
 
 const SEGMENT_COLORS = [
   "#FF6B6B",
@@ -35,17 +31,6 @@ const SEGMENT_COLORS = [
   "#F06595",
   "#63C5DA",
 ];
-
-type RouteSegment = {
-  id: string;
-  from: RaceWithCircuit;
-  to: RaceWithCircuit;
-  coordinates: Coordinates[];
-  color: string;
-  order: number;
-  labelCoordinates: Coordinates;
-  arrowCoordinates: Coordinates;
-};
 
 const InteractiveMap: React.FC = () => {
   const [data, setData] = useState<Circuit[]>([]);

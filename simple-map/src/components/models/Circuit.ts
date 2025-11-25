@@ -8,6 +8,7 @@ export interface Circuit {
     location: string;
     name: string;
     url: string; // wikipedia URL
+    clusterId: string; // optional, used for clustering
 }
 
 /**
@@ -26,6 +27,7 @@ export function fromStringCircuit(obj: { [k: string]: string }): Circuit {
     lng: parseFloat(obj.lng),
     alt: Number.isNaN(parseInt(obj.alt, 10)) ? 0 : parseInt(String(obj.alt || "0"), 10),
     url: obj.url || "",
+    clusterId: obj.clusterId || "",
   } as Circuit;
 }
 

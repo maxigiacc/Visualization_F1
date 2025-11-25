@@ -2,20 +2,42 @@
 import React from "react";
 import type { Circuit } from "./models/Circuit";
 
-type Props = { circuits: Circuit[]; onSelectCircuit: (c: Circuit) => void };
+type Props = {
+  circuits: Circuit[];
+  onSelectCircuit: (circuit: Circuit) => void;
+};
 
-const CountryCircuitList: React.FC<Props> = ({ circuits, onSelectCircuit }) => {
+
+const CountryCircuitList: React.FC<Props> = ({circuits, onSelectCircuit}) => {
   if (!circuits.length) return <div style={{ color: "#666" }}>No circuits for this country.</div>;
+  
   return (
-    <ul style={{ padding: 0, listStyle: "none" }}>
-      {circuits.map((c) => (
-        <li key={c.circuitId} style={{ padding: "8px 4px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => onSelectCircuit(c)}>
-          <div style={{ fontWeight: 600 }}>{c.name}</div>
-          <div style={{ fontSize: 12, color: "#666" }}>{c.location}</div>
-        </li>
-      ))}
-    </ul>
+    <div style={{ marginTop: 16 }}>
+      <strong>Circuits ({circuits.length})</strong>
+      <ul style={{ listStyle: "none", padding: 0, marginTop: 8 }}>
+        {circuits.map((circuit) => (
+          <li
+            key={circuit.circuitId}
+            onClick={() => onSelectCircuit(circuit)}
+            style={{
+              padding: "8px 12px",
+              marginBottom: 6,
+              background: "#f9f9f9",
+              borderRadius: 4,
+              cursor: "pointer",
+              transition: "background 0.2s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#e8e8e8")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#f9f9f9")}
+          >
+            <div style={{ fontWeight: 500 }}>{circuit.name}</div>
+            <div style={{ fontSize: 12, color: "#666" }}>{circuit.location}</div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
+
 
 export default CountryCircuitList;
