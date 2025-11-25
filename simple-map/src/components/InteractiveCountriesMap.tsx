@@ -14,6 +14,7 @@ import type { Circuit } from "./models/Circuit";
 import { fromStringCircuit } from "./models/Circuit";
 import MapMarkers from "./MapMarkers";
 import SidePanelDrawer from "./SidePanelDrawer";
+import { sameCountry } from "./utils/countryUtils";
 
 const GEO_URL = "https://unpkg.com/world-atlas@2/countries-50m.json";
 
@@ -49,7 +50,7 @@ const InteractiveCountriesMap: React.FC = () => {
 
   const circuitsForCountry = useMemo(() => {
     if (!selectedCountry) return [];
-    return circuits.filter((c) => c.country === selectedCountry);
+      return circuits.filter((c) => sameCountry(c.country, selectedCountry));
   }, [circuits, selectedCountry]);
 
   return (

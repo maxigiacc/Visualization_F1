@@ -41,7 +41,7 @@ const CircuitDetails: React.FC<Props> = ({ circuit }) => {
               <strong>Last podium:</strong>
               {stats.lastPodium.length === 0 ? <div style={{ color: "#666" }}>—</div> :
                 <ol>
-                  {stats.lastPodium.map((p, i) => <li key={i}>{p.position}. {p.driver} — {p.team}</li>)}
+                  {stats.lastPodium.map((p, i) => <li key={i}> {p.driver} — {p.team}</li>)}
                 </ol>
               }
             </div>
