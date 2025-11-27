@@ -12,7 +12,7 @@ const Toolbar = () => {
             >
                 {
                     // currently the options are hardcoded
-                    Array.from("aaaaaaaaaaaaaaaaaaaaaaaaa").map((_, i) => (
+                    Array.from("aaaaaaaaaaaaaaaaaaaaaaaaaa").map((_, i) => (
                         <option key={i} value={i + 2000}>
                             {i + 2000}
                         </option>
