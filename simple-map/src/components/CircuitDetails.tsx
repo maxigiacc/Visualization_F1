@@ -1,8 +1,8 @@
 // src/components/CircuitDetails.tsx
 import React, { useEffect, useState } from "react";
 import type { Circuit } from "./models/Circuit";
-import type { CircuitStats } from "./utils/statsUtils";
-import { fetchCircuitStats } from "./utils/statsUtils";
+import type { CircuitStats } from "./utils/dataLoader";
+import { getCircuitStats } from "./utils/dataLoader";
 
 type Props = { circuit: Circuit };
 
@@ -13,7 +13,7 @@ const CircuitDetails: React.FC<Props> = ({ circuit }) => {
   useEffect(() => {
     let mounted = true;
     setLoading(true);
-    fetchCircuitStats(circuit.circuitId).then((s) => {
+    getCircuitStats(circuit.circuitId).then((s) => {
       if (mounted) setStats(s);
     }).finally(() => {
       if (mounted) setLoading(false);

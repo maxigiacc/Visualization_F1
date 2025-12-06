@@ -12,44 +12,26 @@ import {
     type Coordinates,
     useMapContext,
 } from "@vnedyalk0v/react19-simple-maps";
-import { csv } from "d3-fetch";
-import { fromStringCircuit, type Circuit } from "./components/models/Circuit";
-import { fromStringRace, type Race } from "./components/models/Race";
-import CircuitPopup from "./CircuitPopup";
-import type { RaceWithCircuit } from "./components/models/RaceWithCircuit";
-import type { RouteSegment } from "./components/models/RouteSegment";
-import { useSettings } from "./SettingsContext";
-import "./css/InteractiveMap.css";
-
-import geoUrl from "./assets/countries-50m.json";
+import {type Circuit } from "./models/Circuit";
+import {type Race } from "./models/Race";
+import type { RaceWithCircuit } from "./models/RaceWithCircuit";
+import type { RouteSegment } from "./models/RouteSegment";
+import { useSettings } from "../SettingsContext";
+import "../css/InteractiveMap.css";
+import geoUrl from "../assets/countries-50m.json";
+import { getRacesWithCircuits } from "./utils/dataLoader";
 
 const SEGMENT_COLORS = [
-    "#FF6B6B",
-    "#FFA94D",
-    "#FFD43B",
-    "#69DB7C",
-    "#4DABF7",
-    "#9775FA",
-    "#F06595",
-    "#63C5DA",
+    "#FF6B6B", "#FFA94D", "#FFD43B", "#69DB7C",
+    "#4DABF7", "#9775FA", "#F06595", "#63C5DA",
 ];
 
 const InteractiveMap: React.FC = () => {
     const [data, setData] = useState<Circuit[]>([]);
     const [racesMap, setRacesMap] = useState<Map<number, Race[]>>(new Map());
-    const [racesWithCircuit, setRacesWithCircuit] = useState<RaceWithCircuit[]>(
-        [],
-    );
-
+    const [racesWithCircuit, setRacesWithCircuit] = useState<RaceWithCircuit[]>([]);
     const { year, setYear } = useSettings();
-
-    // popup state
-    const [selectedCircuitId, setSelectedCircuitId] = useState<number | null>(
-        null,
-    );
-    const [popupXY, setPopupXY] = useState<{ x: number; y: number } | null>(
-        null,
-    );
+    
 
     // marker UI / zoom refs
     const zoomRef = useRef<number>(1);
@@ -66,71 +48,15 @@ const InteractiveMap: React.FC = () => {
     const centerRef = useRef(createCoordinates(0, 0));
 
     useEffect(() => {
-        Promise.all([csv(`/circuits.csv`), csv(`/races.csv`)]).then(
-            ([circuitsRaw, racesRaw]) => {
-                const circuits = (circuitsRaw as any[]).map((r) =>
-                    fromStringCircuit(r),
-                );
-                setData(circuits);
+    getRacesWithCircuits()
+        .then(({ circuits, racesMap, racesWithCircuit }) => {
+            setData(circuits);
+            setRacesMap(racesMap);
+            setRacesWithCircuit(racesWithCircuit);
+        })
+        .catch(console.error);
+}, []);
 
-                const races = (racesRaw as any[]).map((r) => fromStringRace(r));
-                const map = new Map<number, Race[]>();
-                for (const race of races) {
-                    const arr = map.get(race.circuitId) ?? [];
-                    arr.push(race);
-                    map.set(race.circuitId, arr);
-                }
-                // sort lists
-                for (const arr of map.values()) {
-                    arr.sort((a, b) =>
-                        a.year !== b.year ? a.year - b.year : a.round - b.round,
-                    );
-                }
-                setRacesMap(map);
-
-                const circuitLookup = new Map<number, Circuit>();
-                circuits.forEach((circuit) =>
-                    circuitLookup.set(circuit.circuitId, circuit),
-                );
-
-                const racesWithCircuit: RaceWithCircuit[] = races
-                    .map((race) => {
-                        const circuit = circuitLookup.get(race.circuitId);
-                        if (!circuit) return null;
-                        const label = `${race.year} • R${String(race.round).padStart(2, "0")} • ${race.name}`;
-                        return {
-                            ...race,
-                            circuit,
-                            coordinates: createCoordinates(
-                                circuit.lng,
-                                circuit.lat,
-                            ),
-                            label,
-                        };
-                    })
-                    .filter((race): race is RaceWithCircuit => Boolean(race))
-                    .sort((a, b) =>
-                        a.year !== b.year ? a.year - b.year : a.round - b.round,
-                    );
-
-                setRacesWithCircuit(racesWithCircuit);
-            },
-        );
-    }, []);
-
-    const handleMarkerClick = (e: React.MouseEvent, circuit: Circuit) => {
-        // show popup and center it near the click position
-        const x = e.pageX;
-        const y = e.pageY;
-        setPopupXY({ x, y });
-        setSelectedCircuitId(circuit.circuitId);
-    };
-
-    const selectedCircuit =
-        data.find((d) => d.circuitId === selectedCircuitId) ?? null;
-    const selectedRaces = selectedCircuitId
-        ? (racesMap.get(selectedCircuitId) ?? [])
-        : [];
     const yearOptions = useMemo(() => {
         const years = Array.from(
             new Set(racesWithCircuit.map((race) => race.year)),
@@ -143,7 +69,7 @@ const InteractiveMap: React.FC = () => {
         if (year === null && yearOptions.length > 0) {
             setYear(yearOptions[yearOptions.length - 1]);
         }
-    }, [year, yearOptions]);
+    }, [year, yearOptions, setYear]);
 
     const selectedYearRaces = useMemo(() => {
         if (!year) return [];
@@ -193,7 +119,7 @@ const InteractiveMap: React.FC = () => {
                             setYear(
                                 event.target.value
                                     ? Number(event.target.value)
-                                    : null,
+                                    : Number.NaN,
                             )
                         }
                     >
@@ -317,9 +243,6 @@ const InteractiveMap: React.FC = () => {
                                         pointerEvents: "auto",
                                         cursor: "pointer",
                                     }}
-                                    onClick={(e) =>
-                                        handleMarkerClick(e, circuit)
-                                    }
                                 >
                                     <circle
                                         r={BASE_MARKER_RADIUS_PX}
@@ -357,19 +280,6 @@ const InteractiveMap: React.FC = () => {
                     />
                 </ZoomableGroup>
             </ComposableMap>
-
-            {selectedCircuit && popupXY && (
-                <CircuitPopup
-                    circuit={selectedCircuit}
-                    races={selectedRaces}
-                    x={popupXY.x}
-                    y={popupXY.y}
-                    onClose={() => {
-                        setSelectedCircuitId(null);
-                        setPopupXY(null);
-                    }}
-                />
-            )}
         </div>
     );
 };
