@@ -33,7 +33,7 @@ const SidePanelDrawer: React.FC<Props> = ({
         background: "#fff",
         boxShadow: "rgba(0,0,0,0.2) 0 4px 16px",
         transition: "right 220ms ease",
-        zIndex: 1200,
+        zIndex: 1000,
         padding: 16,
         overflowY: "auto",
       }}
