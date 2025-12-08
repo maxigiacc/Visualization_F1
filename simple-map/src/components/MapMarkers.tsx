@@ -13,36 +13,13 @@ const BASE_MARKER_RADIUS_PX = 3;
 const BASE_FONT_PX = 10;
 
 const MapMarkers: React.FC<Props> = ({ data, markerScale, showLabels}) => {
-  // DEBUG: stampa i primi 3 circuiti
-  React.useEffect(() => {
-    console.log('=== MapMarkers DEBUG ===');
-    console.log('Total circuits:', data.length);
-    console.log('First 3 circuits:', data.slice(0, 3).map(c => ({
-      name: c.name,
-      lat: c.lat,
-      lng: c.lng,
-      latType: typeof c.lat,
-      lngType: typeof c.lng
-    })));
-  }, [data]);
 
   return (
     <>
       {data.map((c, idx) => {
-        if (!c) return null;
-        
+        if (!c) return null;        
         const invZoom = markerScale;
-        
-        // DEBUG: stampa Monaco (dovrebbe essere in Europa)
-        if (c.name.includes('Monaco')) {
-          console.log('Monaco circuit:', {
-            name: c.name,
-            lat: c.lat,
-            lng: c.lng,
-            coords: createCoordinates(c.lng, c.lat)
-          });
-        }
-        
+
         return (
           <Marker key={`${c.circuitId}-${idx}`} coordinates={createCoordinates(c.lng, c.lat)}>
             <g

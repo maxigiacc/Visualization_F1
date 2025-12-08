@@ -21,7 +21,6 @@ const SidePanelDrawer: React.FC<Props> = ({
   selectedCircuit, 
   onSelectCircuit 
 }) => {
-  const displayCountry = country === "USA" ? "United States of America" : country;
  
   return (
     <div
@@ -38,7 +37,7 @@ const SidePanelDrawer: React.FC<Props> = ({
         padding: 16,
         overflowY: "auto",
       }}
-      role="dialog"
+      role="menu"
       aria-hidden={!open}
     >
       <button 
@@ -54,7 +53,7 @@ const SidePanelDrawer: React.FC<Props> = ({
         ✕
       </button>
       
-      <h3 style={{ marginTop: 6 }}>{displayCountry ?? "Select a country"}</h3>
+      <h3 style={{ marginTop: 6 }}>{country ?? "Select a country"}</h3>
       
       {/* First case: country not selected */}
       {!country && (
@@ -86,7 +85,7 @@ const SidePanelDrawer: React.FC<Props> = ({
               fontSize: 13
             }}
           >
-            ← Back to {displayCountry}
+            ← Back to {country}
           </button>
           <CircuitDetails circuit={selectedCircuit} />
         </>

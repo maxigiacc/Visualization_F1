@@ -2,6 +2,7 @@ import { csv } from "d3-fetch";
 import { csvParse, dsvFormat } from "d3-dsv";
 import type { Circuit } from "../models/Circuit";
 import { fromStringCircuit } from "../models/Circuit";
+import type { RaceWithCircuit } from "../models/RaceWithCircuit";
 import type { Race } from "../models/Race";
 import { fromStringRace } from "../models/Race";
 import type { Qualifying } from "../models/Qualyfing";
@@ -11,8 +12,7 @@ import { fromStringConstructor } from "../models/Constructor";
 import type { Driver } from "../models/Driver";
 import { fromStringDriver } from "../models/Driver";
 import { haversine } from "./utils";
-import { createCoordinates, type Coordinates } from "@vnedyalk0v/react19-simple-maps";
-import type { ApexOptions } from "apexcharts";
+import { createCoordinates } from "@vnedyalk0v/react19-simple-maps";
 
 // ============================================================================
 // TYPES
@@ -35,12 +35,6 @@ export type TravelKmData = {
 export type EmissionsData = {
   categories: string[];
   values: number[];
-};
-
-export type RaceWithCircuit = Race & {
-  circuit: Circuit;
-  coordinates: Coordinates;
-  label: string;
 };
 
 export type PodiumEntry = { 
@@ -124,26 +118,21 @@ async function fetchCsv(path: string) {
 
 /**
  * Load all F1 data from CSV files with caching
- * Returns a promise that resolves to the cached data
  */
 export async function loadAllData(): Promise<DataCache> {
-  // Return cached data if available
   if (globalCache) {
     return globalCache;
   }
 
-  // Return existing load promise if already loading
   if (isLoading && loadPromise) {
     return loadPromise;
   }
 
-  // Start loading
   isLoading = true;
   loadPromise = (async () => {
     try {
       console.log("Loading F1 data...");
 
-      // Load all CSV files in parallel
       const [
         circuitsParsed,
         racesParsed,
@@ -160,14 +149,12 @@ export async function loadAllData(): Promise<DataCache> {
         fetchCsv("/emission_factors_2000_2025.csv"),
       ]);
 
-      // Convert to typed objects
       const circuits = (circuitsParsed as any[]).map(fromStringCircuit);
       const races = (racesParsed as any[]).map(fromStringRace);
       const qualifying = (qualifyingParsed as any[]).map(fromStringQualifying);
       const drivers = (driversParsed as any[]).map(fromStringDriver);
       const constructors = (constructorsParsed as any[]).map(fromStringConstructor);
 
-      // Parse emission factors
       const emissionFactors = new Map<number, number>();
       emissionsParsed.forEach((row: any) => {
         const year = parseInt(row.year ?? "", 10);
@@ -177,7 +164,6 @@ export async function loadAllData(): Promise<DataCache> {
         }
       });
 
-      // Create cache
       globalCache = {
         circuits,
         races,
@@ -211,64 +197,43 @@ export async function loadAllData(): Promise<DataCache> {
 }
 
 // ============================================================================
-// SPECIFIC DATA GETTERS
+// BASIC DATA GETTERS
 // ============================================================================
 
-/**
- * Get circuits data (loads if not cached)
- */
 export async function getCircuits(): Promise<Circuit[]> {
   const data = await loadAllData();
   return data.circuits;
 }
 
-/**
- * Get races data (loads if not cached)
- */
 export async function getRaces(): Promise<Race[]> {
   const data = await loadAllData();
   return data.races;
 }
 
-/**
- * Get qualifying data (loads if not cached)
- */
 export async function getQualifying(): Promise<Qualifying[]> {
   const data = await loadAllData();
   return data.qualifying;
 }
 
-/**
- * Get drivers data (loads if not cached)
- */
 export async function getDrivers(): Promise<Driver[]> {
   const data = await loadAllData();
   return data.drivers;
 }
 
-/**
- * Get constructors data (loads if not cached)
- */
 export async function getConstructors(): Promise<Constructor[]> {
   const data = await loadAllData();
   return data.constructors;
 }
 
-/**
- * Get emission factors data (loads if not cached)
- */
 export async function getEmissionFactors(): Promise<Map<number, number>> {
   const data = await loadAllData();
   return data.emissionFactors;
 }
 
 // ============================================================================
-// UTILITY FUNCTIONS
+// DATA AGGREGATION UTILITIES
 // ============================================================================
 
-/**
- * Build a map of races grouped by circuit ID
- */
 export async function getRacesByCircuit(): Promise<Map<number, Race[]>> {
   const races = await getRaces();
   const map = new Map<number, Race[]>();
@@ -279,7 +244,6 @@ export async function getRacesByCircuit(): Promise<Map<number, Race[]>> {
     map.set(race.circuitId, arr);
   }
   
-  // Sort races chronologically within each circuit
   for (const arr of map.values()) {
     arr.sort((a, b) => (a.year !== b.year ? a.year - b.year : a.round - b.round));
   }
@@ -287,9 +251,6 @@ export async function getRacesByCircuit(): Promise<Map<number, Race[]>> {
   return map;
 }
 
-/**
- * Build a map of races grouped by year
- */
 export async function getRacesByYear(): Promise<Map<number, Race[]>> {
   const races = await getRaces();
   const map = new Map<number, Race[]>();
@@ -300,7 +261,6 @@ export async function getRacesByYear(): Promise<Map<number, Race[]>> {
     map.set(race.year, arr);
   }
   
-  // Sort races by round within each year
   for (const arr of map.values()) {
     arr.sort((a, b) => a.round - b.round);
   }
@@ -308,9 +268,6 @@ export async function getRacesByYear(): Promise<Map<number, Race[]>> {
   return map;
 }
 
-/**
- * Build lookup maps for drivers and constructors
- */
 export async function getLookupMaps(): Promise<{
   drivers: Map<number, Driver>;
   constructors: Map<number, Constructor>;
@@ -326,17 +283,11 @@ export async function getLookupMaps(): Promise<{
   };
 }
 
-/**
- * Build a map of circuits by ID
- */
 export async function getCircuitMap(): Promise<Map<number, Circuit>> {
   const circuits = await getCircuits();
   return new Map(circuits.map((c) => [c.circuitId, c]));
 }
 
-/**
- * Get circuit coordinates map for distance calculations
- */
 export async function getCircuitCoordinates(): Promise<
   Record<number, { lat: number; lng: number }>
 > {
@@ -353,13 +304,9 @@ export async function getCircuitCoordinates(): Promise<
 }
 
 // ============================================================================
-// BUSINESS LOGIC FUNCTIONS (for charts/components)
+// BUSINESS LOGIC - DATA PROCESSING
 // ============================================================================
 
-/**
- * Get races with their circuit information and formatted labels
- * Used by InteractiveMap component
- */
 export async function getRacesWithCircuits(): Promise<{
   circuits: Circuit[];
   racesMap: Map<number, Race[]>;
@@ -370,12 +317,7 @@ export async function getRacesWithCircuits(): Promise<{
     getRacesByCircuit(),
   ]);
 
-  // Build circuit lookup for fast access
-  const circuitLookup = new Map(
-    circuits.map((c) => [c.circuitId, c])
-  );
-
-  // Flatten all races and attach circuit info
+  const circuitLookup = new Map(circuits.map((c) => [c.circuitId, c]));
   const allRaces = Array.from(racesMap.values()).flat();
 
   const racesWithCircuit = allRaces
@@ -395,16 +337,9 @@ export async function getRacesWithCircuits(): Promise<{
       a.year !== b.year ? a.year - b.year : a.round - b.round
     );
 
-  return {
-    circuits,
-    racesMap,
-    racesWithCircuit,
-  };
+  return { circuits, racesMap, racesWithCircuit };
 }
 
-/**
- * Calculate travel kilometers per year for chart
- */
 export async function getTravelKmPerYear(): Promise<TravelKmData> {
   const [circuitMap, racesByYear] = await Promise.all([
     getCircuitCoordinates(),
@@ -439,9 +374,6 @@ export async function getTravelKmPerYear(): Promise<TravelKmData> {
   ];
 }
 
-/**
- * Calculate emissions data for bar chart
- */
 export async function getEmissionsData(
   averageCargoMassTonnes = 50,
   earliestYear = 1950
@@ -452,7 +384,6 @@ export async function getEmissionsData(
     getEmissionFactors(),
   ]);
 
-  // Calculate km per year
   const kmPerYear: Record<number, number> = {};
   
   for (const [year, races] of racesByYear.entries()) {
@@ -470,7 +401,6 @@ export async function getEmissionsData(
     kmPerYear[year] = Math.round(totalKm * 100) / 100;
   }
 
-  // Resolve emission factors
   const factorYears = Array.from(emissionFactors.keys()).sort((a, b) => a - b);
   
   const resolveFactor = (year: number) => {
@@ -507,19 +437,10 @@ export async function getEmissionsData(
   return { categories, values };
 }
 
-/**
- * Fetch detailed statistics for a specific circuit
- * Includes: most wins (driver/team), most poles, last podium
- */
 export async function getCircuitStats(circuitId: number): Promise<CircuitStats> {
-  // Check cache first
-  const cacheKey = `circuit_stats_${circuitId}`;
-  
-  // Load main data
   const data = await loadAllData();
   const { drivers: driversLookup, constructors: constructorsLookup } = await getLookupMaps();
 
-  // Load results separately (heavy file, not in main cache)
   const resultsParsed = await fetchAndAutoParseCsv("/results.csv");
   const results = resultsParsed.map((r: any) => ({
     resultId: Number(r.resultId),
@@ -542,21 +463,18 @@ export async function getCircuitStats(circuitId: number): Promise<CircuitStats> 
     statusId: Number(r.statusId),
   }));
 
-  // Filter races for this circuit
   const races = data.races.filter((r) => Number(r.circuitId) === Number(circuitId));
 
   if (!races.length) {
     return { lastPodium: [] };
   }
 
-  // Calculate wins
   const winsCounter = new Map<number, number>();
   const teamWinsCounter = new Map<number, number>();
 
   for (const race of races) {
     const allResults = results.filter((res: any) => Number(res.raceId) === Number(race.raceId));
 
-    // Find winner robustly
     let winner = allResults.find((res: any) => {
       if (res.positionOrder !== undefined && Number(res.positionOrder) === 1) return true;
       const pos = typeof res.position === "number" ? res.position : parseInt(String(res.position || res.positionText || ""), 10);
@@ -594,7 +512,6 @@ export async function getCircuitStats(circuitId: number): Promise<CircuitStats> 
     ? { team: constructorsLookup.get(mostWinsTeamEntry[0])?.name ?? "Unknown", wins: mostWinsTeamEntry[1] }
     : null;
 
-  // Calculate poles
   const polesCounter = new Map<number, number>();
   for (const race of races) {
     const q = data.qualifying.find(
@@ -608,7 +525,6 @@ export async function getCircuitStats(circuitId: number): Promise<CircuitStats> 
     ? { driver: driverName(driversLookup.get(polesEntry[0])), poles: polesEntry[1] } 
     : null;
 
-  // Find last podium
   const sortedRaces = races.slice().sort((a, b) => {
     if (a.year !== b.year) return b.year - a.year;
     return b.round - a.round;
@@ -644,10 +560,6 @@ export async function getCircuitStats(circuitId: number): Promise<CircuitStats> 
   };
 }
 
-/**
- * Load emission factors CSV and prepare data for chart visualization
- * This is specifically for the emission_factors_2000_2025.csv file
- */
 export async function getEmissionFactorsChartData(
   selectedKeys?: string[]
 ): Promise<CsvChartData> {
@@ -658,13 +570,11 @@ export async function getEmissionFactorsChartData(
   }
 
   const firstRowKeys = Object.keys(rows[0]);
-  const yearKey = "year"; // We know the year column name
+  const yearKey = "year";
   
-  // Get all numeric columns except year
   const numericKeys = firstRowKeys
     .filter(k => k !== yearKey)
     .filter(k => {
-      // Check if column is numeric
       for (let i = 0; i < Math.min(rows.length, 5); i++) {
         const v = rows[i][k];
         if (v === undefined || v === "") continue;
@@ -674,12 +584,10 @@ export async function getEmissionFactorsChartData(
       return false;
     });
 
-  // Use selected keys or all numeric keys
   const keysToShow = selectedKeys && selectedKeys.length > 0 
     ? selectedKeys.filter(k => numericKeys.includes(k))
     : numericKeys;
 
-  // Parse years as timestamps
   const xValues = rows.map(r => {
     const raw = String((r as any)[yearKey] ?? "").trim();
     const yearNum = parseInt(raw, 10);
@@ -689,7 +597,6 @@ export async function getEmissionFactorsChartData(
     return new Date(yearNum, 0, 1).getTime();
   });
 
-  // Build series for each metric
   const series: CsvChartSeries[] = keysToShow.map(key => {
     const data: CsvChartPoint[] = rows.map((r, idx) => {
       const raw = (r as any)[key];
@@ -706,7 +613,6 @@ export async function getEmissionFactorsChartData(
     return { name: key, data };
   });
 
-  // Categories for x-axis labels
   const categories = rows.map(r => String((r as any)[yearKey] ?? "").trim());
 
   return {
@@ -716,233 +622,10 @@ export async function getEmissionFactorsChartData(
   };
 }
 
-/**
- * Build annotations for ApexCharts from series data
- * Creates support lines, ranges, and point markers
- */
-type YAnnotation = {
-  y: number;
-  y2?: number;
-  borderColor?: string;
-  fillColor?: string;
-  opacity?: number;
-  label?: {
-    borderColor?: string;
-    style?: Record<string, any>;
-    text?: string;
-  };
-};
-
-type XAnnotation = {
-  x: any;
-  strokeDashArray?: number;
-  borderColor?: string;
-  label?: {
-    borderColor?: string;
-    style?: Record<string, any>;
-    text?: string;
-  };
-};
-
-type PointAnnotation = {
-  x: any;
-  y: number;
-  marker?: Record<string, any>;
-  label?: Record<string, any>;
-};
-
-export function buildChartAnnotations(series: CsvChartSeries[]): {
-  yaxis: YAnnotation[];
-  xaxis: XAnnotation[];
-  points: PointAnnotation[];
-} {
-  const anns: { yaxis: YAnnotation[]; xaxis: XAnnotation[]; points: PointAnnotation[] } = {
-    yaxis: [],
-    xaxis: [],
-    points: [],
-  };
-
-  if (!series || series.length === 0) return anns;
-
-  const first = series[0];
-  const validPoints = (first.data || []).filter((d) => d && d.y !== null && d.y !== undefined);
-
-  if (validPoints.length === 0) return anns;
-
-  const firstPoint = validPoints[Math.min(3, validPoints.length - 1)];
-  const secondPoint = validPoints[Math.min(6, validPoints.length - 1)];
-  const maxY = Math.max(...validPoints.map((p) => Number(p.y)));
-
-  // Y-axis support line
-  anns.yaxis.push({
-    y: Math.round(0.9 * maxY * 100) / 100,
-    borderColor: "#00E396",
-    label: {
-      borderColor: "#00E396",
-      style: { color: "#fff", background: "#00E396" },
-      text: "Support",
-    },
-  });
-
-  // Y-axis range
-  anns.yaxis.push({
-    y: Math.round(maxY * 0.98 * 100) / 100,
-    y2: Math.round(maxY * 1.02 * 100) / 100,
-    borderColor: "#000",
-    fillColor: "#FEB019",
-    opacity: 0.2,
-    label: {
-      borderColor: "#333",
-      style: { fontSize: "10px", color: "#333", background: "#FEB019" },
-      text: "Y-range",
-    },
-  });
-
-  // X-axis annotation
-  anns.xaxis.push({
-    x: secondPoint.x,
-    strokeDashArray: 0,
-    borderColor: "#775DD0",
-    label: {
-      borderColor: "#775DD0",
-      style: { color: "#fff", background: "#775DD0" },
-      text: "Anno Test",
-    },
-  });
-
-  // Point annotation
-  anns.points.push({
-    x: firstPoint.x,
-    y: Number(firstPoint.y),
-    marker: { size: 8, fillColor: "#fff", strokeColor: "red", radius: 2 },
-    label: {
-      borderColor: "#FF4560",
-      offsetY: 0,
-      style: { color: "#fff", background: "#FF4560" },
-      text: "Point Annotation",
-    },
-  });
-
-  return anns;
-}
-
-export type BuildChartOptionsParams = {
-  series?: CsvChartSeries[];
-  categories?: any[]; 
-  annotations?: any;  
-  chartId?: string;
-  height?: number;
-};
-
-export function buildChartOptions({
-  series = [],
-  categories = [],
-  annotations = undefined,
-  chartId = "emission-factors-chart",
-  height = 350,
-}: BuildChartOptionsParams): ApexOptions {
-  
-  // helper: format number with 3 decimals max
-  const fmtNumber = (v: number | string | undefined) => {
-    if (v === null || v === undefined || v === "") return "";
-    const n = Number(v);
-    if (isNaN(n)) return String(v);
-    return n.toFixed(3).replace(/\.?0+$/, "");
-  };
-
-  // helper: parse category -> Date
-  const toDate = (val: any) => {
-    if (val instanceof Date) return val;
-    if (typeof val === "number") return new Date(val);
-    const parsed = Date.parse(String(val));
-    if (!isNaN(parsed)) return new Date(parsed);
-    const yearMatch = String(val).match(/\d{4}/);
-    if (yearMatch) return new Date(Number(yearMatch[0]), 0, 1);
-    return new Date(NaN);
-  };
-
-  // Determine if we should show only year in x-axis labels
-  let showOnlyYear = false;
-  if (categories && categories.length >= 2) {
-    const first = toDate(categories[0]);
-    const last = toDate(categories[categories.length - 1]);
-    if (!isNaN(first.getTime()) && !isNaN(last.getTime())) {
-      const msSpan = Math.abs(last.getTime() - first.getTime());
-      
-      showOnlyYear = msSpan >= 365 * 24 * 3600 * 1000;
-    }
-  }
-
-  const options: ApexOptions = {
-    chart: {
-      id: chartId,
-      height,
-      type: "line",
-      toolbar: { show: true },
-      zoom: { enabled: true },
-    },
-
-    annotations: annotations ?? {},
-
-    dataLabels: { enabled: false },
-    stroke: { curve: "straight" },
-    grid: { padding: { right: 30, left: 20 } },
-    title: { text: "Emission Factors Over Time", align: "left" },
-
-    xaxis: {
-      type: "datetime",
-      categories,
-      labels: {
-        formatter: function (value: any) {
-          const d = toDate(value);
-          if (isNaN(d.getTime())) return String(value);
-          if (showOnlyYear) return String(d.getFullYear());
-          return d.toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
-        },
-      },
-    },
-
-    yaxis: {
-      labels: {
-        formatter: function (val: any) {
-          return fmtNumber(Number(val));
-        },
-      },
-    },
-
-    tooltip: {
-      shared: true,
-      intersect: false,
-      x: {
-        formatter: function (val: any) {
-          const d = toDate(val);
-          if (isNaN(d.getTime())) return String(val);
-          if (showOnlyYear) return String(d.getFullYear());
-          return d.toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
-        },
-      },
-      y: {
-        formatter: function (val: any) {
-          return fmtNumber(Number(val));
-        },
-      },
-    },
-
-    legend: { position: "top" },
-  };
-
-  return options;
-}
-
-
-
 // ============================================================================
 // CACHE MANAGEMENT
 // ============================================================================
 
-/**
- * Clear the data cache (useful for testing or forcing reload)
- */
 export function clearCache(): void {
   globalCache = null;
   isLoading = false;
@@ -950,9 +633,6 @@ export function clearCache(): void {
   console.log("Data cache cleared");
 }
 
-/**
- * Check if data is currently cached
- */
 export function isCached(): boolean {
   return globalCache !== null;
 }
