@@ -1,4 +1,5 @@
 import "./App.css";
+import "./AirportDistance";
 import InteractiveMap from "./components/InteractiveMap";
 import ApexCsvRealtimeChart from "./components/ApexCsvRealtimeChart";
 import TravelKmPerYearChart from "./components/TravelKmPerYearChart";

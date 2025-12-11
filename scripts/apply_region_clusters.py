@@ -9,7 +9,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_PATH = ROOT / "simple-map" / "public" / "circuits.csv"
 
-# Hardcoded mapping: circuitRef -> (cluster_id, cluster_sub_id)
 CIRCUIT_CLUSTERS = {
     # Asia-Pacific
     "albert_park": ("cluster_asia_pacific", "cluster_asia_pacific_australia"),
