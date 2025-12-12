@@ -1,5 +1,4 @@
 import "./App.css";
-import "./AirportDistance";
 import InteractiveMap from "./components/InteractiveMap";
 import ApexCsvRealtimeChart from "./components/ApexCsvRealtimeChart";
 import TravelKmPerYearChart from "./components/TravelKmPerYearChart";
@@ -7,6 +6,7 @@ import BarChartEmissions from "./components/BarChartEmissions";
 import InteractiveCountriesMap from "./components/InteractiveCountriesMap";
 import { SettingsProvider } from "./SettingsContext";
 import Toolbar from "./Toolbar";
+import GraphPlayer from "./components/GraphPlayer";
 
 function App() {
     return (
@@ -18,6 +18,7 @@ function App() {
             <BarChartEmissions />
             <InteractiveCountriesMap />
             <Toolbar />
+            <GraphPlayer /> 
         </SettingsProvider>
     );
 }

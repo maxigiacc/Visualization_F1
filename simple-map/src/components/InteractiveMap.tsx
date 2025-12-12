@@ -25,8 +25,8 @@ const SEGMENT_COLORS = [
 ];
 
 const InteractiveMap: React.FC = () => {
-    const [data, setData] = useState<Circuit[]>([]);
-    const [racesMap, setRacesMap] = useState<Map<number, Race[]>>(new Map());
+    const [races, setRaces] = useState<Circuit[]>([]);
+    const [racesMap, setRacesMap] = useState<Map<number, Race[]>>(new Map());      
     const [racesWithCircuit, setRacesWithCircuit] = useState<RaceWithCircuit[]>([]);
     const { year, setYear } = useSettings();
     
@@ -48,7 +48,7 @@ const InteractiveMap: React.FC = () => {
     useEffect(() => {
     getRacesWithCircuits()
         .then(({ circuits, racesMap, racesWithCircuit }) => {
-            setData(circuits);
+            setRaces(circuits);
             setRacesMap(racesMap);
             setRacesWithCircuit(racesWithCircuit);
         })
@@ -221,7 +221,7 @@ const InteractiveMap: React.FC = () => {
                         }
                     </Geographies>
 
-                    {data.map((circuit, idx) => {
+                    {races.map((circuit, idx) => {
                         const BASE_MARKER_RADIUS_PX = 3;
                         const BASE_FONT_PX = 10;
                         const invZoom = markerScale;

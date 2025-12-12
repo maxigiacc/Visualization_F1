@@ -258,6 +258,7 @@ export function buildEmissionFactorsChartOptions({
       },
     },
     legend: { position: "top" },
+    series,
   };
 
   return options;
@@ -292,7 +293,12 @@ export function buildEmissionsBarChartOptions(
   chartHeight: number
 ): ApexOptions {
   return {
-    chart: { id: "co2-by-year", type: "bar", toolbar: { show: true } },
+    chart: {
+      id: "co2-by-year",
+      type: "bar",
+      toolbar: { show: true },
+      height: chartHeight,
+    },
     title: {
       text: "Estimated F1 Logistics CO₂ Emissions",
       align: "left",

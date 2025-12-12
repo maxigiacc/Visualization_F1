@@ -515,7 +515,7 @@ export async function getCircuitStats(circuitId: number): Promise<CircuitStats> 
   const polesCounter = new Map<number, number>();
   for (const race of races) {
     const q = data.qualifying.find(
-      (q) => Number(q.raceId) === Number(race.raceId) && (Number(q.position) === 1 || q.position === "1")
+      (q) => Number(q.raceId) === Number(race.raceId) && q.position === 1
     );
     if (q) polesCounter.set(Number(q.driverId), (polesCounter.get(Number(q.driverId)) || 0) + 1);
   }

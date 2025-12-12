@@ -81,7 +81,3 @@ export async function fetchFlightDistance(
 }
 
 export default fetchFlightDistance;
-
-// Expose to browser console for quick manual testing (works after this module is imported).
-// Example in console: fetchFlightDistance("JFK", "LHR").then(console.log).catch(console.error);
-// @ts-expect-error attaching helper to window for debugging

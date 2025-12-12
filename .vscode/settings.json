@@ -1,0 +1,5 @@
+{
+    "terminal.integrated.suggest.cdPath": "off",
+    "terminal.integrated.suggest.inlineSuggestion": "off",
+    "terminal.integrated.shellIntegration.enabled": true
+}
