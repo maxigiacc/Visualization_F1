@@ -4,6 +4,8 @@ import type { DistanceTuple } from "./models/Graph";
 import type { RaceWithCircuit } from "./models/RaceWithCircuit";
 import type { Coordinates } from "@vnedyalk0v/react19-simple-maps";
 import { getRacesWithCircuitsByYear } from "./utils/dataLoader";
+import "../css/GraphPlayer.css";
+import { ContinentPie } from "./ContinentPie";
 
 // Could be transformed into its own component later
 const renderGraphPath = (graph: Graph) => {
@@ -71,11 +73,42 @@ const GraphPlayer: React.FC = () => {
 
 
     return (
-        <div className="graph-player">
-            <h2>Graph Player</h2>
-            <p>Graph playback UI will go here.</p>
-            {graph && renderGraphPath(graph)}
+    <div className="graph-player">
+        
+        <div className="selected-route">
+            selected - route : <strong>ALL RACES</strong>
         </div>
+
+        {/* CAR */}
+        <div className="route-row">
+            <div className="route-info">
+                <p>• TOT_KM : 150.000</p>
+                <p>• CO2_EMISSION : 35.000 kg</p>
+            </div>
+            <div className="route-icon">🚗</div>
+        </div>
+
+        {/* PLANE */}
+        <div className="route-row">
+            <div className="route-info">
+                <p>• TOT_KM : 150.000</p>
+                <p>• CO2_EMISSION : 35.000 kg</p>
+            </div>
+            <div className="route-icon">✈️</div>
+        </div>
+
+        {/* CONTINENT PIE CHART */}
+        <ContinentPie
+            title="continent distribution"
+            slices={[
+                { label: "EU", value: 50, color: "#7b83eb" },
+                { label: "AFR", value: 25, color: "#f2b176" },
+                { label: "...", value: 25, color: "#eaeaea" },
+            ]}
+        />
+
+        {graph && renderGraphPath(graph)}
+    </div>
     );
 };
 export default GraphPlayer
