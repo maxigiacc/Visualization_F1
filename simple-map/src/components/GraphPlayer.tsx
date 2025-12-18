@@ -85,7 +85,7 @@ const GraphPlayer: React.FC = () => {
         {/* CAR */}
         <div className="route-row">
             <div className="route-info">
-                <p>• TOT_KM : 150.000</p>
+                <p>• TOT_KM : {graph ? graph.getOriginalPathDistance().carDistance : "Loading..."} {graph ? "Km" : ""}</p>
                 <p>• CO2_EMISSION : 35.000 kg</p>
             </div>
             <div className="route-icon">🚗</div>
@@ -94,7 +94,7 @@ const GraphPlayer: React.FC = () => {
         {/* PLANE */}
         <div className="route-row">
             <div className="route-info">
-                <p>• TOT_KM : 150.000</p>
+                <p>• TOT_KM : {graph ? graph.getOriginalPathDistance().flightDistance : "Loading..."} {graph ? "Km" : ""}</p>
                 <p>• CO2_EMISSION : 35.000 kg</p>
             </div>
             <div className="route-icon">✈️</div>

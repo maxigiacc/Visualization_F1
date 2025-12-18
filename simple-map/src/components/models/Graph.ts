@@ -3,16 +3,14 @@ import fetchFlightDistance from "../utils/AirportDistanceFake";
 import type { RaceWithCircuit } from "./RaceWithCircuit";
 
 export default class Graph {
-    // ============ Attribute ======================
-    private optimized_path: Map<string, Map<string, DistanceTuple>> = new Map();
-    private path: Map<string, Map<string, DistanceTuple>> = new Map(); // [ 'node1': ['node2': (30,50) , 'node3':(32,...] , 'node2': [] , ... ]
-    private circuits: RaceWithCircuit[] = [];
+    // ============ Attribute ====================== 
+    private optimized_path: Map<string, Map<string, DistanceTuple>> = new Map(); // ORDERED-GRAPH ->  [ 'node1': ['node2': (30,50) , 'node3':(32,...] , 'node2': [] , ... ]
+    private path: Map<string, Map<string, DistanceTuple>> = new Map();     // FULLY-CONNECTED-GRAPH ->[ 'node1': ['node2': (30,50) , 'node3':(32,...] , 'node2': [] , ... ]
 
     // ============ Constructor ======================  
     constructor(circuits: RaceWithCircuit[]) {
 
         this.optimized_path = new Map();
-        this.circuits = circuits;
         // Initialize graph with circuits
         for (let i = 0; i < circuits.length; i++) {
             for (let j = i + 1; j < circuits.length; j++) {
@@ -61,18 +59,21 @@ export default class Graph {
     }
 
     // In the moment only sum car distances (TODO : make a check of which one to use using clusted_id into .csv file)
-    getPathDistance(path: string[]): number {
-        let total = 0;
+    getOriginalPathDistance(): {carDistance: number , flightDistance: number} {
+        const nodes = Array.from(this.path.keys());
+        let totalCarDistance = 0;
+        let totalFlightDistance = 0;
 
-        for (let i = 0; i < path.length - 1; i++) {
-            const dist = this.getDistance(path[i], path[i + 1]);
+        for (let i = 0; i < nodes.length - 1; i++) {
+            const dist = this.getDistance(nodes[i], nodes[i + 1]);
             if (dist === undefined) {
-                throw new Error(`No edge between ${path[i]} and ${path[i + 1]}`);
+                throw new Error(`No edge between ${nodes[i]} and ${nodes[i + 1]}`);
             }
-            total += dist[0];
+            totalCarDistance += dist[0];
+            totalFlightDistance += dist[1];
         }
 
-        return total;
+        return {carDistance: totalCarDistance, flightDistance: totalFlightDistance};
     }
 
     // Return the optimized path as a string
