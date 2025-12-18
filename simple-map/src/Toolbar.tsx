@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./css/Toolbar.css";
 import { useSettings } from "./SettingsContext";
 
@@ -6,6 +7,7 @@ const Toolbar = () => {
 
     return (
         <div className="Toolbar">
+            <h1>Visualisation Project</h1>
             <select
                 value={year}
                 onChange={(e) => setYear(parseInt(e.target.value))}
@@ -19,6 +21,20 @@ const Toolbar = () => {
                     ))
                 }
             </select>
+            <ul>
+                <li>
+                    <Link to="circuits">Circuits</Link>
+                </li>
+                <li>
+                    <Link to="races">Races</Link>
+                </li>
+                <li>
+                    <Link to="carbon">Carbon</Link>
+                </li>
+                <li>
+                    <Link to="about">About</Link>
+                </li>
+            </ul>
         </div>
     );
 };

@@ -1,0 +1,10 @@
+.Page {
+    outline: 2px solid dodgerblue;
+
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+}
+
+.Sidebar {
+    background-color: purple;
+}

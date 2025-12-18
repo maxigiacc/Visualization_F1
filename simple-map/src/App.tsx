@@ -1,24 +1,31 @@
-import "./App.css";
-import InteractiveMap from "./components/InteractiveMap";
-import ApexCsvRealtimeChart from "./components/ApexCsvRealtimeChart";
-import TravelKmPerYearChart from "./components/TravelKmPerYearChart";
-import BarChartEmissions from "./components/BarChartEmissions";
-import InteractiveCountriesMap from "./components/InteractiveCountriesMap";
+import "./css/App.css";
 import { SettingsProvider } from "./SettingsContext";
 import Toolbar from "./Toolbar";
-import GraphPlayer from "./components/GraphPlayer";
+import { HashRouter, Route, Routes } from "react-router-dom";
+import CircuitsPage from "./CircuitsPage";
+import RacesPage from "./RacesPage";
+import CarbonPage from "./CarbonPage";
+import AboutPage from "./AboutPage";
 
 function App() {
     return (
         <SettingsProvider>
-            <h1>F1 Visualisation</h1>
-            <InteractiveMap />
-            <ApexCsvRealtimeChart/>
-            <TravelKmPerYearChart />
-            <BarChartEmissions />
-            <InteractiveCountriesMap />
-            <Toolbar />
-            <GraphPlayer /> 
+            <HashRouter>
+                <div className="App">
+                    <Routes>
+                        <Route
+                            index
+                            path="circuits"
+                            element={<CircuitsPage />}
+                        />
+                        <Route path="races" element={<RacesPage />} />
+                        <Route path="carbon" element={<CarbonPage />} />
+                        <Route path="about" element={<AboutPage />} />
+                        <Route element="Error page" />
+                    </Routes>
+                    <Toolbar />
+                </div>
+            </HashRouter>
         </SettingsProvider>
     );
 }

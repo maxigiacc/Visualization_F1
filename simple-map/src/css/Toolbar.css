@@ -1,9 +1,26 @@
 .Toolbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 9999;
-
     background-color: #ff3c00;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 2em;
+}
+
+.Toolbar ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 1em;
+
+    a {
+        color: black;
+        text-decoration: none;
+        font-size: 1.4rem;
+    }
+
+    a:hover,
+    a:focus-visible {
+        font-weight: bold;
+    }
 }
