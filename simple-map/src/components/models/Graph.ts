@@ -18,10 +18,12 @@ export default class Graph {
             for (let j = i + 1; j < circuits.length; j++) {
                 const circuitA = circuits[i].circuit;
                 const circuitB = circuits[j].circuit;
+                const orderA = circuits[i].round;
+                const orderB = circuits[j].round;
                 // Calculate distances (dummy values for now, replace with actual calculation API)
                 const carDistance = fetchFlightDistance(circuitA.location, circuitB.location);                     // TODO replace with real API call
                 const planeDistance = fetchFlightDistance(circuitA.location, circuitB.location);                  // TODO replace with real API call
-                this.addEdge(circuitA.location + circuitA.circuitId, circuitB.location + circuitB.circuitId, [carDistance, planeDistance]);
+                this.addEdge(circuitA.location + orderA, circuitB.location + orderB, [carDistance, planeDistance]);
             }
         }
     }
@@ -73,22 +75,19 @@ export default class Graph {
         return total;
     }
 
+    // Return the optimized path as a string
+    getOptimizedPathString(): string {
+        const result = this.generateOptimizedPath();
 
-    // Debug printing
-    print() {
+        if (result.path.length === 0) return "";
 
-        if(this.path.size === 0) {
-            console.log("Graph is empty.");
-            return;
-        }
-        
-        for (const [node, neighbors] of this.path) {
-            const connections = [...neighbors.entries()]
-                .map(([to, dist]) => `${to}(${dist})`)
-                .join(", ");
+        return result.path.join(" --> ");
+    }
 
-            console.log(`${node} -> ${connections}`);
-        }
+    // Return the original path as a string
+    getOriginalPathString(): string {
+        const nodes = Array.from(this.path.keys());
+        return nodes.join(" --> ");
     }
 
     // Generate optimized path

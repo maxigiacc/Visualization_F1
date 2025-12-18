@@ -65,16 +65,19 @@ const GraphPlayer: React.FC = () => {
         });
     }, []); 
     
-    
     /*useEffect(() => {
         const newGraph = new Graph(circuits);
         setGraph(newGraph);
     }, [circuits]);*/ 
 
-
     return (
     <div className="graph-player">
         
+        {graph?.getOptimizedPathString() && (<div>{graph.getOptimizedPathString()}</div>)}
+        <p> --------------- </p>
+        {graph?.getOriginalPathString() && (<div>{graph.getOriginalPathString()}</div>)}
+
+
         <div className="selected-route">
             selected - route : <strong>ALL RACES</strong>
         </div>
