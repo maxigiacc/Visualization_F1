@@ -307,6 +307,34 @@ export async function getCircuitCoordinates(): Promise<
 // BUSINESS LOGIC - DATA PROCESSING
 // ============================================================================
 
+export async function getRacesWithCircuitsByYear(year: number): Promise<RaceWithCircuit[]> {
+  const [circuits, races] = await Promise.all([
+    getCircuits(),
+    getRaces(),
+  ]);
+
+  // Lookup map for circuits
+  const circuitLookup = new Map(
+    circuits.map(c => [c.circuitId, c])
+  );
+
+  return races
+    .filter(race => race.year === year)
+    .map(race => {
+      const circuit = circuitLookup.get(race.circuitId);
+      if (!circuit) return null;
+
+      return {
+        ...race,
+        circuit,
+        coordinates: createCoordinates(circuit.lng, circuit.lat),
+        label: `${race.year} • R${String(race.round).padStart(2, "0")} • ${race.name}`,
+      };
+    })
+    .filter((r): r is RaceWithCircuit => r !== null)
+    .sort((a, b) => a.round - b.round);
+}
+
 export async function getRacesWithCircuits(): Promise<{
   circuits: Circuit[];
   racesMap: Map<number, Race[]>;

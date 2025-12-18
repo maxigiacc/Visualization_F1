@@ -3,6 +3,7 @@ import Graph from "./models/Graph";
 import type { DistanceTuple } from "./models/Graph";
 import type { RaceWithCircuit } from "./models/RaceWithCircuit";
 import type { Coordinates } from "@vnedyalk0v/react19-simple-maps";
+import { getRacesWithCircuitsByYear } from "./utils/dataLoader";
 
 // Could be transformed into its own component later
 const renderGraphPath = (graph: Graph) => {
@@ -40,9 +41,10 @@ const renderGraphPath = (graph: Graph) => {
 // 3. Create 3 right menu using the information into the Graph (inizialize with the selected_nodes + compute the generateOptimizedPath() + show the results)
 
 const GraphPlayer: React.FC = () => {
-    // ONLY FOR TESTING PURPOSES, REPLACE WITH REAL COORDINATES LATER
+    
+    
+    ////// ONLY FOR TESTING PURPOSES /////
     const fakeCoordinates = [0, 0] as unknown as Coordinates;
-    // Definition of the graph
     const [circuits, setCircuits] = useState<RaceWithCircuit[]>([
         { raceId: 1, year: 2024, round: 1, circuitId: 1, name: "Bahrain Grand Prix", date: "2024-03-02", time: "15:00:00", url: "https://en.wikipedia.org/wiki/2024_Bahrain_Grand_Prix", circuit: { alt: 0, circuitId: 1, circuitRef: "bahrain", name: "Bahrain International Circuit", location: "Sakhir", country: "Bahrain", lat: 26.0325, lng: 50.5106, url: "https://en.wikipedia.org/wiki/Bahrain_International_Circuit", clusterId: "ME" }, coordinates: fakeCoordinates, label: "Round 1 – Bahrain" }, 
         { raceId: 2, year: 2024, round: 2, circuitId: 2, name: "Saudi Arabian Grand Prix", date: "2024-03-09", time: "18:00:00", url: "https://en.wikipedia.org/wiki/2024_Saudi_Arabian_Grand_Prix", circuit: { alt: 0, circuitId: 2, circuitRef: "jeddah", name: "Jeddah Corniche Circuit", location: "Jeddah", country: "Saudi Arabia", lat: 21.6319, lng: 39.1044, url: "https://en.wikipedia.org/wiki/Jeddah_Corniche_Circuit", clusterId: "ME" }, coordinates: fakeCoordinates, label: "Round 2 – Saudi Arabia" }, 
@@ -51,12 +53,21 @@ const GraphPlayer: React.FC = () => {
     ]);
 
     const [graph, setGraph] = useState<Graph | null>(null);
+    const [races , setRaces] = useState<RaceWithCircuit[] | null>(null);
 
+    // Executed only when the component is mounted (loading of the circuits data)
     useEffect(() => {
+        getRacesWithCircuitsByYear(2021).then((data : RaceWithCircuit[]) => {
+            setRaces(data);
+            setGraph(new Graph(data));
+        });
+    }, []); 
+    
+    
+    /*useEffect(() => {
         const newGraph = new Graph(circuits);
         setGraph(newGraph);
-        newGraph.generateOptimizedPath();
-    }, [circuits]); 
+    }, [circuits]);*/ 
 
 
     return (

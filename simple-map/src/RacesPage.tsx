@@ -1,4 +1,5 @@
 import InteractiveMap from "./components/InteractiveMap";
+import GraphPlayer from "./components/GraphPlayer";
 import "./css/Page.css";
 
 const RacesPage = () => {
@@ -7,7 +8,9 @@ const RacesPage = () => {
             <div className="MainContent">
                 <InteractiveMap />
             </div>
-            <div className="Sidebar"></div>
+            <div className="Sidebar">
+                <GraphPlayer />
+            </div>
         </div>
     );
 };
