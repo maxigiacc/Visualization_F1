@@ -47,15 +47,6 @@ export default class Graph {
         this.path.get(to)!.set(from, distance);
     }
 
-    fakeApi( originCode: string, destinationCode: string ): number {
-        // Generate random distance for fake implementation
-        const minDistance = 1; // Minimum distance in km
-        const maxDistance = 5; // Maximum distance in km
-        const distanceKm = Math.floor(Math.random() * (maxDistance - minDistance + 1)) + minDistance;
-        console.log(`Fetched fake distance between ${originCode} and ${destinationCode}: ${distanceKm} km`);
-        return (distanceKm);
-    }
-
     getPath(): Map<string, Map<string, DistanceTuple>> {
         return this.path;
     }
@@ -99,20 +90,20 @@ export default class Graph {
 
     // Return the optimized path as FlowList[]
     getOptimizedPath(): FlowList[] {
-        const result = this.generateOptimizedPath();
+        const optimized_path = this.generateOptimizedPath();
+        const originalPath = Array.from(this.path.keys());
 
-        if (result.path.length === 0) return [];
+        if (optimized_path.path.length === 0) return [];
 
-        const flowList: FlowList[] = result.path.map((node, index) => {
+        const flowList: FlowList[] = optimized_path.path.map((node) => {
             const circuitName = node.slice(0, -1); // Remove the last character (round number)
             const clusterId = parseInt(node.slice(-1)); // Get the last character as round number
             return {
-                id: index + 1,
+                id: originalPath.indexOf(node) + 1,
                 circuit_name: circuitName,
                 clusted_id: clusterId
             };
         });
-
         return flowList;
     }
 

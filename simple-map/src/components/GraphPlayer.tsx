@@ -66,6 +66,7 @@ const GraphPlayer: React.FC = () => {
         </div>
 
         {graph?.getOriginalPath() && (<Flow flowList={graph.getOriginalPath()} />)}
+        {graph?.getOptimizedPath() && (<Flow flowList={graph.getOptimizedPath()} />)}
 
         {/* CAR */}
         <div className="route-row">
