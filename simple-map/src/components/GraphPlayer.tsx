@@ -45,17 +45,6 @@ const renderGraphPath = (graph: Graph) => {
 
 const GraphPlayer: React.FC = () => {
     
-    
-    // ============  ONLY FOR TESTING PURPOSES ============
-    const fakeCoordinates = [0, 0] as unknown as Coordinates;
-    const [circuits, setCircuits] = useState<RaceWithCircuit[]>([
-        { raceId: 1, year: 2024, round: 1, circuitId: 1, name: "Bahrain Grand Prix", date: "2024-03-02", time: "15:00:00", url: "https://en.wikipedia.org/wiki/2024_Bahrain_Grand_Prix", circuit: { alt: 0, circuitId: 1, circuitRef: "bahrain", name: "Bahrain International Circuit", location: "Sakhir", country: "Bahrain", lat: 26.0325, lng: 50.5106, url: "https://en.wikipedia.org/wiki/Bahrain_International_Circuit", clusterId: "ME" }, coordinates: fakeCoordinates, label: "Round 1 – Bahrain" }, 
-        { raceId: 2, year: 2024, round: 2, circuitId: 2, name: "Saudi Arabian Grand Prix", date: "2024-03-09", time: "18:00:00", url: "https://en.wikipedia.org/wiki/2024_Saudi_Arabian_Grand_Prix", circuit: { alt: 0, circuitId: 2, circuitRef: "jeddah", name: "Jeddah Corniche Circuit", location: "Jeddah", country: "Saudi Arabia", lat: 21.6319, lng: 39.1044, url: "https://en.wikipedia.org/wiki/Jeddah_Corniche_Circuit", clusterId: "ME" }, coordinates: fakeCoordinates, label: "Round 2 – Saudi Arabia" }, 
-        { raceId: 3, year: 2024, round: 3, circuitId: 3, name: "Australian Grand Prix", date: "2024-03-24", time: "05:00:00", url: "https://en.wikipedia.org/wiki/2024_Australian_Grand_Prix", circuit: { alt: 0, circuitId: 3, circuitRef: "albert_park", name: "Albert Park Circuit", location: "Melbourne", country: "Australia", lat: -37.8497, lng: 144.968, url: "https://en.wikipedia.org/wiki/Albert_Park_Circuit", clusterId: "OC" }, coordinates: fakeCoordinates, label: "Round 3 – Australia" }, 
-        { raceId: 4, year: 2024, round: 4, circuitId: 4, name: "Japanese Grand Prix", date: "2024-04-07", time: "07:00:00", url: "https://en.wikipedia.org/wiki/2024_Japanese_Grand_Prix", circuit: { alt: 0, circuitId: 4, circuitRef: "suzuka", name: "Suzuka Circuit", location: "Suzuka", country: "Japan", lat: 34.8431, lng: 136.5419, url: "https://en.wikipedia.org/wiki/Suzuka_Circuit", clusterId: "AS" }, coordinates: fakeCoordinates, label: "Round 4 – Japan" }
-    ]);
-    // ============  ONLY FOR TESTING PURPOSES ============
-
     const [graph, setGraph] = useState<Graph | null>(null);
     const [races , setRaces] = useState<RaceWithCircuit[] | null>(null);
 
@@ -67,11 +56,6 @@ const GraphPlayer: React.FC = () => {
         });
     }, []); 
     
-    /*useEffect(() => {
-        const newGraph = new Graph(circuits);
-        setGraph(newGraph);
-    }, [circuits]);*/ 
-
     return (
     <div className="graph-player">
         
