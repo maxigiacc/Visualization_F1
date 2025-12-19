@@ -6,6 +6,8 @@
 
 import type { ApexOptions } from "apexcharts";
 import type { CsvChartSeries } from "./dataLoader";
+import type { Circuit } from "../models/Circuit";
+
 
 // ============================================================================
 // TYPES FOR ANNOTATIONS
@@ -350,6 +352,48 @@ export function buildEmissionsBarChartOptions(
     theme: { mode: "light" },
   };
 }
+
+type ContinentCount = Record<string, number>;
+
+export function buildContinentPieOptions(
+  circuits: Circuit[]
+): { series: number[]; options: ApexOptions } {
+  const counts: ContinentCount = {};
+
+  circuits.forEach(c => {
+    if (!c.country) return;
+    counts[c.country] = (counts[c.country] ?? 0) + 1;
+  });
+
+  const labels = Object.keys(counts);
+  const series = labels.map(l => counts[l]);
+
+  const options: ApexOptions = {
+    chart: {
+      type: "pie",
+      width: "100%",
+    },
+    labels,
+    legend: {
+      position: "bottom",
+    },
+    dataLabels: {
+      enabled: true,
+      formatter: (val: number) => `${val.toFixed(1)}%`,
+    },
+    tooltip: {
+      y: {
+        formatter: (val: number) => `${val} circuits`,
+      },
+    },
+    stroke: {
+      width: 2,
+    },
+  };
+
+  return { series, options };
+}
+
 
 // ============================================================================
 // PRESET CONFIGURATIONS

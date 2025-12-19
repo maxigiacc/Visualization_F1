@@ -3,69 +3,63 @@ import React from "react";
 import type { Circuit } from "./models/Circuit";
 import CountryCircuitList from "./CountryCircuitList";
 import CircuitDetails from "./CircuitDetails";
+import ContinentPieChart from "./ContinentPieChart";
+import { sameCountry } from "./utils/countryUtils";
 
 type Props = {
-  open: boolean;
-  onClose: () => void;
-  country: string | null;
+  country: string;
   circuits: Circuit[];
   selectedCircuit: Circuit | null;
   onSelectCircuit: (circuit: Circuit | null) => void;
 };
 
-const SidePanelDrawer: React.FC<Props> = ({ 
-  open, 
-  onClose, 
-  country, 
-  circuits, 
-  selectedCircuit, 
-  onSelectCircuit 
+const SidePanelDrawer: React.FC<Props> = ({
+  country,
+  circuits,
+  selectedCircuit,
+  onSelectCircuit,
 }) => {
- 
+
+  const circuitsForCountry = circuits.filter(c => sameCountry(c.country, country));
+  
   return (
     <div
       style={{
-        position: "fixed",
-        right: open ? 0 : -420,
+        position: "sticky",
         top: 0,
-        height: "100vh",
-        width: 420,
+        height: "90vh",
         background: "#fff",
         boxShadow: "rgba(0,0,0,0.2) 0 4px 16px",
-        transition: "right 220ms ease",
-        zIndex: 1000,
         padding: 16,
         overflowY: "auto",
       }}
-      role="menu"
-      aria-hidden={!open}
+      role="complementary"
     >
-      <button 
-        onClick={onClose} 
-        style={{ 
-          float: "right", 
-          border: "none", 
-          background: "transparent", 
-          fontSize: 20,
-          cursor: "pointer"
-        }}
-      >
-        ✕
-      </button>
       
       <h3 style={{ marginTop: 6 }}>{country ?? "Select a country"}</h3>
       
       {/* First case: country not selected */}
       {!country && (
-        <div style={{ color: "#666" }}>
-          Click on a country to see its circuits.
-        </div>
+          <>
+            <div style={{ color: "#666", marginBottom: 12 }}>
+              All circuits worldwide
+            </div>
+
+            <ContinentPieChart circuits={circuits} />
+
+            <hr style={{ margin: "16px 0" }} />
+
+            <CountryCircuitList
+              circuits={circuits}
+              onSelectCircuit={onSelectCircuit}
+            />
+          </>
       )}
       
       {/* Country selected, no circuit selected --> show list */}
       {country && !selectedCircuit && (
         <CountryCircuitList 
-          circuits={circuits} 
+          circuits={circuitsForCountry} 
           onSelectCircuit={onSelectCircuit}
         />
       )}

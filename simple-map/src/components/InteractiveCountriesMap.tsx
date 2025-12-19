@@ -1,5 +1,5 @@
 // src/components/InteractiveCountriesMap.tsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
     ComposableMap,
     Geographies,
@@ -9,20 +9,26 @@ import {
     createScaleExtent,
     createTranslateExtent,
 } from "@vnedyalk0v/react19-simple-maps";
-import type { Circuit } from "./models/Circuit";
 import MapMarkers from "./MapMarkers";
-import SidePanelDrawer from "./SidePanelDrawer";
-import { sameCountry } from "./utils/countryUtils";
 
 import GEO_URL from "../assets/countries-50m.json";
-import { getCircuits } from "./utils/dataLoader";
+import type { Circuit } from "./models/Circuit";
 
-const InteractiveCountriesMap: React.FC = () => {
-    const [circuits, setCircuits] = useState<Circuit[]>([]);
-    const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [selectedCircuit, setSelectedCircuit] = useState<Circuit | null>(null);
-    
+type Props = {
+  circuits: Circuit[];
+  selectedCircuit: Circuit | null;
+  onCountrySelect: (country: string) => void;
+  onCircuitSelect: (circuit: Circuit | null) => void;
+};
+
+
+const InteractiveCountriesMap: React.FC<Props> = ({
+  circuits,
+  selectedCircuit,
+  onCountrySelect,
+  onCircuitSelect,
+}) => {
+  
     const zoomRef = useRef<number>(1);
     const [markerScale, setMarkerScale] = useState<number>(1);
     const [showLabels, setShowLabels] = useState(false);
@@ -33,34 +39,19 @@ const InteractiveCountriesMap: React.FC = () => {
     const DEBOUNCE_MS = 50;
     const SHOW_LABEL_ZOOM_THRESHOLD = 2;
 
-    useEffect(() => {
-        getCircuits().then(setCircuits).catch(console.error);
-    }, []);
-
-    const handleCountrySelect = (countryName: string) => {
-        setSelectedCountry(countryName);
-        setSelectedCircuit(null);
-        setDrawerOpen(true);
-    };
-
-    const circuitsForCountry = useMemo(() => {
-        if (!selectedCountry) return [];
-        return circuits.filter((c) => sameCountry(c.country, selectedCountry));
-    }, [circuits, selectedCountry]);
-
-    return (
-        <>
-            <div style={{ position: "relative" }}>
-                <ComposableMap projection="geoEqualEarth" width={780} height={520}>
-                    <ZoomableGroup
-                        minZoom={1}
-                        maxZoom={8}
-                        scaleExtent={createScaleExtent(1, 8)}
-                        translateExtent={createTranslateExtent(
+  return (
+    <>
+        <div style={{ position: "relative" }}>
+            <ComposableMap projection="geoEqualEarth" width={780} height={520}>
+                <ZoomableGroup
+                    minZoom={1}
+                    maxZoom={8}
+                    scaleExtent={createScaleExtent(1, 8)}
+                    translateExtent={createTranslateExtent(
                             createCoordinates(-2000, -1000),
                             createCoordinates(2000, 1000),
-                        )}
-                        onMoveEnd={(position: any) => {
+                    )}
+                    onMoveEnd={(position: any) => {
                             const rawZoom = position?.k ?? position?.scale ?? position?.zoom ?? 1;
                             const snapped = Math.round(rawZoom / STEP) * STEP;
                             const prevZoom = zoomRef.current;
@@ -77,19 +68,19 @@ const InteractiveCountriesMap: React.FC = () => {
                                 }, DEBOUNCE_MS);
                             }
                         }}
-                    >
-                        <Geographies geography={GEO_URL}>
-                            {({ geographies }) =>
-                                geographies.map((geo, idx) => (
-                                    <Geography
-                                        key={`${geo.id ?? "geo"}-${idx}`}
-                                        geography={geo}
-                                        onClick={() => 
-                                            handleCountrySelect(
-                                                geo.properties?.name ?? "Unknown"
-                                            )
-                                        }
-                                        style={{
+                >
+                    <Geographies geography={GEO_URL}>
+                    {({ geographies }) =>
+                        geographies.map((geo) => (
+                        <Geography
+                            key={geo.rsmKey}
+                            geography={geo}
+                            onClick={() =>
+                                onCountrySelect(
+                                    geo.properties?.name ?? "Unknown"
+                                )
+                            }
+                            style={{
                                             default: { 
                                                 fill: "#D6D6DA", 
                                                 outline: "none", 
@@ -107,28 +98,24 @@ const InteractiveCountriesMap: React.FC = () => {
                                                 outline: "none" 
                                             },
                                         }}
-                                    />
-                                ))
-                            }
-                        </Geographies>
-                        <MapMarkers 
-                            data={circuits} 
-                            markerScale={markerScale} 
-                            showLabels={showLabels} 
                         />
-                    </ZoomableGroup>
+                        ))
+                    }
+                    </Geographies>
+
+                    <MapMarkers
+                        circuits={circuits}
+                        markerScale={markerScale}
+                        showLabels={showLabels}
+                        selectedCircuit={selectedCircuit}
+                        onSelectCircuit={onCircuitSelect}
+                    />
+                </ZoomableGroup>
                 </ComposableMap>
-            </div>
-            <SidePanelDrawer
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
-                country={selectedCountry}
-                circuits={circuitsForCountry}
-                selectedCircuit={selectedCircuit}
-                onSelectCircuit={(c) => setSelectedCircuit(c)}
-            />
-        </>
-    );
+        </div>
+    </>
+    
+  );
 };
 
 export default InteractiveCountriesMap;

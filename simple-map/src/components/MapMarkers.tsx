@@ -4,34 +4,52 @@ import { Marker, createCoordinates } from "@vnedyalk0v/react19-simple-maps";
 import type { Circuit } from "./models/Circuit";
 
 type Props = {
-  data: Circuit[];
+  circuits: Circuit[];
   markerScale: number;
   showLabels: boolean;
+  selectedCircuit: Circuit | null;
+  onSelectCircuit: (circuit: Circuit) => void;
 };
+
 
 const BASE_MARKER_RADIUS_PX = 3;
 const BASE_FONT_PX = 10;
 
-const MapMarkers: React.FC<Props> = ({ data, markerScale, showLabels}) => {
-
+const MapMarkers: React.FC<Props> = ({
+  circuits,
+  markerScale,
+  showLabels,
+  selectedCircuit,
+  onSelectCircuit,
+}) => {
   return (
     <>
-      {data.map((c, idx) => {
-        if (!c) return null;        
-        const invZoom = markerScale;
+      {circuits.map((c) => {
+        if (!c) return null;
+
+        const isSelected = selectedCircuit?.circuitId === c.circuitId;
 
         return (
-          <Marker key={`${c.circuitId}-${idx}`} coordinates={createCoordinates(c.lng, c.lat)}>
+          <Marker
+            key={c.circuitId}
+            coordinates={createCoordinates(c.lng, c.lat)}
+          >
             <g
-              transform={`scale(${invZoom})`}
-              style={{ transformOrigin: "0 0", pointerEvents: "auto", cursor: "pointer" }}
+              transform={`scale(${markerScale})`}
+              style={{
+                transformOrigin: "0 0",
+                pointerEvents: "auto",
+                cursor: "pointer",
+              }}
+              onClick={() => onSelectCircuit(c)}
             >
-              <circle 
-                r={BASE_MARKER_RADIUS_PX} 
-                fill="#F44174" 
-                stroke="#fff" 
-                strokeWidth={Math.max(0.5, BASE_MARKER_RADIUS_PX * 0.08)} 
+              <circle
+                r={BASE_MARKER_RADIUS_PX}
+                fill={isSelected ? "#1E88E5" : "#F44174"}
+                stroke="#fff"
+                strokeWidth={Math.max(0.5, BASE_MARKER_RADIUS_PX * 0.08)}
               />
+
               {showLabels && (
                 <text
                   x={0}
@@ -55,5 +73,6 @@ const MapMarkers: React.FC<Props> = ({ data, markerScale, showLabels}) => {
     </>
   );
 };
+
 
 export default MapMarkers;
