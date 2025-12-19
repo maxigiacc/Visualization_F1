@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Graph from "./models/Graph";
 import type { DistanceTuple } from "./models/Graph";
 import type { RaceWithCircuit } from "./models/RaceWithCircuit";
-import type { Coordinates } from "@vnedyalk0v/react19-simple-maps";
 import { getRacesWithCircuitsByYear } from "./utils/dataLoader";
 import "../css/GraphPlayer.css";
 import { ContinentPie } from "./ContinentPie";
 import { Flow } from "./Flow";
+import { useSettings } from "../SettingsContext";
 
 // Could be transformed into its own component later
 const renderGraphPath = (graph: Graph) => {
@@ -37,36 +37,36 @@ const renderGraphPath = (graph: Graph) => {
     );
 };
 
-
-// THINGS TO DO IN THE FUTURE:
-// 1. Instead of initialize by hand const [circuits, setCircuits] use the data_loader or utilize the variable selectedYearRaces (InteractiveMap.tsx)
-// 2. Instead of using into the class Graph.ts the fakeApi method using the original one
-// 3. Create 3 right menu using the information into the Graph (inizialize with the selected_nodes + compute the generateOptimizedPath() + show the results)
-
 const GraphPlayer: React.FC = () => {
     
     const [graph, setGraph] = useState<Graph | null>(null);
-    const [races , setRaces] = useState<RaceWithCircuit[] | null>(null);
+    const { year , selected_race } = useSettings();
+
 
     // Executed only when the component is mounted (loading of the circuits data)
     useEffect(() => {
-        getRacesWithCircuitsByYear(2021).then((data : RaceWithCircuit[]) => {
-            setRaces(data);
+        getRacesWithCircuitsByYear(year).then((data : RaceWithCircuit[]) => {
+            // Filter only the selected races
+            if(selected_race && selected_race.length > 0){
+                console.log("Filtering races by selected");
+                data = data.filter(race => selected_race.includes(race.circuit.name));
+                console.log(data);
+            }
             setGraph(new Graph(data));
         });
-    }, []); 
-    
+    }, [year , selected_race]); 
+
+
     return (
     <div className="graph-player">
         
-        
-
         <div className="selected-route">
             selected - route : <strong>ALL RACES</strong>
         </div>
 
         {graph?.getOriginalPath() && (<Flow flowList={graph.getOriginalPath()} />)}
         {graph?.getOptimizedPath() && (<Flow flowList={graph.getOptimizedPath()} />)}
+        {selected_race && <div>Selected Races: {selected_race.join(", ")}</div>}
 
         {/* CAR */}
         <div className="route-row">

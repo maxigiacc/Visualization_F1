@@ -1,7 +1,6 @@
 import InteractiveMap from "./components/InteractiveMap";
 import GraphPlayer from "./components/GraphPlayer";
 import "./css/Page.css";
-import { Flow } from "./components/Flow";
 
 const RacesPage = () => {
     return (
