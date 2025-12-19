@@ -55,6 +55,10 @@ export default class Graph {
         return this.path.get(a)?.get(b);
     }
 
+    getNumberOfNodes(): number {
+        return this.path.size;
+    }
+
     // In the moment only sum car distances (TODO : make a check of which one to use using clusted_id into .csv file)
     getOriginalPathDistance(): {carDistance: number , flightDistance: number} {
         const nodes = Array.from(this.path.keys());

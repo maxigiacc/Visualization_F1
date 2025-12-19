@@ -28,6 +28,7 @@ const InteractiveMap: React.FC = () => {
     const [races, setRaces] = useState<Circuit[]>([]);
     const [racesMap, setRacesMap] = useState<Map<number, Race[]>>(new Map());      
     const [racesWithCircuit, setRacesWithCircuit] = useState<RaceWithCircuit[]>([]);
+    const [activeSegmentOrders, setActiveSegmentOrders] = useState<number[]>([]);
     const { year, setYear , selected_race, setSelectedRace  } = useSettings();
     
 
@@ -105,6 +106,24 @@ const InteractiveMap: React.FC = () => {
             };
         });
     }, [selectedYearRaces]);
+
+    const handleSegmentClick = (segment: RouteSegment) => {
+        const nextSelected = new Set(selected_race);
+        nextSelected.add(segment.from.circuit.name);
+        nextSelected.add(segment.to.circuit.name);
+        setSelectedRace(Array.from(nextSelected));
+        // Insert segment order 
+        setActiveSegmentOrders((prev) => {
+            // Empty list case
+            if(prev.length == 0) return [segment.order];
+            // User click in the back
+            if(prev[0] == segment.order+1){
+                return [segment.order, ...prev];
+            }else{ // User click in the front
+                return [...prev, segment.order];
+            }
+        });
+    };
 
     return (
         <div style={{ position: "relative" }} className="InteractiveMap">
@@ -276,6 +295,8 @@ const InteractiveMap: React.FC = () => {
                     <RouteSegmentsLayer
                         segments={routeSegments}
                         markerScale={markerScale}
+                        onSegmentClick={handleSegmentClick}
+                        activeSegmentOrders={activeSegmentOrders}
                     />
                 </ZoomableGroup>
             </ComposableMap>
@@ -284,5 +305,3 @@ const InteractiveMap: React.FC = () => {
 };
 
 export default InteractiveMap;
-
-

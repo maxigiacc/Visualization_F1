@@ -6,10 +6,19 @@ import {
   type Coordinates,
   createCoordinates
 } from "@vnedyalk0v/react19-simple-maps";
+import { useState } from "react";
 import type { RouteSegment } from "./models/RouteSegment";
 
+type RouteSegmentsLayerProps = {
+    segments: RouteSegment[];
+    markerScale: number;
+    onSegmentClick?: (segment: RouteSegment) => void;
+    activeSegmentOrders: number[];
+};
 
-export const RouteSegmentsLayer: React.FC<{ segments: RouteSegment[]; markerScale: number }> = ({ segments, markerScale }) => {
+export const RouteSegmentsLayer: React.FC<RouteSegmentsLayerProps> = ({ segments, markerScale, onSegmentClick, activeSegmentOrders,}) => {
+    
+    const [hoveredId, setHoveredId] = useState<string | null>(null);
     const { projection } = useMapContext();
     const getArrowAngle = (segment: RouteSegment) => {
         if (!projection) return 0;
@@ -26,29 +35,49 @@ export const RouteSegmentsLayer: React.FC<{ segments: RouteSegment[]; markerScal
             Math.PI
         );
     };
-
     const LABEL_WIDTH = 22;
     const LABEL_HEIGHT = 14;
-  
+    const activeOrderSet = new Set<number>(activeSegmentOrders);
+    const neighborOrderSet = new Set<number>();
+    activeSegmentOrders.forEach((order) => {
+        neighborOrderSet.add(order - 1);
+        neighborOrderSet.add(order + 1);
+    });
+
+    const visibleSegments = segments.filter((segment) => {
+        if (activeOrderSet.size === 0) return true;
+        return (
+            activeOrderSet.has(segment.order) ||
+            neighborOrderSet.has(segment.order)
+        );
+    });
+
      return (
-        <>
-            {segments.map((segment) => (
+        <>  
+            {/* LINES */}
+            {visibleSegments.map((segment) => {
+                const isMuted = activeOrderSet.size > 0 && !activeOrderSet.has(segment.order) && neighborOrderSet.has(segment.order);
+                const displayColor = isMuted ? "#B0B0B0" : segment.color;
+                return (
                 <Line
                     key={segment.id}
                     from={segment.from.coordinates}
                     to={segment.to.coordinates}
                     coordinates={segment.coordinates}
-                    stroke={segment.color}
+                    stroke={displayColor}
                     strokeWidth={1}
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                 />
-            ))}
+            )})}
 
-            {segments.map((segment) => {
+            {/* ARROWS */}
+            {visibleSegments.map((segment) => {
                 const invZoom = markerScale;
                 const arrowAngle = getArrowAngle(segment);
+                const isMuted = activeOrderSet.size > 0 && !activeOrderSet.has(segment.order) && neighborOrderSet.has(segment.order);
+                const displayColor = isMuted ? "#B0B0B0" : segment.color;
                 return (
                     <Marker
                         key={`arrow-${segment.id}`}
@@ -63,7 +92,7 @@ export const RouteSegmentsLayer: React.FC<{ segments: RouteSegment[]; markerScal
                         >
                             <path
                                 d="M0 0 L-10 4 L-10 -4 Z"
-                                fill={segment.color}
+                                fill={displayColor}
                                 opacity={0.9}
                             />
                         </g>
@@ -71,8 +100,12 @@ export const RouteSegmentsLayer: React.FC<{ segments: RouteSegment[]; markerScal
                 );
             })}
 
-            {segments.map((segment) => {
+            {/* LABELS */}
+            {visibleSegments.map((segment) => {
                 const invZoom = markerScale;
+                const isMuted = activeOrderSet.size > 0 && !activeOrderSet.has(segment.order) && neighborOrderSet.has(segment.order);
+                const displayColor = isMuted ? "#B0B0B0" : segment.color;
+                const isHovered = hoveredId === segment.id;
                 return (
                     <Marker
                         key={`label-${segment.id}`}
@@ -82,8 +115,12 @@ export const RouteSegmentsLayer: React.FC<{ segments: RouteSegment[]; markerScal
                             transform={`scale(${invZoom})`}
                             style={{
                                 transformOrigin: "0 0",
-                                pointerEvents: "none",
+                                pointerEvents: "auto",
+                                cursor: onSegmentClick ? "pointer" : "default",
                             }}
+                            onClick={() => onSegmentClick?.(segment)}
+                            onMouseEnter={() => setHoveredId(segment.id)}
+                            onMouseLeave={() => setHoveredId(null)}
                         >
                             <rect
                                 x={-LABEL_WIDTH / 2}
@@ -91,15 +128,19 @@ export const RouteSegmentsLayer: React.FC<{ segments: RouteSegment[]; markerScal
                                 width={LABEL_WIDTH}
                                 height={LABEL_HEIGHT}
                                 rx={LABEL_HEIGHT / 2}
-                                fill="rgba(255, 255, 255, 0.9)"
-                                stroke={segment.color}
+                                fill={
+                                    isHovered
+                                        ? displayColor
+                                        : "rgba(255, 255, 255, 0.9)"
+                                }
+                                stroke={displayColor}
                                 strokeWidth={0.8}
                             />
                             <text
                                 x={0}
                                 y={-LABEL_HEIGHT / 2}
                                 textAnchor="middle"
-                                fill={segment.color}
+                                fill={isHovered ? "#fff" : displayColor}
                                 style={{
                                     fontSize: "8px",
                                     fontWeight: 600,
