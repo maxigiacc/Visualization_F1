@@ -1,10 +1,8 @@
-// src/pages/CircuitsPage.tsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import InteractiveCountriesMap from "./components/InteractiveCountriesMap";
 import SidePanelDrawer from "./components/SidePanelDrawer";
 import { getCircuits } from "./components/utils/dataLoader";
 import type { Circuit } from "./components/models/Circuit";
-import { sameCountry } from "./components/utils/countryUtils";
 import "./css/Page.css";
 
 const CircuitsPage = () => {
@@ -15,13 +13,6 @@ const CircuitsPage = () => {
   useEffect(() => {
     getCircuits().then(setCircuits).catch(console.error);
   }, []);
-
-  const circuitsForCountry = useMemo(() => {
-    if (!selectedCountry) return [];
-    return circuits.filter(c =>
-      sameCountry(c.country, selectedCountry)
-    );
-  }, [circuits, selectedCountry]);
 
   return (
     <div className="Page">
@@ -43,6 +34,7 @@ const CircuitsPage = () => {
           circuits={circuits}
           selectedCircuit={selectedCircuit}
           onSelectCircuit={setSelectedCircuit}
+          onSelectCountry={setSelectedCountry}
         />
       </div>
     </div>

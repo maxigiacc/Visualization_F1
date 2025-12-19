@@ -7,10 +7,11 @@ import ContinentPieChart from "./ContinentPieChart";
 import { sameCountry } from "./utils/countryUtils";
 
 type Props = {
-  country: string;
+  country: string | null;
   circuits: Circuit[];
   selectedCircuit: Circuit | null;
   onSelectCircuit: (circuit: Circuit | null) => void;
+  onSelectCountry: (circuit: string | null) => void;
 };
 
 const SidePanelDrawer: React.FC<Props> = ({
@@ -18,6 +19,7 @@ const SidePanelDrawer: React.FC<Props> = ({
   circuits,
   selectedCircuit,
   onSelectCircuit,
+  onSelectCountry,
 }) => {
 
   const circuitsForCountry = circuits.filter(c => sameCountry(c.country, country));
@@ -58,11 +60,28 @@ const SidePanelDrawer: React.FC<Props> = ({
       
       {/* Country selected, no circuit selected --> show list */}
       {country && !selectedCircuit && (
+        <>
+        <button
+            onClick={() => onSelectCountry(null)}
+            style={{
+              marginTop: 8,
+              padding: "4px 12px",
+              background: "#f0f0f0",
+              border: "1px solid #ccc",
+              borderRadius: 4,
+              cursor: "pointer",
+              fontSize: 13
+            }}
+          >
+            ← Back to circuits list
+        </button>
         <CountryCircuitList 
           circuits={circuitsForCountry} 
           onSelectCircuit={onSelectCircuit}
         />
+        </>
       )}
+
       
       {/* Circuit selected --> show details */}
       {selectedCircuit && (
