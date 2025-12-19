@@ -6,6 +6,7 @@ import type { Coordinates } from "@vnedyalk0v/react19-simple-maps";
 import { getRacesWithCircuitsByYear } from "./utils/dataLoader";
 import "../css/GraphPlayer.css";
 import { ContinentPie } from "./ContinentPie";
+import { Flow } from "./Flow";
 
 // Could be transformed into its own component later
 const renderGraphPath = (graph: Graph) => {
@@ -45,7 +46,7 @@ const renderGraphPath = (graph: Graph) => {
 const GraphPlayer: React.FC = () => {
     
     
-    ////// ONLY FOR TESTING PURPOSES /////
+    // ============  ONLY FOR TESTING PURPOSES ============
     const fakeCoordinates = [0, 0] as unknown as Coordinates;
     const [circuits, setCircuits] = useState<RaceWithCircuit[]>([
         { raceId: 1, year: 2024, round: 1, circuitId: 1, name: "Bahrain Grand Prix", date: "2024-03-02", time: "15:00:00", url: "https://en.wikipedia.org/wiki/2024_Bahrain_Grand_Prix", circuit: { alt: 0, circuitId: 1, circuitRef: "bahrain", name: "Bahrain International Circuit", location: "Sakhir", country: "Bahrain", lat: 26.0325, lng: 50.5106, url: "https://en.wikipedia.org/wiki/Bahrain_International_Circuit", clusterId: "ME" }, coordinates: fakeCoordinates, label: "Round 1 – Bahrain" }, 
@@ -53,6 +54,7 @@ const GraphPlayer: React.FC = () => {
         { raceId: 3, year: 2024, round: 3, circuitId: 3, name: "Australian Grand Prix", date: "2024-03-24", time: "05:00:00", url: "https://en.wikipedia.org/wiki/2024_Australian_Grand_Prix", circuit: { alt: 0, circuitId: 3, circuitRef: "albert_park", name: "Albert Park Circuit", location: "Melbourne", country: "Australia", lat: -37.8497, lng: 144.968, url: "https://en.wikipedia.org/wiki/Albert_Park_Circuit", clusterId: "OC" }, coordinates: fakeCoordinates, label: "Round 3 – Australia" }, 
         { raceId: 4, year: 2024, round: 4, circuitId: 4, name: "Japanese Grand Prix", date: "2024-04-07", time: "07:00:00", url: "https://en.wikipedia.org/wiki/2024_Japanese_Grand_Prix", circuit: { alt: 0, circuitId: 4, circuitRef: "suzuka", name: "Suzuka Circuit", location: "Suzuka", country: "Japan", lat: 34.8431, lng: 136.5419, url: "https://en.wikipedia.org/wiki/Suzuka_Circuit", clusterId: "AS" }, coordinates: fakeCoordinates, label: "Round 4 – Japan" }
     ]);
+    // ============  ONLY FOR TESTING PURPOSES ============
 
     const [graph, setGraph] = useState<Graph | null>(null);
     const [races , setRaces] = useState<RaceWithCircuit[] | null>(null);
@@ -73,14 +75,13 @@ const GraphPlayer: React.FC = () => {
     return (
     <div className="graph-player">
         
-        {graph?.getOptimizedPathString() && (<div>{graph.getOptimizedPathString()}</div>)}
-        <p> --------------- </p>
-        {graph?.getOriginalPathString() && (<div>{graph.getOriginalPathString()}</div>)}
-
+        
 
         <div className="selected-route">
             selected - route : <strong>ALL RACES</strong>
         </div>
+
+        {graph?.getOriginalPath() && (<Flow flowList={graph.getOriginalPath()} />)}
 
         {/* CAR */}
         <div className="route-row">
@@ -110,7 +111,18 @@ const GraphPlayer: React.FC = () => {
             ]}
         />
 
-        {graph && renderGraphPath(graph)}
+        {/* RACE LIST (ONLY IF THERE ARE NOT SELECTED NODE) */}
+        <div className="continent-title">races list</div>
+        <ul>
+            <li>1. Roma</li>
+            <li>2. Monaco</li>
+            <li>3. Silverstone</li>
+            <li>4. Spa</li>
+            <li>5. Monza</li>
+            <li>6. Mugello</li>
+            <li>7. Barcelona</li>
+        </ul>
+
     </div>
     );
 };

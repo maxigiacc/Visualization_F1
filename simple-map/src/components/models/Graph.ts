@@ -2,6 +2,12 @@ export type DistanceTuple = [number, number];   // (car, flight) distances
 import fetchFlightDistance from "../utils/AirportDistanceFake";
 import type { RaceWithCircuit } from "./RaceWithCircuit";
 
+export type FlowList = {
+    id: number;
+    circuit_name: string;
+    clusted_id: number;
+};
+
 export default class Graph {
     // ============ Attribute ====================== 
     private optimized_path: Map<string, Map<string, DistanceTuple>> = new Map(); // ORDERED-GRAPH ->  [ 'node1': ['node2': (30,50) , 'node3':(32,...] , 'node2': [] , ... ]
@@ -89,6 +95,42 @@ export default class Graph {
     getOriginalPathString(): string {
         const nodes = Array.from(this.path.keys());
         return nodes.join(" --> ");
+    }
+
+    // Return the optimized path as FlowList[]
+    getOptimizedPath(): FlowList[] {
+        const result = this.generateOptimizedPath();
+
+        if (result.path.length === 0) return [];
+
+        const flowList: FlowList[] = result.path.map((node, index) => {
+            const circuitName = node.slice(0, -1); // Remove the last character (round number)
+            const clusterId = parseInt(node.slice(-1)); // Get the last character as round number
+            return {
+                id: index + 1,
+                circuit_name: circuitName,
+                clusted_id: clusterId
+            };
+        });
+
+        return flowList;
+    }
+
+    // Return the original path as FlowList[]
+    getOriginalPath(): FlowList[] {
+        const nodes = Array.from(this.path.keys());
+
+        const flowList: FlowList[] = nodes.map((node, index) => {
+            const circuitName = node.slice(0, -1); // Remove the last character (round number)
+            const clusterId = parseInt(node.slice(-1)); // Get the last character as round number
+            return {
+                id: index + 1,
+                circuit_name: circuitName,
+                clusted_id: clusterId
+            };
+        });
+
+        return flowList;
     }
 
     // Generate optimized path
