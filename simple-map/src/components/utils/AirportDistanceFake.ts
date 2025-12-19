@@ -17,7 +17,7 @@ export function fetchFlightDistance( originCode: string, destinationCode: string
   const minDistance = 1; // Minimum distance in km
   const maxDistance = 5; // Maximum distance in km
   const distanceKm = Math.floor(Math.random() * (maxDistance - minDistance + 1)) + minDistance;
-  console.log(`Fetched fake distance between ${originCode} and ${destinationCode}: ${distanceKm} km`);
+  //console.log(`Fetched fake distance between ${originCode} and ${destinationCode}: ${distanceKm} km`);
   return (distanceKm);
 }
 

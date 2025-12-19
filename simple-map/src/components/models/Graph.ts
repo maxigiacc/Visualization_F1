@@ -2,26 +2,32 @@ export type DistanceTuple = [number, number];   // (car, flight) distances
 import fetchFlightDistance from "../utils/AirportDistanceFake";
 import type { RaceWithCircuit } from "./RaceWithCircuit";
 
+export type FlowList = {
+    id: number;
+    circuit_name: string;
+    clusted_id: number;
+};
+
 export default class Graph {
-    // ============ Attribute ======================
-    private optimized_path: Map<string, Map<string, DistanceTuple>> = new Map();
-    private path: Map<string, Map<string, DistanceTuple>> = new Map(); // [ 'node1': ['node2': (30,50) , 'node3':(32,...] , 'node2': [] , ... ]
-    private circuits: RaceWithCircuit[] = [];
+    // ============ Attribute ====================== 
+    private optimized_path: Map<string, Map<string, DistanceTuple>> = new Map(); // ORDERED-GRAPH ->  [ 'node1': ['node2': (30,50) , 'node3':(32,...] , 'node2': [] , ... ]
+    private path: Map<string, Map<string, DistanceTuple>> = new Map();     // FULLY-CONNECTED-GRAPH ->[ 'node1': ['node2': (30,50) , 'node3':(32,...] , 'node2': [] , ... ]
 
     // ============ Constructor ======================  
     constructor(circuits: RaceWithCircuit[]) {
 
         this.optimized_path = new Map();
-        this.circuits = circuits;
         // Initialize graph with circuits
         for (let i = 0; i < circuits.length; i++) {
             for (let j = i + 1; j < circuits.length; j++) {
                 const circuitA = circuits[i].circuit;
                 const circuitB = circuits[j].circuit;
+                const orderA = circuits[i].round;
+                const orderB = circuits[j].round;
                 // Calculate distances (dummy values for now, replace with actual calculation API)
                 const carDistance = fetchFlightDistance(circuitA.location, circuitB.location);                     // TODO replace with real API call
                 const planeDistance = fetchFlightDistance(circuitA.location, circuitB.location);                  // TODO replace with real API call
-                this.addEdge(circuitA.location + circuitA.circuitId, circuitB.location + circuitB.circuitId, [carDistance, planeDistance]);
+                this.addEdge(circuitA.location + orderA, circuitB.location + orderB, [carDistance, planeDistance]);
             }
         }
     }
@@ -41,15 +47,6 @@ export default class Graph {
         this.path.get(to)!.set(from, distance);
     }
 
-    fakeApi( originCode: string, destinationCode: string ): number {
-        // Generate random distance for fake implementation
-        const minDistance = 1; // Minimum distance in km
-        const maxDistance = 5; // Maximum distance in km
-        const distanceKm = Math.floor(Math.random() * (maxDistance - minDistance + 1)) + minDistance;
-        console.log(`Fetched fake distance between ${originCode} and ${destinationCode}: ${distanceKm} km`);
-        return (distanceKm);
-    }
-
     getPath(): Map<string, Map<string, DistanceTuple>> {
         return this.path;
     }
@@ -59,36 +56,72 @@ export default class Graph {
     }
 
     // In the moment only sum car distances (TODO : make a check of which one to use using clusted_id into .csv file)
-    getPathDistance(path: string[]): number {
-        let total = 0;
+    getOriginalPathDistance(): {carDistance: number , flightDistance: number} {
+        const nodes = Array.from(this.path.keys());
+        let totalCarDistance = 0;
+        let totalFlightDistance = 0;
 
-        for (let i = 0; i < path.length - 1; i++) {
-            const dist = this.getDistance(path[i], path[i + 1]);
+        for (let i = 0; i < nodes.length - 1; i++) {
+            const dist = this.getDistance(nodes[i], nodes[i + 1]);
             if (dist === undefined) {
-                throw new Error(`No edge between ${path[i]} and ${path[i + 1]}`);
+                throw new Error(`No edge between ${nodes[i]} and ${nodes[i + 1]}`);
             }
-            total += dist[0];
+            totalCarDistance += dist[0];
+            totalFlightDistance += dist[1];
         }
 
-        return total;
+        return {carDistance: totalCarDistance, flightDistance: totalFlightDistance};
     }
 
+    // Return the optimized path as a string
+    getOptimizedPathString(): string {
+        const result = this.generateOptimizedPath();
 
-    // Debug printing
-    print() {
+        if (result.path.length === 0) return "";
 
-        if(this.path.size === 0) {
-            console.log("Graph is empty.");
-            return;
-        }
-        
-        for (const [node, neighbors] of this.path) {
-            const connections = [...neighbors.entries()]
-                .map(([to, dist]) => `${to}(${dist})`)
-                .join(", ");
+        return result.path.join(" --> ");
+    }
 
-            console.log(`${node} -> ${connections}`);
-        }
+    // Return the original path as a string
+    getOriginalPathString(): string {
+        const nodes = Array.from(this.path.keys());
+        return nodes.join(" --> ");
+    }
+
+    // Return the optimized path as FlowList[]
+    getOptimizedPath(): FlowList[] {
+        const optimized_path = this.generateOptimizedPath();
+        const originalPath = Array.from(this.path.keys());
+
+        if (optimized_path.path.length === 0) return [];
+
+        const flowList: FlowList[] = optimized_path.path.map((node) => {
+            const circuitName = node.slice(0, -1); // Remove the last character (round number)
+            const clusterId = parseInt(node.slice(-1)); // Get the last character as round number
+            return {
+                id: originalPath.indexOf(node) + 1,
+                circuit_name: circuitName,
+                clusted_id: clusterId
+            };
+        });
+        return flowList;
+    }
+
+    // Return the original path as FlowList[]
+    getOriginalPath(): FlowList[] {
+        const nodes = Array.from(this.path.keys());
+
+        const flowList: FlowList[] = nodes.map((node, index) => {
+            const circuitName = node.slice(0, -1); // Remove the last character (round number)
+            const clusterId = parseInt(node.slice(-1)); // Get the last character as round number
+            return {
+                id: index + 1,
+                circuit_name: circuitName,
+                clusted_id: clusterId
+            };
+        });
+
+        return flowList;
     }
 
     // Generate optimized path

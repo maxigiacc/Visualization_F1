@@ -1,0 +1,36 @@
+.graph-player {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.selected-route {
+    border: 2px solid orange;
+    color: orange;
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.route-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.route-info p {
+    margin: 4px 0;
+}
+
+.route-icon {
+    font-size: 40px;
+    margin-left: 20px;
+}
+
+.continent-title {
+  border: 2px solid black;
+  padding: 6px 12px;
+  display: inline-block;
+  margin-bottom: 12px;
+  font-weight: bold;
+}

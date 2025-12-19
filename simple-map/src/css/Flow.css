@@ -1,0 +1,61 @@
+.timeline-wrapper {
+  position: relative;
+  width: fit-content;
+  padding: 40px 20px;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #aaa;
+}
+
+.timeline-steps {
+  display: flex;
+  gap: 5px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.step-number {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px   ;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  bottom: 28px;
+  background: black;
+  color: white;
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dot:hover .tooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+

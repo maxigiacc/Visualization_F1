@@ -28,7 +28,7 @@ const InteractiveMap: React.FC = () => {
     const [races, setRaces] = useState<Circuit[]>([]);
     const [racesMap, setRacesMap] = useState<Map<number, Race[]>>(new Map());      
     const [racesWithCircuit, setRacesWithCircuit] = useState<RaceWithCircuit[]>([]);
-    const { year, setYear } = useSettings();
+    const { year, setYear , selected_race, setSelectedRace  } = useSettings();
     
 
     // marker UI / zoom refs
@@ -53,6 +53,7 @@ const InteractiveMap: React.FC = () => {
             setRacesWithCircuit(racesWithCircuit);
         })
         .catch(console.error);
+        // setSelectedRace(['Bahrain International Circuit' , 'Autodromo Enzo e Dino Ferrari']); // TODO : Implement the logic to add selected race clicking the map 
 }, []);
 
     const yearOptions = useMemo(() => {
