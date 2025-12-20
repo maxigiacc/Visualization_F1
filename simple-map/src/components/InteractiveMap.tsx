@@ -10,7 +10,6 @@ import {
     createTranslateExtent,
 } from "@vnedyalk0v/react19-simple-maps";
 import {type Circuit } from "./models/Circuit";
-import {type Race } from "./models/Race";
 import type { RaceWithCircuit } from "./models/RaceWithCircuit";
 import type { RouteSegment } from "./models/RouteSegment";
 import { useSettings } from "../SettingsContext";
@@ -63,6 +62,7 @@ const InteractiveMap: React.FC = () => {
     }, [racesWithCircuit]);
     
     const filteredRaces = useMemo(() => {
+        setActiveSegmentOrders([]); // Reset active segments on filter change
         if (!year) return races;
         const id_list = racesWithCircuit.filter(race => race.year === year).map(race => race.circuit.circuitId);
         return races.filter(c => id_list.includes(c.circuitId));

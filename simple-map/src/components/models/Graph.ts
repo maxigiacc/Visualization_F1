@@ -108,6 +108,12 @@ export default class Graph {
                 clusted_id: clusterId
             };
         });
+
+        // Reversed the list if the first element is at the end
+        if(flowList[flowList.length - 1].id == 1) {
+            flowList.reverse();
+        }
+        
         return flowList;
     }
 

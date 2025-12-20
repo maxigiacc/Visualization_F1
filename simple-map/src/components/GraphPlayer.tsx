@@ -1,4 +1,3 @@
-// TODO : Remove the not used race from InteractiveMap
 // TODO : Improve the pie chart and see the Massimo - link about charts
 // TODO : Fix the optimized graph (if the first node is at the end invert the list)
 // TODO : Insert list of races only when are selected all the races
@@ -45,23 +44,27 @@ const renderGraphPath = (graph: Graph) => {
 
 const GraphPlayer: React.FC = () => {
     
-    const [graph, setGraph] = useState<Graph | null>(null);
-    const { year , selected_race } = useSettings();
+    
+    const { year , selected_race , setSelectedRace } = useSettings();
+    const [races, setRaces] = useState<RaceWithCircuit[]>([]);
 
+    const graph = useMemo(() => {
+        console.log("Loading light");
+        if (!races.length) return null;
+        
+        const filtered = selected_race?.length ? races.filter(race => selected_race.includes(race.circuit.name)) : races;
+        console.log ("finished graph filtering: "); 
+        return new Graph(filtered);
+        
+    }, [selected_race]);
 
-    // Executed only when the component is mounted (loading of the circuits data)
+    // Update after year change
     useEffect(() => {
-        getRacesWithCircuitsByYear(year).then((data : RaceWithCircuit[]) => {
-            // Filter only the selected races
-            if(selected_race && selected_race.length > 0){
-                console.log("Filtering races by selected");
-                data = data.filter(race => selected_race.includes(race.circuit.name));
-                console.log(data);
-            }
-            setGraph(new Graph(data));
+        setSelectedRace([]); // Reset selected
+        getRacesWithCircuitsByYear(year).then((data) => {
+            setRaces(data);
         });
-    }, [year , selected_race]); 
-
+    }, [year]);
 
     return (
     <div className="graph-player">
