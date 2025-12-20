@@ -26,7 +26,6 @@ const SEGMENT_COLORS = [
 
 const InteractiveMap: React.FC = () => {
     const [races, setRaces] = useState<Circuit[]>([]);
-    const [racesMap, setRacesMap] = useState<Map<number, Race[]>>(new Map());      
     const [racesWithCircuit, setRacesWithCircuit] = useState<RaceWithCircuit[]>([]);
     const [activeSegmentOrders, setActiveSegmentOrders] = useState<number[]>([]);
     const { year, setYear , selected_race, setSelectedRace  } = useSettings();
@@ -48,14 +47,12 @@ const InteractiveMap: React.FC = () => {
 
     useEffect(() => {
     getRacesWithCircuits()
-        .then(({ circuits, racesMap, racesWithCircuit }) => {
+        .then(({ circuits, racesWithCircuit }) => {
             setRaces(circuits);
-            setRacesMap(racesMap);
             setRacesWithCircuit(racesWithCircuit);
         })
         .catch(console.error);
-        // setSelectedRace(['Bahrain International Circuit' , 'Autodromo Enzo e Dino Ferrari']); // TODO : Implement the logic to add selected race clicking the map 
-}, []);
+    }, []);
 
     const yearOptions = useMemo(() => {
         const years = Array.from(
@@ -64,6 +61,12 @@ const InteractiveMap: React.FC = () => {
         years.sort((a, b) => a - b);
         return years;
     }, [racesWithCircuit]);
+    
+    const filteredRaces = useMemo(() => {
+        if (!year) return races;
+        const id_list = racesWithCircuit.filter(race => race.year === year).map(race => race.circuit.circuitId);
+        return races.filter(c => id_list.includes(c.circuitId));
+    }, [year, races]);
 
     useEffect(() => {
         if (year === null && yearOptions.length > 0) {
@@ -241,7 +244,8 @@ const InteractiveMap: React.FC = () => {
                         }
                     </Geographies>
 
-                    {races.map((circuit, idx) => {
+                    {/* Markers for circuits */}
+                    {filteredRaces.map((circuit, idx) => {
                         const BASE_MARKER_RADIUS_PX = 3;
                         const BASE_FONT_PX = 10;
                         const invZoom = markerScale;
