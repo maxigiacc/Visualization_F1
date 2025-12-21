@@ -22,12 +22,10 @@ export default class Graph {
             for (let j = i + 1; j < circuits.length; j++) {
                 const circuitA = circuits[i].circuit;
                 const circuitB = circuits[j].circuit;
-                const orderA = circuits[i].round;
-                const orderB = circuits[j].round;
                 // Calculate distances (dummy values for now, replace with actual calculation API)
                 const carDistance = fetchFlightDistance(circuitA.location, circuitB.location);                     // TODO replace with real API call
                 const planeDistance = fetchFlightDistance(circuitA.location, circuitB.location);                  // TODO replace with real API call
-                this.addEdge(circuitA.location + orderA, circuitB.location + orderB, [carDistance, planeDistance]);
+                this.addEdge(circuitA.location , circuitB.location , [carDistance, planeDistance]);
             }
         }
     }
@@ -70,6 +68,26 @@ export default class Graph {
             if (dist === undefined) {
                 throw new Error(`No edge between ${nodes[i]} and ${nodes[i + 1]}`);
             }
+            totalCarDistance += dist[0];
+            totalFlightDistance += dist[1];
+        }
+
+        return {carDistance: totalCarDistance, flightDistance: totalFlightDistance};
+    }
+
+    // Return total distances of optimized path
+    getOptimizedPathDistance(): {carDistance: number , flightDistance: number} {
+        const nodes = Array.from(this.optimized_path.keys());
+        console.log("Optimized path nodes: ", nodes);
+        let totalCarDistance = 0;
+        let totalFlightDistance = 0;
+
+        for (let i = 0; i < nodes.length - 1; i++) {
+            const dist = this.optimized_path.get(nodes[i])?.get(nodes[i + 1]);
+            if (dist === undefined) {
+                throw new Error(`No edge between ${nodes[i]} and ${nodes[i + 1]}`);
+            }
+            console.log("Distance between ", nodes[i], " and ", nodes[i + 1], " is ", dist);
             totalCarDistance += dist[0];
             totalFlightDistance += dist[1];
         }
@@ -198,11 +216,18 @@ export default class Graph {
             const from = bestPath[i];
             const to = bestPath[i + 1];
             const dist = this.getDistance(from, to)!;
-
+            
+            // Create the node of from if not exists
             if (!this.optimized_path.has(from)) {
                 this.optimized_path.set(from, new Map());
             }
 
+            // Create the node of to if not exists
+            if(!this.optimized_path.has(to)) {
+                this.optimized_path.set(to, new Map());
+            }
+
+            // Create the edge from -> to
             this.optimized_path.get(from)!.set(to, dist);
         }
 
