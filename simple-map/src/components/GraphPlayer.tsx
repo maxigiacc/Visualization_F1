@@ -1,5 +1,3 @@
-// TODO : Improve the pie chart and see the Massimo - link about charts
-
 import React, { useEffect, useMemo, useState } from "react";
 import Graph from "./models/Graph";
 import type { RaceWithCircuit } from "./models/RaceWithCircuit";
@@ -33,16 +31,16 @@ const getCO2Saved = (graph: Graph, co2_per_km_car: number, co2_per_km_flight: nu
     return 0;
 }
 
+// Placeholder function for onSelectCircuit prop
 const placeHolder = (circuit: Circuit | null) => void{};
 
 const GraphPlayer: React.FC = () => {
-    
-    
     const { year , selected_race , setSelectedRace } = useSettings();
     const [races, setRaces] = useState<RaceWithCircuit[]>([]);
     const co2_per_km_car = 0.192; // Kg CO2 per Km for car
     const co2_per_km_flight = 0.255; // Kg CO2 per Km for flight
     
+    // Create the graph for the optimization
     let graph = useMemo(() => {
         console.log("Loading light");
         if (!races.length) return null;
@@ -50,6 +48,7 @@ const GraphPlayer: React.FC = () => {
         return new Graph(filtered);
     }, [selected_race , races]);
 
+    // Obtain circuits for the actual year
     let circuitsMemo = useMemo(() => {
         if (!races.length) return [];
         return races.map(race => race.circuit);
