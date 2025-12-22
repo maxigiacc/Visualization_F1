@@ -22,9 +22,16 @@ export default class Graph {
             for (let j = i + 1; j < circuits.length; j++) {
                 const circuitA = circuits[i].circuit;
                 const circuitB = circuits[j].circuit;
-                // Calculate distances (dummy values for now, replace with actual calculation API)
-                const carDistance = fetchFlightDistance(circuitA.location, circuitB.location);                     // TODO replace with real API call
-                const planeDistance = fetchFlightDistance(circuitA.location, circuitB.location);                  // TODO replace with real API call
+                let carDistance: number;
+                let planeDistance: number;
+                // Use the car distance only if they are in the same cluster
+                if(circuitA.clusterId === circuitB.clusterId) {
+                    carDistance = fetchFlightDistance(circuitA.location, circuitB.location);   // TODO replace with real API call
+                    planeDistance = 0;
+                }else{
+                    carDistance = 0;  
+                    planeDistance = fetchFlightDistance(circuitA.location, circuitB.location); // TODO replace with real API call
+                }        
                 this.addEdge(circuitA.location , circuitB.location , [carDistance, planeDistance]);
             }
         }
@@ -185,9 +192,9 @@ export default class Graph {
 
                 for (const [neighbor, dist] of neighbors) {
                     if (!visited.has(neighbor)) {
-                        const carDistance = dist[0];
-                        if (carDistance < nearestDistance) {
-                            nearestDistance = carDistance;
+                        const distance = dist[0] + dist[1]; // Sum car and flight distances
+                        if (distance < nearestDistance) {
+                            nearestDistance = distance;
                             nearestNode = neighbor;
                         }
                     }

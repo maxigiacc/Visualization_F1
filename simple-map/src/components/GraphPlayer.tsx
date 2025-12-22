@@ -1,11 +1,7 @@
 // TODO : Improve the pie chart and see the Massimo - link about charts
-// TODO : Fix the optimized graph (if the first node is at the end invert the list)
-// TODO : Insert list of races only when are selected all the races
-// TODO : Add savings + CO2 emissions
 
 import React, { useEffect, useMemo, useState } from "react";
 import Graph from "./models/Graph";
-import type { DistanceTuple } from "./models/Graph";
 import type { RaceWithCircuit } from "./models/RaceWithCircuit";
 import { getRacesWithCircuitsByYear } from "./utils/dataLoader";
 import "../css/GraphPlayer.css";
