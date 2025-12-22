@@ -5,9 +5,11 @@ import Graph from "./models/Graph";
 import type { RaceWithCircuit } from "./models/RaceWithCircuit";
 import { getRacesWithCircuitsByYear } from "./utils/dataLoader";
 import "../css/GraphPlayer.css";
-import { ContinentPie } from "./ContinentPie";
+import type { Circuit } from "./models/Circuit";
 import { Flow } from "./Flow";
 import { useSettings } from "../SettingsContext";
+import ContinentPieChart from "./ContinentPieChart";
+import CountryCircuitList from "./CountryCircuitList";
 
 // Return the Km saved between original and optimized path
 const getKmSaved = (graph: Graph): number => {
@@ -31,6 +33,8 @@ const getCO2Saved = (graph: Graph, co2_per_km_car: number, co2_per_km_flight: nu
     return 0;
 }
 
+const placeHolder = (circuit: Circuit | null) => void{};
+
 const GraphPlayer: React.FC = () => {
     
     
@@ -45,6 +49,11 @@ const GraphPlayer: React.FC = () => {
         const filtered = selected_race?.length ? races.filter(race => selected_race.includes(race.circuit.name)) : races;
         return new Graph(filtered);
     }, [selected_race , races]);
+
+    let circuitsMemo = useMemo(() => {
+        if (!races.length) return [];
+        return races.map(race => race.circuit);
+    }, [races]);
 
     // Update after year change
     useEffect(() => {
@@ -123,27 +132,11 @@ const GraphPlayer: React.FC = () => {
         {/* INFO IF THERE ARE NO SELECTED NODES */}
         {selected_race.length === 0 && (
             <>
-                {/* CONTINENT PIE CHART */}
-                <ContinentPie
-                title="continent distribution"
-                slices={[
-                    { label: "EU", value: 50, color: "#7b83eb" },
-                    { label: "AFR", value: 25, color: "#f2b176" },
-                    { label: "...", value: 25, color: "#eaeaea" },
-                ]}
-                />
+                {/* CONTINENT MAX CHART */}
+                <div className="title">continent distribution</div>
+                {circuitsMemo.length > 0 ? <ContinentPieChart circuits={circuitsMemo}></ContinentPieChart> : "Loading..." }
 
-                {/* RACE LIST (ONLY IF THERE ARE NO SELECTED NODES) */}
-                <div className="title">races list</div>
-                <ul>
-                <li>1. Roma</li>
-                <li>2. Monaco</li>
-                <li>3. Silverstone</li>
-                <li>4. Spa</li>
-                <li>5. Monza</li>
-                <li>6. Mugello</li>
-                <li>7. Barcelona</li>
-                </ul>
+                <CountryCircuitList circuits={circuitsMemo} onSelectCircuit={placeHolder}></CountryCircuitList>
             </>
         )}
 

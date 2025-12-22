@@ -14,6 +14,7 @@ export default class Graph {
     private path: Map<string, Map<string, DistanceTuple>> = new Map();     // FULLY-CONNECTED-GRAPH ->[ 'node1': ['node2': (30,50) , 'node3':(32,...] , 'node2': [] , ... ]
 
     // ============ Constructor ======================  
+    // Initialize graph from circuits (the graph contains all the possible connections between circuits and the distance filled is the car distance or flight distance based on clusterId)
     constructor(circuits: RaceWithCircuit[]) {
 
         this.optimized_path = new Map();
@@ -64,7 +65,7 @@ export default class Graph {
         return this.path.size;
     }
 
-    // In the moment only sum car distances (TODO : make a check of which one to use using clusted_id into .csv file)
+    // Return total distances of original path for car and flight
     getOriginalPathDistance(): {carDistance: number , flightDistance: number} {
         const nodes = Array.from(this.path.keys());
         let totalCarDistance = 0;
@@ -82,7 +83,7 @@ export default class Graph {
         return {carDistance: totalCarDistance, flightDistance: totalFlightDistance};
     }
 
-    // Return total distances of optimized path
+    // Return total distances of optimized path for car and flight
     getOptimizedPathDistance(): {carDistance: number , flightDistance: number} {
         const nodes = Array.from(this.optimized_path.keys());
         console.log("Optimized path nodes: ", nodes);
@@ -159,7 +160,7 @@ export default class Graph {
         return flowList;
     }
 
-    // Generate optimized path
+    // Generate optimized path using Nearest Neighbor heuristic
     generateOptimizedPath(): { path: string[]; distance: number;} {
         
         // Hande empty graph case
@@ -242,7 +243,6 @@ export default class Graph {
             path: bestPath,
             distance: bestDistance
         };
-}
-
+    }
 
 }
