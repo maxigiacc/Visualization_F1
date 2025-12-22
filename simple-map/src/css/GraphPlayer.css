@@ -1,36 +1,78 @@
 .graph-player {
-    padding: 20px;
-    font-family: Arial, sans-serif;
+    padding: 24px;
+    font-family: Inter, Arial, sans-serif;
+    background: #f8f9fb;
+    color: #222;
 }
 
+/* Selected route badge */
 .selected-route {
-    border: 2px solid orange;
-    color: orange;
+    border: 2px solid #ff9800;
+    color: #ff9800;
+    background: #fff7e6;
     display: inline-block;
-    padding: 6px 12px;
-    margin-bottom: 20px;
-    font-weight: bold;
+    padding: 8px 14px;
+    margin-bottom: 24px;
+    font-weight: 600;
+    border-radius: 8px;
 }
 
+/* Section titles */
+.title {
+    border-left: 5px solid currentColor;
+    padding: 6px 12px;
+    margin: 24px 0 16px 0;
+    font-weight: 700;
+    font-size: 1.05rem;
+    background: white;
+    border-radius: 6px;
+}
+
+/* Route rows as cards */
 .route-row {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    background: white;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.route-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Info text */
 .route-info p {
-    margin: 4px 0;
+    margin: 6px 0;
+    font-size: 0.95rem;
 }
 
+.route-info p:first-child {
+    font-weight: 600;
+}
+
+/* Icons */
 .route-icon {
-    font-size: 40px;
-    margin-left: 20px;
+    font-size: 42px;
+    margin-left: 24px;
 }
 
-.title {
-  border: 2px solid black;
-  padding: 6px 12px;
-  display: inline-block;
-  margin-bottom: 12px;
-  font-weight: bold;
+/* Special styling for savings row */
+.route-row:last-child {
+    border-left: 6px solid #4caf50;
+    background: #f1fbf4;
+}
+
+.route-row:last-child .route-icon {
+    filter: drop-shadow(0 0 4px rgba(76, 175, 80, 0.5));
+}
+
+/* Flow component spacing */
+.graph-player > div > .flow {
+    margin-bottom: 20px;
 }
