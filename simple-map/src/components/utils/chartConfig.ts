@@ -7,7 +7,7 @@
 import type { ApexOptions } from "apexcharts";
 import type { CsvChartSeries } from "./dataLoader";
 import type { Circuit } from "../models/Circuit";
-
+import type { Country } from "../models/Country";
 
 // ============================================================================
 // TYPES FOR ANNOTATIONS
@@ -353,17 +353,68 @@ export function buildEmissionsBarChartOptions(
   };
 }
 
-type ContinentCount = Record<string, number>;
+type PieResult = {
+  series: number[];
+  options: ApexOptions;
+};
+
+function normalizeCountryKey(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/\./g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+
+const COUNTRY_ALIASES: Record<string, string> = {
+  "uk": "united kingdom",
+  "usa": "united states",
+  "u.s.a": "united states",
+  "uae": "united arab emirates",
+  "south korea": "korea, south",
+};
+
 
 export function buildContinentPieOptions(
-  circuits: Circuit[]
-): { series: number[]; options: ApexOptions } {
-  const counts: ContinentCount = {};
+  circuits: Circuit[],
+  countries: Country[]
+): PieResult {
+  if (!circuits.length || !countries.length) {
+    return { series: [], options: {} };
+  }
 
-  circuits.forEach(c => {
-    if (!c.country) return;
-    counts[c.country] = (counts[c.country] ?? 0) + 1;
+  // Map normalized country name -> continentId
+  const countryToContinent = new Map<string, string>();
+
+  countries.forEach(c => {
+    const key = normalizeCountryKey(c.name);
+    countryToContinent.set(key, c.continentId);
   });
+
+  const counts: Record<string, number> = {};
+  const unknown = new Set<string>();
+
+  circuits.forEach(circuit => {
+    const raw = normalizeCountryKey(circuit.country);
+    const alias = COUNTRY_ALIASES[raw] ?? raw;
+
+    const continent =
+      countryToContinent.get(alias) ?? "Unknown";
+
+    if (continent === "Unknown") {
+      unknown.add(circuit.country);
+    }
+
+    counts[continent] = (counts[continent] ?? 0) + 1;
+  });
+
+  // Debug utile (non rumore)
+  if (unknown.size) {
+    console.group("🌍 Countries still mapped to Unknown");
+    unknown.forEach(c => console.warn(c));
+    console.groupEnd();
+  }
 
   const labels = Object.keys(counts);
   const series = labels.map(l => counts[l]);
@@ -371,28 +422,25 @@ export function buildContinentPieOptions(
   const options: ApexOptions = {
     chart: {
       type: "pie",
-      width: "100%",
+      height: 280,
     },
     labels,
     legend: {
       position: "bottom",
     },
-    dataLabels: {
-      enabled: true,
-      formatter: (val: number) => `${val.toFixed(1)}%`,
-    },
     tooltip: {
       y: {
-        formatter: (val: number) => `${val} circuits`,
+        formatter: val => `${val} circuits`,
       },
     },
-    stroke: {
-      width: 2,
+    dataLabels: {
+      formatter: (val: number) => `${val.toFixed(1)}%`,
     },
   };
 
   return { series, options };
 }
+
 
 
 // ============================================================================

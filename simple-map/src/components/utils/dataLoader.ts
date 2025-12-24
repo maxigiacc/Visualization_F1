@@ -11,6 +11,8 @@ import type { Constructor } from "../models/Constructor";
 import { fromStringConstructor } from "../models/Constructor";
 import type { Driver } from "../models/Driver";
 import { fromStringDriver } from "../models/Driver";
+import type { Country } from "../models/Country";
+import { fromStringCountry} from "../models/Country";
 import { haversine } from "./utils";
 import { createCoordinates } from "@vnedyalk0v/react19-simple-maps";
 
@@ -25,6 +27,7 @@ export type DataCache = {
   drivers: Driver[];
   constructors: Constructor[];
   emissionFactors: Map<number, number>;
+  countries: Country[];
 };
 
 export type TravelKmData = {
@@ -140,6 +143,7 @@ export async function loadAllData(): Promise<DataCache> {
         driversParsed,
         constructorsParsed,
         emissionsParsed,
+        countriesParsed,
       ] = await Promise.all([
         fetchAndAutoParseCsv("/circuits.csv"),
         fetchAndAutoParseCsv("/races.csv"),
@@ -147,6 +151,7 @@ export async function loadAllData(): Promise<DataCache> {
         fetchAndAutoParseCsv("/drivers.csv"),
         fetchAndAutoParseCsv("/constructors.csv"),
         fetchCsv("/emission_factors_2000_2025.csv"),
+        fetchCsv("f1db-countries.csv"),
       ]);
 
       const circuits = (circuitsParsed as any[]).map(fromStringCircuit);
@@ -154,6 +159,7 @@ export async function loadAllData(): Promise<DataCache> {
       const qualifying = (qualifyingParsed as any[]).map(fromStringQualifying);
       const drivers = (driversParsed as any[]).map(fromStringDriver);
       const constructors = (constructorsParsed as any[]).map(fromStringConstructor);
+      const countries = (countriesParsed as any[]).map(fromStringCountry);
 
       const emissionFactors = new Map<number, number>();
       emissionsParsed.forEach((row: any) => {
@@ -171,6 +177,7 @@ export async function loadAllData(): Promise<DataCache> {
         drivers,
         constructors,
         emissionFactors,
+        countries
       };
 
       console.log("F1 data loaded successfully:", {
@@ -180,6 +187,7 @@ export async function loadAllData(): Promise<DataCache> {
         drivers: drivers.length,
         constructors: constructors.length,
         emissionFactors: emissionFactors.size,
+        countries: countries.length
       });
 
       return globalCache;
@@ -228,6 +236,11 @@ export async function getConstructors(): Promise<Constructor[]> {
 export async function getEmissionFactors(): Promise<Map<number, number>> {
   const data = await loadAllData();
   return data.emissionFactors;
+}
+
+export async function getCountries(): Promise<Country[]> {
+  const data = await loadAllData();
+  return data.countries;
 }
 
 // ============================================================================
