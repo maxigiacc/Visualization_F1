@@ -8,7 +8,11 @@ import {
 } from './utils/chartConfig';
 
 
-export default function ApexCsvRealtimeChart() {
+type Props = {
+  filterYear?: number | null;
+};
+
+export default function ApexCsvRealtimeChart({ filterYear }: Props) {
   // all series
   const [fullSeries, setFullSeries] = useState<CsvChartSeries[]>([]);
   // effective series to show
@@ -23,10 +27,29 @@ export default function ApexCsvRealtimeChart() {
     [series]
   );
 
-  const options = useMemo(
-    () => buildEmissionFactorsChartOptions({ series, categories, annotations, chartId: "emission-factors-chart", height: 350 }),
-    [series, categories, annotations]
-  );
+  const options = useMemo(() => {
+    const filteredCategories = filterYear && Number.isFinite(filterYear)
+      ? categories.filter((c) => parseInt(String(c), 10) === filterYear)
+      : categories;
+
+    const filteredSeries = filterYear && Number.isFinite(filterYear)
+      ? series.map((s) => ({
+          ...s,
+          data: (s.data || []).filter((d) => {
+            const dYear = d?.x ? new Date(d.x).getFullYear() : NaN;
+            return dYear === filterYear;
+          }),
+        }))
+      : series;
+
+    return buildEmissionFactorsChartOptions({ 
+      series: filteredSeries, 
+      categories: filteredCategories, 
+      annotations, 
+      chartId: "emission-factors-chart", 
+      height: 350 
+    });
+  }, [series, categories, annotations, filterYear]);
 
   // Initial load
   useEffect(() => {

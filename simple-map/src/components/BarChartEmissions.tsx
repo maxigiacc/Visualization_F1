@@ -8,7 +8,11 @@ import { buildEmissionsBarChartOptions } from './utils/chartConfig';
 const AVERAGE_CARGO_MASS_TONNES = 50;
 const EARLIEST_YEAR = 2000;
 
-export default function BarChartEmissions() {
+type Props = {
+  filterYear?: number | null;
+};
+
+export default function BarChartEmissions({ filterYear }: Props) {
   const [chartData, setChartData] = useState<EmissionsData>({ 
     categories: [], 
     values: [] 
@@ -22,17 +26,30 @@ export default function BarChartEmissions() {
       .finally(() => setLoading(false));
   }, []);
   
+  const filteredData = useMemo(() => {
+    if (!filterYear || !Number.isFinite(filterYear)) return chartData;
+    const idx = chartData.categories.findIndex(
+      (c) => parseInt(c, 10) === filterYear
+    );
+    if (idx === -1) return { categories: [], values: [] };
+    return {
+      categories: [chartData.categories[idx]],
+      values: [chartData.values[idx]],
+    };
+  }, [chartData, filterYear]);
+
   const series = useMemo(
-    () => [{ name: "Estimated CO₂", data: chartData.values }], 
-    [chartData.values]
+    () => [{ name: "Estimated CO₂", data: filteredData.values }],
+    [filteredData.values]
   );
 
-  const chartHeight = Math.max(520, chartData.categories.length * 14);
-  const options = buildEmissionsBarChartOptions(chartData.categories, chartHeight);
+  const chartHeight = Math.max(320, filteredData.categories.length * 24);
+  const options = buildEmissionsBarChartOptions(filteredData.categories, chartHeight);
 
 
 
   if (loading) return <div>Loading emission data...</div>;
+  if (!filteredData.categories.length) return <div>No emission data</div>;
   
   return (
     <Chart 
