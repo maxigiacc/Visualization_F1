@@ -369,10 +369,10 @@ function normalizeCountryKey(name: string): string {
 
 const COUNTRY_ALIASES: Record<string, string> = {
   "uk": "united kingdom",
-  "usa": "united states",
-  "u.s.a": "united states",
+  "usa": "united states of america",
+  "u.s.a": "united states of america",
   "uae": "united arab emirates",
-  "south korea": "korea, south",
+  "korea": "south korea",
 };
 
 
