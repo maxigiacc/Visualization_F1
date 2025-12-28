@@ -1,4 +1,62 @@
-.InteractiveMap {
-    background-color: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(2px);
+#optimizedButton,
+#EntiredButton,
+#ResetButton {
+  padding: 1.3em 3em;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #000;
+  background-color: #fff;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+}
+
+#optimizedButton:hover,
+#EntiredButton:hover,
+#ResetButton:hover {
+  background-color: var(--btn-bg);
+  box-shadow: 0px 15px 20px rgba(var(--btn-rgb), 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+#optimizedButton:active,
+#EntiredButton:active,
+#ResetButton:active {
+  transform: translateY(-1px);
+}
+
+/* Disabled Button styles */
+#optimizedButton:disabled {
+  background-color: #e0e0e0;
+  color: #9e9e9e;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+#optimizedButton:disabled:hover {
+  background-color: #e0e0e0;
+  box-shadow: none;
+  color: #9e9e9e;
+  transform: none;
+}
+
+
+/* Specific Button colors */
+#optimizedButton {
+  --btn-bg: #23c483;
+  --btn-rgb: 35, 196, 131;
+}
+#EntiredButton {
+  --btn-bg: #1e90ff;
+  --btn-rgb: 30, 144, 255;
+}
+#ResetButton {
+  --btn-bg: #ff531e;
+  --btn-rgb: 255, 83, 30;
 }

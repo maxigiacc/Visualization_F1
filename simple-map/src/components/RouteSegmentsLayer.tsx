@@ -14,9 +14,18 @@ type RouteSegmentsLayerProps = {
     markerScale: number;
     onSegmentClick?: (segment: RouteSegment) => void;
     activeSegmentOrders: number[];
+    showLabels?: boolean;
+    showArrows?: boolean;
 };
 
-export const RouteSegmentsLayer: React.FC<RouteSegmentsLayerProps> = ({ segments, markerScale, onSegmentClick, activeSegmentOrders,}) => {
+export const RouteSegmentsLayer: React.FC<RouteSegmentsLayerProps> = ({
+    segments,
+    markerScale,
+    onSegmentClick,
+    activeSegmentOrders,
+    showLabels = true,
+    showArrows = true,
+}) => {
     
     const [hoveredId, setHoveredId] = useState<string | null>(null);
     const { projection } = useMapContext();
@@ -73,88 +82,98 @@ export const RouteSegmentsLayer: React.FC<RouteSegmentsLayerProps> = ({ segments
             )})}
 
             {/* ARROWS */}
-            {visibleSegments.map((segment) => {
-                const invZoom = markerScale;
-                const arrowAngle = getArrowAngle(segment);
-                const isMuted = activeOrderSet.size > 0 && !activeOrderSet.has(segment.order) && neighborOrderSet.has(segment.order);
-                const displayColor = isMuted ? "#B0B0B0" : segment.color;
-                return (
-                    <Marker
-                        key={`arrow-${segment.id}`}
-                        coordinates={segment.arrowCoordinates}
-                    >
-                        <g
-                            transform={`scale(${invZoom}) rotate(${arrowAngle})`}
-                            style={{
-                                transformOrigin: "0 0",
-                                pointerEvents: "none",
-                            }}
+            {showArrows &&
+                visibleSegments.map((segment) => {
+                    const invZoom = markerScale;
+                    const arrowAngle = getArrowAngle(segment);
+                    const isMuted =
+                        activeOrderSet.size > 0 &&
+                        !activeOrderSet.has(segment.order) &&
+                        neighborOrderSet.has(segment.order);
+                    const displayColor = isMuted ? "#B0B0B0" : segment.color;
+                    return (
+                        <Marker
+                            key={`arrow-${segment.id}`}
+                            coordinates={segment.arrowCoordinates}
                         >
-                            <path
-                                d="M0 0 L-10 4 L-10 -4 Z"
-                                fill={displayColor}
-                                opacity={0.9}
-                            />
-                        </g>
-                    </Marker>
-                );
-            })}
-
-            {/* LABELS */}
-            {visibleSegments.map((segment) => {
-                const invZoom = markerScale;
-                const isMuted = activeOrderSet.size > 0 && !activeOrderSet.has(segment.order) && neighborOrderSet.has(segment.order);
-                const displayColor = isMuted ? "#B0B0B0" : segment.color;
-                const isHovered = hoveredId === segment.id;
-                return (
-                    <Marker
-                        key={`label-${segment.id}`}
-                        coordinates={segment.labelCoordinates}
-                    >
-                        <g
-                            transform={`scale(${invZoom})`}
-                            style={{
-                                transformOrigin: "0 0",
-                                pointerEvents: "auto",
-                                cursor: onSegmentClick ? "pointer" : "default",
-                            }}
-                            onClick={() => onSegmentClick?.(segment)}
-                            onMouseEnter={() => setHoveredId(segment.id)}
-                            onMouseLeave={() => setHoveredId(null)}
-                        >
-                            <rect
-                                x={-LABEL_WIDTH / 2}
-                                y={-LABEL_HEIGHT - 3}
-                                width={LABEL_WIDTH}
-                                height={LABEL_HEIGHT}
-                                rx={LABEL_HEIGHT / 2}
-                                fill={
-                                    isHovered
-                                        ? displayColor
-                                        : "rgba(255, 255, 255, 0.9)"
-                                }
-                                stroke={displayColor}
-                                strokeWidth={0.8}
-                            />
-                            <text
-                                x={0}
-                                y={-LABEL_HEIGHT / 2}
-                                textAnchor="middle"
-                                fill={isHovered ? "#fff" : displayColor}
+                            <g
+                                transform={`scale(${invZoom}) rotate(${arrowAngle})`}
                                 style={{
-                                    fontSize: "8px",
-                                    fontWeight: 600,
-                                    letterSpacing: "0.3px",
-                                    textTransform: "uppercase",
-                                    userSelect: "none",
+                                    transformOrigin: "0 0",
+                                    pointerEvents: "none",
                                 }}
                             >
-                                #{segment.order}
-                            </text>
-                        </g>
-                    </Marker>
-                );
-            })}
+                                <path
+                                    d="M0 0 L-10 4 L-10 -4 Z"
+                                    fill={displayColor}
+                                    opacity={0.9}
+                                />
+                            </g>
+                        </Marker>
+                    );
+                })}
+
+            {/* LABELS */}
+            {showLabels &&
+                visibleSegments.map((segment) => {
+                    const invZoom = markerScale;
+                    const isMuted =
+                        activeOrderSet.size > 0 &&
+                        !activeOrderSet.has(segment.order) &&
+                        neighborOrderSet.has(segment.order);
+                    const displayColor = isMuted ? "#B0B0B0" : segment.color;
+                    const isHovered = hoveredId === segment.id;
+                    return (
+                        <Marker
+                            key={`label-${segment.id}`}
+                            coordinates={segment.labelCoordinates}
+                        >
+                            <g
+                                transform={`scale(${invZoom})`}
+                                style={{
+                                    transformOrigin: "0 0",
+                                    pointerEvents: "auto",
+                                    cursor: onSegmentClick
+                                        ? "pointer"
+                                        : "default",
+                                }}
+                                onClick={() => onSegmentClick?.(segment)}
+                                onMouseEnter={() => setHoveredId(segment.id)}
+                                onMouseLeave={() => setHoveredId(null)}
+                            >
+                                <rect
+                                    x={-LABEL_WIDTH / 2}
+                                    y={-LABEL_HEIGHT - 3}
+                                    width={LABEL_WIDTH}
+                                    height={LABEL_HEIGHT}
+                                    rx={LABEL_HEIGHT / 2}
+                                    fill={
+                                        isHovered
+                                            ? displayColor
+                                            : "rgba(255, 255, 255, 0.9)"
+                                    }
+                                    stroke={displayColor}
+                                    strokeWidth={0.8}
+                                />
+                                <text
+                                    x={0}
+                                    y={-LABEL_HEIGHT / 2}
+                                    textAnchor="middle"
+                                    fill={isHovered ? "#fff" : displayColor}
+                                    style={{
+                                        fontSize: "8px",
+                                        fontWeight: 600,
+                                        letterSpacing: "0.3px",
+                                        textTransform: "uppercase",
+                                        userSelect: "none",
+                                    }}
+                                >
+                                    #{segment.order}
+                                </text>
+                            </g>
+                        </Marker>
+                    );
+                })}
         </>
     );
 };

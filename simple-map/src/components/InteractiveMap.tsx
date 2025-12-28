@@ -16,7 +16,8 @@ import { useSettings } from "../SettingsContext";
 import "../css/InteractiveMap.css";
 import geoUrl from "../assets/countries-50m.json";
 import { getRacesWithCircuits } from "./utils/dataLoader";
-import {RouteSegmentsLayer, generateCurvedLine} from "./RouteSegmentsLayer";
+import { RouteSegmentsLayer, generateCurvedLine } from "./RouteSegmentsLayer";
+import Graph from "./models/Graph";
 
 const SEGMENT_COLORS = [
     "#FF6B6B", "#FFA94D", "#FFD43B", "#69DB7C",
@@ -27,6 +28,7 @@ const InteractiveMap: React.FC = () => {
     const [races, setRaces] = useState<Circuit[]>([]);
     const [racesWithCircuit, setRacesWithCircuit] = useState<RaceWithCircuit[]>([]);
     const [activeSegmentOrders, setActiveSegmentOrders] = useState<number[]>([]);
+    const [showOptimizedPath, setShowOptimizedPath] = useState<boolean>(false);
     const { year, setYear , selected_race, setSelectedRace  } = useSettings();
     
 
@@ -81,6 +83,36 @@ const InteractiveMap: React.FC = () => {
             .sort((a, b) => a.round - b.round);
     }, [racesWithCircuit, year]);
 
+    const selectedRacesForOptimization = useMemo(() => {
+        if (selected_race.length === 0) return selectedYearRaces;
+        const selectedNames = new Set(selected_race);
+        return selectedYearRaces.filter((race) =>
+            selectedNames.has(race.circuit.name),
+        );
+    }, [selectedYearRaces, selected_race]);
+
+    const optimizedOrderedRaces = useMemo(() => {
+        if (selectedRacesForOptimization.length <= 1) {
+            return selectedRacesForOptimization;
+        }
+        const graph = new Graph(selectedRacesForOptimization);
+        const optimizedPath = graph.generateOptimizedPath().path;
+        if (optimizedPath.length === 0) return selectedRacesForOptimization;
+        const raceByLocation = new Map(
+            selectedRacesForOptimization.map((race) => [
+                race.circuit.location,
+                race,
+            ]),
+        );
+        const orderedRaces = optimizedPath
+            .map((node) => raceByLocation.get(node))
+            .filter((race): race is RaceWithCircuit => Boolean(race));
+        if (orderedRaces.length !== optimizedPath.length) {
+            return selectedRacesForOptimization;
+        }
+        return orderedRaces;
+    }, [selectedRacesForOptimization]);
+
     const routeSegments = useMemo<RouteSegment[]>(() => {
         if (selectedYearRaces.length <= 1) return [];
         return selectedYearRaces.slice(0, -1).map((race, idx) => {
@@ -110,22 +142,81 @@ const InteractiveMap: React.FC = () => {
         });
     }, [selectedYearRaces]);
 
+    const optimizedRouteSegments = useMemo<RouteSegment[]>(() => {
+        if (optimizedOrderedRaces.length <= 1) return [];
+        return optimizedOrderedRaces.slice(0, -1).map((race, idx) => {
+            const nextRace = optimizedOrderedRaces[idx + 1];
+            const coordinates = generateCurvedLine(
+                race.coordinates,
+                nextRace.coordinates,
+                0.25,
+                64,
+            );
+            const labelCoordinates =
+                coordinates[Math.floor(coordinates.length / 2)] ??
+                race.coordinates;
+            const arrowIndex = Math.max(coordinates.length - 3, 0);
+            const arrowCoordinates =
+                coordinates[arrowIndex] ?? nextRace.coordinates;
+            return {
+                id: `${race.raceId}-${nextRace.raceId}-optimized`,
+                from: race,
+                to: nextRace,
+                coordinates,
+                color: "#2F9E44",
+                order: idx + 1,
+                labelCoordinates,
+                arrowCoordinates,
+            };
+        });
+    }, [optimizedOrderedRaces]);
+
     const handleSegmentClick = (segment: RouteSegment) => {
         const nextSelected = new Set(selected_race);
         nextSelected.add(segment.from.circuit.name);
         nextSelected.add(segment.to.circuit.name);
-        setSelectedRace(Array.from(nextSelected));
-        // Insert segment order 
-        setActiveSegmentOrders((prev) => {
-            // Empty list case
-            if(prev.length == 0) return [segment.order];
-            // User click in the back
-            if(prev[0] == segment.order+1){
-                return [segment.order, ...prev];
-            }else{ // User click in the front
-                return [...prev, segment.order];
-            }
-        });
+        const new_list_of_races = Array.from(nextSelected)
+        
+        // Update the selected races only if the user clicked on a new segment 
+        if(new_list_of_races.length != selected_race.length){
+            setSelectedRace(new_list_of_races);
+            // Insert segment order 
+            setActiveSegmentOrders((prev) => {
+                // Empty list case
+                if(prev.length == 0) return [segment.order];
+                // User click in the back
+                if(prev[0] == segment.order+1){
+                    return [segment.order, ...prev];
+                }else{ // User click in the front
+                    return [...prev, segment.order];
+                }
+            });
+        }
+    };
+
+    const hasSelectedPath = activeSegmentOrders.length > 0;
+
+    useEffect(() => {
+        if (!hasSelectedPath && showOptimizedPath) {
+            setShowOptimizedPath(false);
+        }
+    }, [hasSelectedPath, showOptimizedPath]);
+
+    const handleToggleOptimizedPath = () => {
+        if (!hasSelectedPath) return;
+        setShowOptimizedPath((prev) => !prev);
+    };
+
+    const handleSelectEntirePath = () => {
+        if (selectedYearRaces.length === 0) return;
+        setSelectedRace(selectedYearRaces.map((race) => race.circuit.name));
+        setActiveSegmentOrders(routeSegments.map((segment) => segment.order));
+    };
+
+    const handleResetSelection = () => {
+        setSelectedRace([]);
+        setActiveSegmentOrders([]);
+        setShowOptimizedPath(false);
     };
 
     return (
@@ -152,6 +243,16 @@ const InteractiveMap: React.FC = () => {
                         ))}
                     </select>
                 </div>
+                <button
+                    type="button" onClick={handleToggleOptimizedPath} disabled={!hasSelectedPath} id="optimizedButton">
+                    {showOptimizedPath ? "ORIGINAL PATH" : "OPTIMIZED PATH"}
+                </button>
+                <button type="button" id="EntiredButton" onClick={handleSelectEntirePath}>
+                    ENTIRE PATH
+                </button>
+                <button type="button" id="ResetButton" onClick={handleResetSelection}>
+                    RESET
+                </button>
             </div>
 
             <ComposableMap projection="geoEqualEarth" width={780} height={520}>
@@ -296,12 +397,22 @@ const InteractiveMap: React.FC = () => {
                         );
                     })}
 
-                    <RouteSegmentsLayer
-                        segments={routeSegments}
-                        markerScale={markerScale}
-                        onSegmentClick={handleSegmentClick}
-                        activeSegmentOrders={activeSegmentOrders}
-                    />
+                    {showOptimizedPath ? (
+                        <RouteSegmentsLayer
+                            segments={optimizedRouteSegments}
+                            markerScale={markerScale}
+                            activeSegmentOrders={[]}
+                            showLabels={false}
+                            showArrows={false}
+                        />
+                    ) : (
+                        <RouteSegmentsLayer
+                            segments={routeSegments}
+                            markerScale={markerScale}
+                            onSegmentClick={handleSegmentClick}
+                            activeSegmentOrders={activeSegmentOrders}
+                        />
+                    )}
                 </ZoomableGroup>
             </ComposableMap>
         </div>

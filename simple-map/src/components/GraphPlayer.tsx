@@ -42,7 +42,9 @@ const GraphPlayer: React.FC = () => {
     
     // Create the graph for the optimization
     let graph = useMemo(() => {
+        console.log("------------------------------")
         console.log("Loading light");
+        console.log(selected_race , races);
         if (!races.length) return null;
         const filtered = selected_race?.length ? races.filter(race => selected_race.includes(race.circuit.name)) : races;
         return new Graph(filtered);

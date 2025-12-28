@@ -86,7 +86,7 @@ export default class Graph {
     // Return total distances of optimized path for car and flight
     getOptimizedPathDistance(): {carDistance: number , flightDistance: number} {
         const nodes = Array.from(this.optimized_path.keys());
-        console.log("Optimized path nodes: ", nodes);
+        // console.log("Optimized path nodes: ", nodes);
         let totalCarDistance = 0;
         let totalFlightDistance = 0;
 
@@ -95,7 +95,7 @@ export default class Graph {
             if (dist === undefined) {
                 throw new Error(`No edge between ${nodes[i]} and ${nodes[i + 1]}`);
             }
-            console.log("Distance between ", nodes[i], " and ", nodes[i + 1], " is ", dist);
+            // console.log("Distance between ", nodes[i], " and ", nodes[i + 1], " is ", dist);
             totalCarDistance += dist[0];
             totalFlightDistance += dist[1];
         }
