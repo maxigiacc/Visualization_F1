@@ -144,17 +144,27 @@ const InteractiveMap: React.FC = () => {
 
     const optimizedRouteSegments = useMemo<RouteSegment[]>(() => {
         if (optimizedOrderedRaces.length <= 1) return [];
+        const OPTIMIZED_OFFSET = { lng: 1.2, lat: 0.8 };
+        const OPTIMIZED_LABEL_OFFSET_LAT = 5;
         return optimizedOrderedRaces.slice(0, -1).map((race, idx) => {
             const nextRace = optimizedOrderedRaces[idx + 1];
-            const coordinates = generateCurvedLine(
+            const baseCoordinates = generateCurvedLine(
                 race.coordinates,
                 nextRace.coordinates,
                 0.25,
                 64,
             );
-            const labelCoordinates =
+            const coordinates = baseCoordinates.map(([lng, lat]) => [
+                lng + OPTIMIZED_OFFSET.lng,
+                lat + OPTIMIZED_OFFSET.lat,
+            ]);
+            const labelCoordinatesBase =
                 coordinates[Math.floor(coordinates.length / 2)] ??
                 race.coordinates;
+            const labelCoordinates: [number, number] = [
+                labelCoordinatesBase[0],
+                labelCoordinatesBase[1] - OPTIMIZED_LABEL_OFFSET_LAT,
+            ];
             const arrowIndex = Math.max(coordinates.length - 3, 0);
             const arrowCoordinates =
                 coordinates[arrowIndex] ?? nextRace.coordinates;
@@ -170,6 +180,19 @@ const InteractiveMap: React.FC = () => {
             };
         });
     }, [optimizedOrderedRaces]);
+
+    const originalOverlaySegments = useMemo<RouteSegment[]>(() => {
+        const baseSegments =
+            activeSegmentOrders.length > 0
+                ? routeSegments.filter((segment) =>
+                      activeSegmentOrders.includes(segment.order),
+                  )
+                : [];
+        return baseSegments.map((segment) => ({
+            ...segment,
+            color: "#F08C00",
+        }));
+    }, [routeSegments, activeSegmentOrders]);
 
     const handleSegmentClick = (segment: RouteSegment) => {
         const nextSelected = new Set(selected_race);
@@ -248,7 +271,7 @@ const InteractiveMap: React.FC = () => {
                     {showOptimizedPath ? "ORIGINAL PATH" : "OPTIMIZED PATH"}
                 </button>
                 <button type="button" id="EntiredButton" onClick={handleSelectEntirePath}>
-                    ENTIRE PATH
+                    SELECT ALL
                 </button>
                 <button type="button" id="ResetButton" onClick={handleResetSelection}>
                     RESET
@@ -398,14 +421,24 @@ const InteractiveMap: React.FC = () => {
                     })}
 
                     {showOptimizedPath ? (
-                        <RouteSegmentsLayer
-                            segments={optimizedRouteSegments}
-                            markerScale={markerScale}
-                            activeSegmentOrders={[]}
-                            showLabels={true}
-                            showArrows={true}
-                            interactive={false}
-                        />
+                        <>
+                            <RouteSegmentsLayer
+                                segments={optimizedRouteSegments}
+                                markerScale={markerScale}
+                                activeSegmentOrders={[]}
+                                showLabels={true}
+                                showArrows={true}
+                                interactive={false}
+                            />
+                            <RouteSegmentsLayer
+                                segments={originalOverlaySegments}
+                                markerScale={markerScale}
+                                activeSegmentOrders={[]}
+                                showLabels={true}
+                                showArrows={true}
+                                interactive={false}
+                            />
+                        </>
                     ) : (
                         <RouteSegmentsLayer
                             segments={routeSegments}
