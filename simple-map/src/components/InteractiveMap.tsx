@@ -156,17 +156,19 @@ const InteractiveMap: React.FC = () => {
                 0.25,
                 64,
             );
-            const coordinates = baseCoordinates.map(([lng, lat]) => [
-                lng + OPTIMIZED_OFFSET.lng,
-                lat + OPTIMIZED_OFFSET.lat,
-            ]);
+            const coordinates = baseCoordinates.map(([lng, lat]) =>
+                createCoordinates(
+                    lng + OPTIMIZED_OFFSET.lng,
+                    lat + OPTIMIZED_OFFSET.lat
+                )
+            );
             const labelCoordinatesBase =
                 coordinates[Math.floor(coordinates.length / 2)] ??
                 race.coordinates;
-            const labelCoordinates: [number, number] = [
+            const labelCoordinates = createCoordinates(
                 labelCoordinatesBase[0],
-                labelCoordinatesBase[1] - OPTIMIZED_LABEL_OFFSET_LAT,
-            ];
+                labelCoordinatesBase[1] - OPTIMIZED_LABEL_OFFSET_LAT
+            );
             const arrowIndex = Math.max(coordinates.length - 3, 0);
             const arrowCoordinates =
                 coordinates[arrowIndex] ?? nextRace.coordinates;
