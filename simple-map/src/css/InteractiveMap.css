@@ -32,14 +32,18 @@
 }
 
 /* Disabled Button styles */
-#optimizedButton:disabled {
+#optimizedButton:disabled,
+#EntiredButton:disabled,
+#ResetButton:disabled {
   background-color: #e0e0e0;
   color: #9e9e9e;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
 }
-#optimizedButton:disabled:hover {
+#optimizedButton:disabled:hover,
+#EntiredButton:disabled:hover,
+#ResetButton:disabled:hover {
   background-color: #e0e0e0;
   box-shadow: none;
   color: #9e9e9e;
@@ -59,4 +63,17 @@
 #ResetButton {
   --btn-bg: #ff531e;
   --btn-rgb: 255, 83, 30;
+}
+
+.selectionNotice {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fff4d6, #ffe4a1);
+  border: 1px solid #f59f00;
+  color: #7a4a00;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  box-shadow: 0 8px 16px rgba(245, 159, 0, 0.18);
 }

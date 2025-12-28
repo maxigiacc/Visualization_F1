@@ -29,6 +29,7 @@ const InteractiveMap: React.FC = () => {
     const [racesWithCircuit, setRacesWithCircuit] = useState<RaceWithCircuit[]>([]);
     const [activeSegmentOrders, setActiveSegmentOrders] = useState<number[]>([]);
     const [showOptimizedPath, setShowOptimizedPath] = useState<boolean>(false);
+    const [showAllSelectedNotice, setShowAllSelectedNotice] = useState<boolean>(false);  // Deal the notification for uncorrect click
     const { year, setYear , selected_race, setSelectedRace  } = useSettings();
     
 
@@ -64,7 +65,8 @@ const InteractiveMap: React.FC = () => {
     }, [racesWithCircuit]);
     
     const filteredRaces = useMemo(() => {
-        setActiveSegmentOrders([]); // Reset active segments on filter change
+            setActiveSegmentOrders([]); // Reset active segments on filter change
+            setShowAllSelectedNotice(false);  // Reset notice on filter change
         if (!year) return races;
         const id_list = racesWithCircuit.filter(race => race.year === year).map(race => race.circuit.circuitId);
         return races.filter(c => id_list.includes(c.circuitId));
@@ -202,6 +204,9 @@ const InteractiveMap: React.FC = () => {
         
         // Update the selected races only if the user clicked on a new segment 
         if(new_list_of_races.length != selected_race.length){
+            if ( filteredRaces.length > 0 && new_list_of_races.length === filteredRaces.length) {
+                setShowAllSelectedNotice(true);
+            }
             setSelectedRace(new_list_of_races);
             // Insert segment order 
             setActiveSegmentOrders((prev) => {
@@ -225,6 +230,12 @@ const InteractiveMap: React.FC = () => {
         }
     }, [hasSelectedPath, showOptimizedPath]);
 
+    useEffect(() => {
+        if ( filteredRaces.length === 0 || selected_race.length !== filteredRaces.length) {
+            setShowAllSelectedNotice(false);
+        }
+    }, [filteredRaces.length, selected_race.length]);
+
     const handleToggleOptimizedPath = () => {
         if (!hasSelectedPath) return;
         setShowOptimizedPath((prev) => !prev);
@@ -240,10 +251,13 @@ const InteractiveMap: React.FC = () => {
         setSelectedRace([]);
         setActiveSegmentOrders([]);
         setShowOptimizedPath(false);
+        setShowAllSelectedNotice(false);
     };
 
     return (
         <div style={{ position: "relative" }} className="InteractiveMap">
+            
+            {/* Filter bar for year selection and buttons */}
             <div className="filterBar">
                 <div className="year-select-wrapper">
                     <label htmlFor="year-select">Season</label>
@@ -270,14 +284,23 @@ const InteractiveMap: React.FC = () => {
                     type="button" onClick={handleToggleOptimizedPath} disabled={!hasSelectedPath} id="optimizedButton">
                     {showOptimizedPath ? "ORIGINAL PATH" : "OPTIMIZED PATH"}
                 </button>
-                <button type="button" id="EntiredButton" onClick={handleSelectEntirePath}>
+                <button type="button" id="EntiredButton" onClick={handleSelectEntirePath} disabled={filteredRaces && selected_race.length === filteredRaces.length} >
                     SELECT ALL
                 </button>
-                <button type="button" id="ResetButton" onClick={handleResetSelection}>
+                <button type="button" id="ResetButton" onClick={handleResetSelection} disabled={selected_race.length === 0} >
                     RESET
                 </button>
             </div>
+            
+            {/* Notification for selecting all */}
+            {showAllSelectedNotice && (
+                    <div className="selectionNotice">
+                        You have selected all the races now! If you want to
+                        restart the selection clicked RESET button.
+                    </div>
+            )}
 
+            {/* The Map itself */}
             <ComposableMap projection="geoEqualEarth" width={780} height={520}>
                 <ZoomableGroup
                     minZoom={1}
@@ -420,6 +443,7 @@ const InteractiveMap: React.FC = () => {
                         );
                     })}
 
+                    {/* If optimized path is clicked, draw both optimized and original overlays */}
                     {showOptimizedPath ? (
                         <>
                             <RouteSegmentsLayer
