@@ -402,8 +402,9 @@ const InteractiveMap: React.FC = () => {
                             segments={optimizedRouteSegments}
                             markerScale={markerScale}
                             activeSegmentOrders={[]}
-                            showLabels={false}
-                            showArrows={false}
+                            showLabels={true}
+                            showArrows={true}
+                            interactive={false}
                         />
                     ) : (
                         <RouteSegmentsLayer

@@ -16,6 +16,7 @@ type RouteSegmentsLayerProps = {
     activeSegmentOrders: number[];
     showLabels?: boolean;
     showArrows?: boolean;
+    interactive?: boolean;
 };
 
 export const RouteSegmentsLayer: React.FC<RouteSegmentsLayerProps> = ({
@@ -25,6 +26,7 @@ export const RouteSegmentsLayer: React.FC<RouteSegmentsLayerProps> = ({
     activeSegmentOrders,
     showLabels = true,
     showArrows = true,
+    interactive = true,
 }) => {
     
     const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -130,17 +132,27 @@ export const RouteSegmentsLayer: React.FC<RouteSegmentsLayerProps> = ({
                         >
                             <g
                                 transform={`scale(${invZoom})`}
-                                style={{
-                                    transformOrigin: "0 0",
-                                    pointerEvents: "auto",
-                                    cursor: onSegmentClick
-                                        ? "pointer"
-                                        : "default",
-                                }}
-                                onClick={() => onSegmentClick?.(segment)}
-                                onMouseEnter={() => setHoveredId(segment.id)}
-                                onMouseLeave={() => setHoveredId(null)}
-                            >
+                            style={{
+                                transformOrigin: "0 0",
+                                pointerEvents: interactive ? "auto" : "none",
+                                cursor: interactive && onSegmentClick
+                                    ? "pointer"
+                                    : "default",
+                            }}
+                            onClick={
+                                interactive
+                                    ? () => onSegmentClick?.(segment)
+                                    : undefined
+                            }
+                            onMouseEnter={
+                                interactive
+                                    ? () => setHoveredId(segment.id)
+                                    : undefined
+                            }
+                            onMouseLeave={
+                                interactive ? () => setHoveredId(null) : undefined
+                            }
+                        >
                                 <rect
                                     x={-LABEL_WIDTH / 2}
                                     y={-LABEL_HEIGHT - 3}
