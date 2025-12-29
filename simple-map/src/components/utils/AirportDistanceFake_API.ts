@@ -12,13 +12,15 @@
  * Do not commit real keys in production; move them to environment variables later.
  */
 
-export function fetchFlightDistance( originCode: string, destinationCode: string ): number {
-  // Generate random distance for fake implementation
-  const minDistance = 1; // Minimum distance in km
-  const maxDistance = 5; // Maximum distance in km
-  const distanceKm = Math.floor(Math.random() * (maxDistance - minDistance + 1)) + minDistance;
-  //console.log(`Fetched fake distance between ${originCode} and ${destinationCode}: ${distanceKm} km`);
-  return (distanceKm);
+export async function fetchFlightDistance( originCode: string, destinationCode: string ): Promise<number> {
+  
+  const minDistance = 1;
+  const maxDistance = 5;
+
+  const distanceKm =
+    Math.floor(Math.random() * (maxDistance - minDistance + 1)) + minDistance;
+
+  return distanceKm;
 }
 
 export default fetchFlightDistance;

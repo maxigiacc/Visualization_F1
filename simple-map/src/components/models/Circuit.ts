@@ -9,6 +9,8 @@ export interface Circuit {
     name: string;
     url: string; // wikipedia URL
     clusterId: string; // optional, used for clustering
+    nearest_airport_iata?: string; // optional, IATA code of nearest airport
+    nearest_airport_icao?: string; // optional, ICAO code of nearest airport
 }
 
 /**
