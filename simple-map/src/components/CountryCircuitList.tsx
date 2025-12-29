@@ -1,6 +1,7 @@
 // src/components/CountryCircuitList.tsx
 import React from "react";
 import type { Circuit } from "./models/Circuit";
+import CircuitDetails from "./CircuitDetails";
 
 type Props = {
   circuits: Circuit[];
