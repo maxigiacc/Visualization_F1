@@ -5,6 +5,7 @@ import type { CircuitStats } from "./utils/dataLoader";
 import { getCircuitStats } from "./utils/dataLoader";
 import { TEAM_COLORS } from "./StatCard";
 import StatCard from "./StatCard";
+import DriverAvatar from "./DriverAvatar";
 
 type Props = {
   circuit: Circuit;
@@ -102,6 +103,7 @@ const CircuitDetails: React.FC<Props> = ({ circuit, onBack }) => {
               <ol style={{ marginTop: 8, paddingLeft: 18 }}>
                 {stats.lastPodium.map((p, i) => (
                   <li key={i} style={{ marginBottom: 4 }}>
+                    <DriverAvatar name={p.driver} team={p.team} />
                     <strong style={{ color: TEAM_COLORS[p.team] ?? "#fff" }}>
                       {p.driver}
                     </strong>{" "}

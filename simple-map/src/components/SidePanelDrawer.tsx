@@ -22,6 +22,14 @@ const SidePanelDrawer: React.FC<Props> = ({
   onSelectCountry,
 }) => {
 
+    if (selectedCircuit) {
+    return (
+      <CircuitDetails
+        circuit={selectedCircuit}
+        onBack={() => onSelectCircuit(null)}/>
+    );
+  }
+
   const circuitsForCountry = circuits.filter(c => sameCountry(c.country, country));
   
   return (
@@ -73,7 +81,7 @@ const SidePanelDrawer: React.FC<Props> = ({
               fontSize: 13
             }}
           >
-            ← Back to circuits list
+            Back to circuits list
         </button>
         <CountryCircuitList 
           circuits={circuitsForCountry} 
@@ -100,7 +108,10 @@ const SidePanelDrawer: React.FC<Props> = ({
           >
             ← Back to {country}
           </button>
-          <CircuitDetails circuit={selectedCircuit} />
+          <CircuitDetails 
+            circuit={selectedCircuit} 
+            onBack={() => onSelectCircuit(null)}
+          />
         </>
       )}
     </div>
