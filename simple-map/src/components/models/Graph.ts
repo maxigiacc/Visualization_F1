@@ -1,5 +1,5 @@
 export type DistanceTuple = [number, number];   // (car, flight) distances
-import fetchFlightDistance from "../utils/AirportDistanceFake";
+import fetchFlightDistance from "../utils/AirportDistanceFake_FUNCTION";
 import type { RaceWithCircuit } from "./RaceWithCircuit";
 
 export type FlowList = {
