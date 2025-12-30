@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import Graph from "./models/Graph";
+import Graph from "./models/Graph_API";
 import type { RaceWithCircuit } from "./models/RaceWithCircuit";
 import { getRacesWithCircuitsByYear } from "./utils/dataLoader";
 import "../css/GraphPlayer.css";
@@ -37,29 +37,62 @@ const placeHolder = (circuit: Circuit | null) => void{};
 const GraphPlayer: React.FC = () => {
     const { year , selected_race , setSelectedRace } = useSettings();
     const [races, setRaces] = useState<RaceWithCircuit[]>([]);
+    const [baseGraph, setBaseGraph] = useState<Graph | null>(null);
     const co2_per_km_car = 0.192; // Kg CO2 per Km for car
     const co2_per_km_flight = 0.255; // Kg CO2 per Km for flight
-    
-    // Create the graph for the optimization
-    let graph = useMemo(() => {
-        if (!races.length) return null;
-        const filtered = selected_race?.length ? races.filter(race => selected_race.includes(race.circuit.name)) : races;
-        return new Graph(filtered);
-    }, [selected_race , races]);
 
     // Obtain circuits for the actual year
-    let circuitsMemo = useMemo(() => {
+    const circuitsMemo = useMemo(() => {
         if (!races.length) return [];
         return races.map(race => race.circuit);
     }, [races]);
 
     // Update after year change
     useEffect(() => {
+        let cancelled = false;
         setSelectedRace([]); // Reset selected
-        getRacesWithCircuitsByYear(year).then((data) => {
-            setRaces(data);
-        });
-    }, [year]);
+
+        const loadGraph = async () => {
+            try {
+                const data = await getRacesWithCircuitsByYear(year);
+                if (cancelled) return;
+
+                const nextGraph = new Graph();
+                await nextGraph.initPath(data);
+                if (cancelled) return;
+
+                setRaces(data);
+                setBaseGraph(nextGraph);
+            } catch (error) {
+                console.error("Failed to load races or build graph:", error);
+            }
+        };
+
+        void loadGraph();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [year, setSelectedRace]);
+
+    const filteredRaces = useMemo(() => {
+        if (!races.length) return [];
+        if (selected_race.length === 0) return races;
+        return races.filter((race) => selected_race.includes(race.circuit.name));
+    }, [races, selected_race]);
+
+    const graph = useMemo(() => {
+        if (!baseGraph || baseGraph.isEmpty() || races.length === 0) return null;
+
+        try {
+            const nextGraph = new Graph(baseGraph);
+            nextGraph.initSelectedPath(filteredRaces);
+            return nextGraph;
+        } catch (error) {
+            console.error("Failed to initialize selected path:", error);
+            return null;
+        }
+    }, [baseGraph, filteredRaces, races.length]);
 
     return (
     <div className="graph-player">
@@ -142,4 +175,3 @@ const GraphPlayer: React.FC = () => {
     );
 };
 export default GraphPlayer
-

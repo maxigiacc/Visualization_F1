@@ -17,7 +17,7 @@ import "../css/InteractiveMap.css";
 import geoUrl from "../assets/countries-50m.json";
 import { getRacesWithCircuits } from "./utils/dataLoader";
 import { RouteSegmentsLayer, generateCurvedLine } from "./RouteSegmentsLayer";
-import Graph from "./models/Graph";
+import Graph from "./models/Graph_API";
 
 const SEGMENT_COLORS = [
     "#FF6B6B", "#FFA94D", "#FFD43B", "#69DB7C",
@@ -30,6 +30,7 @@ const InteractiveMap: React.FC = () => {
     const [activeSegmentOrders, setActiveSegmentOrders] = useState<number[]>([]);
     const [showOptimizedPath, setShowOptimizedPath] = useState<boolean>(false);
     const [showAllSelectedNotice, setShowAllSelectedNotice] = useState<boolean>(false);  // Deal the notification for uncorrect click
+    const [baseGraph, setBaseGraph] = useState<Graph | null>(null);
     const { year, setYear , selected_race, setSelectedRace  } = useSettings();
     
 
@@ -63,15 +64,18 @@ const InteractiveMap: React.FC = () => {
         years.sort((a, b) => a - b);
         return years;
     }, [racesWithCircuit]);
+
+    useEffect(() => {
+        setActiveSegmentOrders([]);
+        setShowAllSelectedNotice(false);
+    }, [year, races, racesWithCircuit]);
     
     // Filtered races based on selected year
     const selectedYearRaces = useMemo(() => {
-        setActiveSegmentOrders([]); // Reset active segments on filter change
-        setShowAllSelectedNotice(false);  // Reset notice on filter change
         if (!year) return races;
         const id_list = racesWithCircuit.filter(race => race.year === year).map(race => race.circuit.circuitId);
         return races.filter(c => id_list.includes(c.circuitId));
-    }, [year, races]);
+    }, [year, races, racesWithCircuit]);
 
     // Filtered races+circuits based on selected year 
     const selectedYearRacesWithCircuit = useMemo(() => {
@@ -88,14 +92,64 @@ const InteractiveMap: React.FC = () => {
         );
     }, [selectedYearRacesWithCircuit, selected_race]);
 
+    useEffect(() => {
+        let cancelled = false;
+
+        setBaseGraph(null);
+
+        if (!year || Number.isNaN(year) || selectedYearRacesWithCircuit.length === 0) {
+            return () => {
+                cancelled = true;
+            };
+        }
+
+        const buildGraph = async () => {
+            try {
+                const nextGraph = new Graph();
+                await nextGraph.initPath(selectedYearRacesWithCircuit);
+                if (cancelled) return;
+                setBaseGraph(nextGraph);
+            } catch (error) {
+                console.error("Failed to initialize graph:", error);
+                if (!cancelled) {
+                    setBaseGraph(null);
+                }
+            }
+        };
+
+        void buildGraph();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [year, selectedYearRacesWithCircuit]);
+
+    const selectedGraph = useMemo(() => {
+        if (!baseGraph || baseGraph.isEmpty()) return null;
+
+        try {
+            const nextGraph = new Graph(baseGraph);
+            nextGraph.initSelectedPath(selectedRacesForOptimization);
+            return nextGraph;
+        } catch (error) {
+            console.error("Failed to initialize selected path:", error);
+            return null;
+        }
+    }, [baseGraph, selectedRacesForOptimization]);
+
     // Filtered and ordered races+circuits based on optimized path
     const optimizedOrderedRaces = useMemo(() => {
         if (selectedRacesForOptimization.length <= 1) {
             return selectedRacesForOptimization;
         }
-        const graph = new Graph(selectedRacesForOptimization);
-        const optimizedPath = graph.generateOptimizedPath().path;
+
+        if (!selectedGraph || selectedGraph.isEmpty()) {
+            return selectedRacesForOptimization;
+        }
+
+        const optimizedPath = selectedGraph.getOptimizedPathNodes();
         if (optimizedPath.length === 0) return selectedRacesForOptimization;
+
         const raceByLocation = new Map(
             selectedRacesForOptimization.map((race) => [
                 race.circuit.location,
@@ -109,7 +163,7 @@ const InteractiveMap: React.FC = () => {
             return selectedRacesForOptimization;
         }
         return orderedRaces;
-    }, [selectedRacesForOptimization]);
+    }, [selectedGraph, selectedRacesForOptimization]);
 
     const routeSegments = useMemo<RouteSegment[]>(() => {
         if (selectedYearRacesWithCircuit.length <= 1) return [];

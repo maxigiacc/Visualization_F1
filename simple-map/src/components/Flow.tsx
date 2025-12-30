@@ -1,6 +1,6 @@
 import React from "react";
 import "../css/Flow.css";
-import type { FlowList } from "./models/Graph";
+import type { FlowList } from "./models/Graph_API";
 
 
 const colorMap = ["#7b83eb", "#f2b176", "#e57373", "#81c784", "#64b5f6", "#ba68c8" , "#4db6ac", "#ffb74d" , "#90a4ae"];
