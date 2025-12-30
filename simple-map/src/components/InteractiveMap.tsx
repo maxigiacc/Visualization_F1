@@ -47,6 +47,7 @@ const InteractiveMap: React.FC = () => {
     // to center map on zoom/move end ? We need it
     const centerRef = useRef(createCoordinates(0, 0));
 
+    // Load races and circuits data
     useEffect(() => {
     getRacesWithCircuits()
         .then(({ circuits, racesWithCircuit }) => {
@@ -56,43 +57,38 @@ const InteractiveMap: React.FC = () => {
         .catch(console.error);
     }, []);
 
+    // List of years available for the dropdown
     const yearOptions = useMemo(() => {
-        const years = Array.from(
-            new Set(racesWithCircuit.map((race) => race.year)),
-        );
+        const years = Array.from(new Set(racesWithCircuit.map((race) => race.year)));
         years.sort((a, b) => a - b);
         return years;
     }, [racesWithCircuit]);
     
-    const filteredRaces = useMemo(() => {
-            setActiveSegmentOrders([]); // Reset active segments on filter change
-            setShowAllSelectedNotice(false);  // Reset notice on filter change
+    // Filtered races based on selected year
+    const selectedYearRaces = useMemo(() => {
+        setActiveSegmentOrders([]); // Reset active segments on filter change
+        setShowAllSelectedNotice(false);  // Reset notice on filter change
         if (!year) return races;
         const id_list = racesWithCircuit.filter(race => race.year === year).map(race => race.circuit.circuitId);
         return races.filter(c => id_list.includes(c.circuitId));
     }, [year, races]);
 
-    useEffect(() => {
-        if (year === null && yearOptions.length > 0) {
-            setYear(yearOptions[yearOptions.length - 1]);
-        }
-    }, [year, yearOptions, setYear]);
-
-    const selectedYearRaces = useMemo(() => {
+    // Filtered races+circuits based on selected year 
+    const selectedYearRacesWithCircuit = useMemo(() => {
         if (!year) return [];
-        return racesWithCircuit
-            .filter((race) => race.year === year)
-            .sort((a, b) => a.round - b.round);
+        return racesWithCircuit.filter((race) => race.year === year).sort((a, b) => a.round - b.round);
     }, [racesWithCircuit, year]);
 
+    // Filter races+circuits based on selected circuits for optimization
     const selectedRacesForOptimization = useMemo(() => {
-        if (selected_race.length === 0) return selectedYearRaces;
+        if (selected_race.length === 0) return selectedYearRacesWithCircuit;
         const selectedNames = new Set(selected_race);
-        return selectedYearRaces.filter((race) =>
+        return selectedYearRacesWithCircuit.filter((race) =>
             selectedNames.has(race.circuit.name),
         );
-    }, [selectedYearRaces, selected_race]);
+    }, [selectedYearRacesWithCircuit, selected_race]);
 
+    // Filtered and ordered races+circuits based on optimized path
     const optimizedOrderedRaces = useMemo(() => {
         if (selectedRacesForOptimization.length <= 1) {
             return selectedRacesForOptimization;
@@ -116,9 +112,9 @@ const InteractiveMap: React.FC = () => {
     }, [selectedRacesForOptimization]);
 
     const routeSegments = useMemo<RouteSegment[]>(() => {
-        if (selectedYearRaces.length <= 1) return [];
-        return selectedYearRaces.slice(0, -1).map((race, idx) => {
-            const nextRace = selectedYearRaces[idx + 1];
+        if (selectedYearRacesWithCircuit.length <= 1) return [];
+        return selectedYearRacesWithCircuit.slice(0, -1).map((race, idx) => {
+            const nextRace = selectedYearRacesWithCircuit[idx + 1];
             const coordinates = generateCurvedLine(
                 race.coordinates,
                 nextRace.coordinates,
@@ -142,7 +138,7 @@ const InteractiveMap: React.FC = () => {
                 arrowCoordinates,
             };
         });
-    }, [selectedYearRaces]);
+    }, [selectedYearRacesWithCircuit]);
 
     const optimizedRouteSegments = useMemo<RouteSegment[]>(() => {
         if (optimizedOrderedRaces.length <= 1) return [];
@@ -206,7 +202,7 @@ const InteractiveMap: React.FC = () => {
         
         // Update the selected races only if the user clicked on a new segment 
         if(new_list_of_races.length != selected_race.length){
-            if ( filteredRaces.length > 0 && new_list_of_races.length === filteredRaces.length) {
+            if ( selectedYearRaces.length > 0 && new_list_of_races.length === selectedYearRaces.length) {
                 setShowAllSelectedNotice(true);
             }
             setSelectedRace(new_list_of_races);
@@ -233,10 +229,10 @@ const InteractiveMap: React.FC = () => {
     }, [hasSelectedPath, showOptimizedPath]);
 
     useEffect(() => {
-        if ( filteredRaces.length === 0 || selected_race.length !== filteredRaces.length) {
+        if ( selectedYearRaces.length === 0 || selected_race.length !== selectedYearRaces.length) {
             setShowAllSelectedNotice(false);
         }
-    }, [filteredRaces.length, selected_race.length]);
+    }, [selectedYearRaces.length, selected_race.length]);
 
     const handleToggleOptimizedPath = () => {
         if (!hasSelectedPath) return;
@@ -244,8 +240,8 @@ const InteractiveMap: React.FC = () => {
     };
 
     const handleSelectEntirePath = () => {
-        if (selectedYearRaces.length === 0) return;
-        setSelectedRace(selectedYearRaces.map((race) => race.circuit.name));
+        if (selectedYearRacesWithCircuit.length === 0) return;
+        setSelectedRace(selectedYearRacesWithCircuit.map((race) => race.circuit.name));
         setActiveSegmentOrders(routeSegments.map((segment) => segment.order));
     };
 
@@ -286,7 +282,7 @@ const InteractiveMap: React.FC = () => {
                     type="button" onClick={handleToggleOptimizedPath} disabled={!hasSelectedPath} id="optimizedButton">
                     {showOptimizedPath ? "ORIGINAL PATH" : "OPTIMIZED PATH"}
                 </button>
-                <button type="button" id="EntiredButton" onClick={handleSelectEntirePath} disabled={filteredRaces && selected_race.length === filteredRaces.length} >
+                <button type="button" id="EntiredButton" onClick={handleSelectEntirePath} disabled={selectedYearRaces.length > 0 && selected_race.length === selectedYearRaces.length} >
                     SELECT ALL
                 </button>
                 <button type="button" id="ResetButton" onClick={handleResetSelection} disabled={selected_race.length === 0} >
@@ -394,7 +390,7 @@ const InteractiveMap: React.FC = () => {
                     </Geographies>
 
                     {/* Markers for circuits */}
-                    {filteredRaces.map((circuit, idx) => {
+                    {selectedYearRaces.map((circuit, idx) => {
                         const BASE_MARKER_RADIUS_PX = 3;
                         const BASE_FONT_PX = 10;
                         const invZoom = markerScale;
