@@ -13,11 +13,8 @@ function App() {
             <HashRouter>
                 <div className="App">
                     <Routes>
-                        <Route
-                            index
-                            path="circuits"
-                            element={<CircuitsPage />}
-                        />
+                        <Route index element={<CircuitsPage />} />
+                        <Route path="circuits" element={<CircuitsPage />} />
                         <Route path="races" element={<RacesPage />} />
                         <Route path="carbon" element={<CarbonPage />} />
                         <Route path="about" element={<AboutPage />} />
