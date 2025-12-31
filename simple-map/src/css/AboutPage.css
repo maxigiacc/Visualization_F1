@@ -1,0 +1,3 @@
+.AboutPage {
+    padding: 0 max(1em, calc((100vw - 900px) / 2));
+}

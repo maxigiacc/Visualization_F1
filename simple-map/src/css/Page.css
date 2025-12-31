@@ -1,12 +1,13 @@
 .Page {
+    overflow: scroll;
+}
+
+.Page.PageWithSidebar {
     display: grid;
     grid-template-columns: minmax(0, 2.4fr) minmax(340px, 1fr);
     gap: 18px;
     padding: 18px 20px 24px;
-    background: #f7f7f8;
     align-items: start;
-
-    overflow: scroll;
 }
 
 .MainContent {

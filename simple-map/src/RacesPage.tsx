@@ -4,7 +4,7 @@ import "./css/Page.css";
 
 const RacesPage = () => {
     return (
-        <div className="Page">
+        <div className="Page PageWithSidebar">
             <div className="MainContent">
                 <InteractiveMap />
             </div>
