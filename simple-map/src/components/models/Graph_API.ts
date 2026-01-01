@@ -15,14 +15,20 @@ export default class Graph {
     private path: Map<string, Map<string, DistanceTuple>> = new Map();           // FULLY-CONNECTED graph of ALL circuits
     private bestPath: string[] = [];
     private bestDistance: number = Infinity;
+    private year : number = 2021;
 
-    // ============ Constructor ======================
-    constructor(other?: Graph) {
+    // ============ Constructor ======================    
+    constructor(other?: Graph , year?: number) {
+        if(year !== undefined && other === undefined) {
+            throw new Error("Year not provided without Graph to copy from.");
+        }
+
         if (!other) {
             this.optimized_path = new Map();
             this.selected_path = new Map();
             this.path = new Map();
             this.bestPath = [];
+            this.year = year || 2021;
             this.bestDistance = Infinity;
             return;
         }
@@ -75,40 +81,9 @@ export default class Graph {
         return source.get(a)?.get(b);
     }
 
-    // Build a fully-connected graph for the given circuits into `target`
-    private async buildFullyConnectedGraph( target: Map<string, Map<string, DistanceTuple>>, circuits: RaceWithCircuit[]): Promise<void> {
-        target.clear();
-
-        for (let i = 0; i < circuits.length; i++) {
-            for (let j = i + 1; j < circuits.length; j++) {
-                const circuitA = circuits[i].circuit;
-                const circuitB = circuits[j].circuit;
-
-                // Make it awaitable (so swapping to a real async API later is painless)
-                const d = await Promise.resolve(
-                    fetchFlightDistance(circuitA.location, circuitB.location)
-                );
-
-                let carDistance = 0;
-                let planeDistance = 0;
-
-                // Use car only if same cluster; otherwise flight only
-                if (circuitA.clusterId === circuitB.clusterId) {
-                    carDistance = d;
-                    planeDistance = 0;
-                } else {
-                    carDistance = 0;
-                    planeDistance = d;
-                }
-
-                this.addEdgeTo(
-                    target,
-                    circuitA.location,
-                    circuitB.location,
-                    [carDistance, planeDistance]
-                );
-            }
-        }
+    // Build a fully-connected graph for the given circuits into `target` USING API
+    private async buildFullyConnectedGraphFromAPI( target: Map<string, Map<string, DistanceTuple>>, circuits: RaceWithCircuit[]): Promise<void> {
+        // TODO : To implement
     }
 
     public isEmpty(): boolean {
@@ -117,7 +92,7 @@ export default class Graph {
     // ============ Public init methods ======================
     // Fill the FULL graph (path) from all circuits
     async initPath(circuits: RaceWithCircuit[]): Promise<void> {
-        await this.buildFullyConnectedGraph(this.path, circuits);
+        await this.buildFullyConnectedGraphFromAPI(this.path, circuits);
     }
 
     // Fill the SELECTED graph from a subset of circuits (effective path),

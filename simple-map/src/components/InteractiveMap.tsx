@@ -105,7 +105,7 @@ const InteractiveMap: React.FC = () => {
 
         const buildGraph = async () => {
             try {
-                const nextGraph = new Graph();
+                const nextGraph = new Graph(undefined, year);
                 await nextGraph.initPath(selectedYearRacesWithCircuit);
                 if (cancelled) return;
                 setBaseGraph(nextGraph);

@@ -57,7 +57,7 @@ const GraphPlayer: React.FC = () => {
                 const data = await getRacesWithCircuitsByYear(year);
                 if (cancelled) return;
 
-                const nextGraph = new Graph();
+                const nextGraph = new Graph(undefined, year);
                 await nextGraph.initPath(data);
                 if (cancelled) return;
 
