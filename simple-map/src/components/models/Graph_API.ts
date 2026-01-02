@@ -1,6 +1,7 @@
 export type DistanceTuple = [number, number]; // (car, flight) distances
 import fetchFlightDistance from "../utils/AirportDistanceFake_API";
 import type { RaceWithCircuit } from "./RaceWithCircuit";
+import { fetchAndAutoParseCsv, getRacesWithCircuitsByYear } from "../utils/dataLoader";
 
 export type FlowList = {
     id: number;
@@ -119,8 +120,85 @@ export default class Graph {
 
     // Build a fully-connected graph for the given circuits into `target` USING API
     private async buildFullyConnectedGraphFromCSV( target: Map<string, Map<string, DistanceTuple>>, circuits: RaceWithCircuit[]): Promise<void> {
-        // TODO : To implement
+        target.clear();
+
+        // 1) Get all RaceWithCircuit for the selected year
+        const racesWithCircuit = await getRacesWithCircuitsByYear(this.year);
+
+        // 2) Build circuitId -> location map (graph nodes are locations)
+        const idToLocation = new Map<number, string>();
+        for (const r of racesWithCircuit) {
+            idToLocation.set(r.circuit.circuitId, r.circuit.location);
+        }
+
+        // CircuitIds involved in THIS graph
+        const wantedIds = new Set<number>(
+            circuits.map(r => r.circuit.circuitId)
+        );
+
+        // Ensure nodes exist even if only one circuit is selected
+        for (const id of wantedIds) {
+            const location = idToLocation.get(id);
+            if (!location) {
+                throw new Error(
+                    `CircuitId ${id} not found for year ${this.year}.`
+                );
+            }
+            this.addNodeTo(target, location);
+        }
+
+        // 3) Load distances from CSV
+        const rows = await fetchAndAutoParseCsv("/distances.csv");
+
+        for (const row of rows as any[]) {
+            const rowYear = Number(row.Year ?? row.year);
+            if (!Number.isFinite(rowYear) || rowYear !== this.year) {
+                continue;
+            }
+
+            const fromId = Number(row.circuitIdFrom ?? row.circuitidfrom);
+            const toId = Number(row.circuitIdTo ?? row.circuitidto);
+
+            if (!wantedIds.has(fromId) || !wantedIds.has(toId)) {
+                continue;
+            }
+
+            const fromLocation = idToLocation.get(fromId);
+            const toLocation = idToLocation.get(toId);
+            if (!fromLocation || !toLocation) {
+                continue;
+            }
+
+            const car = Number(row.Car ?? row.car);
+            const plane = Number(row.Plane ?? row.plane);
+
+            this.addEdgeTo(
+                target,
+                fromLocation,
+                toLocation,
+                [
+                    Number.isFinite(car) ? car : 0,
+                    Number.isFinite(plane) ? plane : 0
+                ]
+            );
+        }
+
+        // 4) Sanity check: graph must be fully connected for selected circuits
+        const locations = Array.from(wantedIds)
+            .map(id => idToLocation.get(id)!);
+
+        for (let i = 0; i < locations.length; i++) {
+            for (let j = i + 1; j < locations.length; j++) {
+                if (!this.getDistanceFrom(target, locations[i], locations[j])) {
+                    throw new Error(
+                        `Missing CSV distance for year ${this.year} between ` +
+                        `${locations[i]} and ${locations[j]}.`
+                    );
+                }
+            }
+        }
     }
+
 
     public isEmpty(): boolean {
         return this.path.size === 0;
@@ -128,7 +206,7 @@ export default class Graph {
     // ============ Public init methods ======================
     // Fill the FULL graph (path) from all circuits
     async initPath(circuits: RaceWithCircuit[]): Promise<void> {
-        await this.buildFullyConnectedGraphFromAPI(this.path, circuits);
+        await this.buildFullyConnectedGraphFromCSV(this.path, circuits);
     }
 
     // Fill the SELECTED graph from a subset of circuits (effective path),
