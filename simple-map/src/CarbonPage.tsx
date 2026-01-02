@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ApexCsvRealtimeChart from "./components/ApexCsvRealtimeChart";
 import BarChartEmissions from "./components/BarChartEmissions";
+import TopLegEmissionsChart from "./components/TopLegEmissionsChart";
 import TravelKmPerYearChart from "./components/TravelKmPerYearChart";
 import { useSettings } from "./SettingsContext";
 import "./css/Page.css";
@@ -40,6 +41,15 @@ const CHARTS: CarbonChart[] = [
         ),
         accent: "#f59e0b",
     },
+    {
+        id: "leg-emissions",
+        title: "Top emitting legs",
+        description: "Highest CO₂ legs for the selected season",
+        render: (filterYear) => (
+            <TopLegEmissionsChart filterYear={filterYear} />
+        ),
+        accent: "#ef4444",
+    },
 ];
 
 const MAX_COMPARISON = 2;
@@ -66,6 +76,18 @@ const CarbonPage = () => {
         !focusedChart;
     const effectiveFilterYear =
         showYearOnly && Number.isFinite(year) ? Number(year) : null;
+
+    // Auto-enable single-year filter when viewing top leg emissions (needs a year)
+    const topLegVisible =
+        focusedChart === "leg-emissions" ||
+        (!focusedChart && selectedCharts.includes("leg-emissions"));
+
+    // Keep single-year filter on when top leg chart is visible
+    useEffect(() => {
+        if (topLegVisible && Number.isFinite(year)) {
+            setShowYearOnly(true);
+        }
+    }, [topLegVisible, year]);
 
     const visibleCharts = useMemo(() => {
         if (focusedChart) {

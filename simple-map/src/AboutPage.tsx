@@ -1,93 +1,91 @@
+import logo from "./assets/F1.png";
 import "./css/Page.css";
 import "./css/AboutPage.css";
 
 const AboutPage = () => {
     return (
         <div className="Page AboutPage">
-            <h1>About</h1>
-
-            <p className="intro">
-                This project was developed for the course{" "}
-                <strong>Data Visualization (DM878)</strong>
-                and explores the hidden logistical and environmental cost of the
-                Formula 1 World Championship.
-            </p>
-
-            <section>
-                <h2>Why Formula 1?</h2>
-                <p>
-                    Formula 1 is a truly global sport, spanning five continents
-                    and requiring the constant movement of cars, equipment, and
-                    personnel. While this global scale is part of its appeal,
-                    the current race calendar often forces teams into long and
-                    inefficient travel routes. In some seasons, teams travel
-                    from the Middle East to North America and back to Europe
-                    within a few weeks, creating significant back-and-forth
-                    movement that could potentially be reduced.
+            <header className="about-hero">
+                <div className="title-row">
+                    <img src={logo} alt="F1 logo" className="about-logo" />
+                    <div>
+                        <p className="eyebrow">DM878 · Data Visualization</p>
+                        <h1>Mapping the hidden cost of F1 logistics</h1>
+                    </div>
+                </div>
+                <p className="intro">
+                    A compact overview of how Formula 1’s global calendar
+                    drives travel distance and carbon emissions — and how a
+                    smarter schedule could help.
                 </p>
+                <div className="about-highlight">
+                    <div>
+                        <span className="pill">Focus</span>
+                        <strong>Logistics & CO₂</strong>
+                    </div>
+                    <div>
+                        <span className="pill">Scope</span>
+                        <strong>2000–2025 seasons</strong>
+                    </div>
+                </div>
+            </header>
+
+            <section className="about-grid">
+                <div className="card">
+                    <h2>Why Formula 1?</h2>
+                    <p>
+                        F1 spans five continents and ships hundreds of tonnes of
+                        equipment between races. The calendar sometimes bounces
+                        between regions within weeks, creating avoidable
+                        back-and-forth routes.
+                    </p>
+                </div>
+
+                <div className="card">
+                    <h2>What we show</h2>
+                    <ul>
+                        <li>Map each circuit and the official race order.</li>
+                        <li>Sum distance between consecutive events.</li>
+                        <li>
+                            Estimate logistics emissions using published air
+                            freight factors.
+                        </li>
+                    </ul>
+                </div>
+
+                <div className="card">
+                    <h2>Environmental angle</h2>
+                    <p>
+                        Distances feed into CO₂ estimates to illustrate the
+                        scale of freight emissions. Values are indicative, but
+                        they surface the footprint of a global calendar.
+                    </p>
+                </div>
+
+                <div className="card">
+                    <h2>Calendar optimization</h2>
+                    <p>
+                        We compare the official route with a distance-minimized
+                        alternative to see how many kilometers — and emissions —
+                        could be saved with a better ordering.
+                    </p>
+                </div>
             </section>
 
-            <section>
-                <h2>What this project shows</h2>
+            <section className="data-tools card">
+                <h2>Data & tools</h2>
                 <p>
-                    The goal of this project is to make these inefficiencies
-                    visible. Using geographic data for each circuit, the
-                    official Formula 1 calendar is mapped and the distance
-                    between consecutive races is calculated.
-                </p>
-                <p>
-                    By aggregating these distances, we can estimate how much
-                    teams travel over the course of a season and highlight where
-                    unnecessary movement occurs.
-                </p>
-            </section>
-
-            <section>
-                <h2>Environmental impact</h2>
-                <p>
-                    Travel distance is combined with public logistics and
-                    sustainability data to estimate the environmental impact of
-                    the championship. Although these values are approximations,
-                    they help illustrate the scale of emissions generated by
-                    global motorsport logistics.
-                </p>
-                <p>
-                    The analysis takes into account air freight, sea freight,
-                    and ground transport, reflecting the complexity of
-                    real-world Formula 1 operations.
-                </p>
-            </section>
-
-            <section>
-                <h2> Optimizing the calendar</h2>
-                <p>
-                    Beyond analysis, the project also proposes an optimized
-                    version of the race calendar. By reordering events to
-                    minimize total travel distance, an alternative scenario is
-                    generated and compared with the official calendar.
-                </p>
-                <p>
-                    This comparison helps evaluate how much travel — and
-                    potential environmental impact — could be reduced through
-                    better scheduling.
-                </p>
-            </section>
-
-            <section>
-                <h2> Data & tools</h2>
-                <p>
-                    Historical race data is sourced from the
+                    Race history from{" "}
                     <a
                         href="https://www.kaggle.com/datasets/rohanrao/formula-1-world-championship-1950-2020"
                         target="_blank"
                         rel="noreferrer"
                     >
-                        {" "}
-                        Formula 1 World Championship dataset (1950–2020)
-                    </a>
-                    . Environmental impact estimates are supported by external
-                    carbon calculators and publicly available sustainability
-                    reports.
+                        Kaggle (1950–2020)
+                    </a>{" "}
+                    plus extended seasons; emission factors from public
+                    logistics sources; geospatial calcs via haversine; charts
+                    built with ApexCharts and React.
                 </p>
             </section>
         </div>
