@@ -311,30 +311,10 @@ const InteractiveMap: React.FC = () => {
             
             {/* Filter bar for year selection and buttons */}
             <div className="filterBar">
-                <div className="year-select-wrapper">
-                    <label htmlFor="year-select">Season</label>
-                    <select
-                        id="year-select"
-                        value={year ?? ""}
-                        onChange={(event) =>
-                            setYear(
-                                event.target.value
-                                    ? Number(event.target.value)
-                                    : Number.NaN,
-                            )
-                        }
-                    >
-                        <option value="">Select a year</option>
-                        {yearOptions.map((year) => (
-                            <option key={`year-${year}`} value={year}>
-                                {year}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                
                 <button
                     type="button" onClick={handleToggleOptimizedPath} disabled={!hasSelectedPath} id="optimizedButton">
-                    {showOptimizedPath ? "ORIGINAL PATH" : "OPTIMIZED PATH"}
+                    {showOptimizedPath ? "SHOW ORIGINAL PATH" : "SHOW OPTIMIZED PATH"}
                 </button>
                 <button type="button" id="EntiredButton" onClick={handleSelectEntirePath} disabled={selectedYearRaces.length > 0 && selected_race.length === selectedYearRaces.length} >
                     SELECT ALL
@@ -495,19 +475,11 @@ const InteractiveMap: React.FC = () => {
                         );
                     })}
 
-                    {/* If optimized path is clicked, draw both optimized and original overlays */}
+                    {/* If optimized path is clicked, draw OPTIMIZED overlays otherwise ORIGINAL */}
                     {showOptimizedPath ? (
                         <>
                             <RouteSegmentsLayer
                                 segments={optimizedRouteSegments}
-                                markerScale={markerScale}
-                                activeSegmentOrders={[]}
-                                showLabels={true}
-                                showArrows={true}
-                                interactive={false}
-                            />
-                            <RouteSegmentsLayer
-                                segments={originalOverlaySegments}
                                 markerScale={markerScale}
                                 activeSegmentOrders={[]}
                                 showLabels={true}
