@@ -19,7 +19,7 @@ export default class Graph {
 
     // ============ Constructor ======================    
     constructor(other?: Graph , year?: number) {
-        if(year !== undefined && other === undefined) {
+        if(year === undefined && other === undefined) {
             throw new Error("Year not provided without Graph to copy from.");
         }
 
@@ -81,8 +81,44 @@ export default class Graph {
         return source.get(a)?.get(b);
     }
 
-    // Build a fully-connected graph for the given circuits into `target` USING API
+    // Build a fully-connected graph for the given circuits into `target`
     private async buildFullyConnectedGraphFromAPI( target: Map<string, Map<string, DistanceTuple>>, circuits: RaceWithCircuit[]): Promise<void> {
+        target.clear();
+
+        for (let i = 0; i < circuits.length; i++) {
+            for (let j = i + 1; j < circuits.length; j++) {
+                const circuitA = circuits[i].circuit;
+                const circuitB = circuits[j].circuit;
+
+                // Make it awaitable (so swapping to a real async API later is painless)
+                const d = await Promise.resolve(
+                    fetchFlightDistance(circuitA.location, circuitB.location)
+                );
+
+                let carDistance = 0;
+                let planeDistance = 0;
+
+                // Use car only if same cluster; otherwise flight only
+                if (circuitA.clusterId === circuitB.clusterId) {
+                    carDistance = d;
+                    planeDistance = 0;
+                } else {
+                    carDistance = 0;
+                    planeDistance = d;
+                }
+
+                this.addEdgeTo(
+                    target,
+                    circuitA.location,
+                    circuitB.location,
+                    [carDistance, planeDistance]
+                );
+            }
+        }
+    }
+
+    // Build a fully-connected graph for the given circuits into `target` USING API
+    private async buildFullyConnectedGraphFromCSV( target: Map<string, Map<string, DistanceTuple>>, circuits: RaceWithCircuit[]): Promise<void> {
         // TODO : To implement
     }
 
