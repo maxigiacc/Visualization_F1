@@ -34,12 +34,17 @@ const getCO2Saved = (graph: Graph, co2_per_km_car: number, co2_per_km_flight: nu
 // Placeholder function for onSelectCircuit prop
 const placeHolder = (circuit: Circuit | null) => void{};
 
-const GraphPlayer: React.FC = () => {
+// Props passed to GraphPlayer component
+type props = {
+    co2_emission_car: number;
+    co2_emission_flight: number;
+};
+
+const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight }) => {
     const { year , selected_race , setSelectedRace } = useSettings();
     const [races, setRaces] = useState<RaceWithCircuit[]>([]);
     const [baseGraph, setBaseGraph] = useState<Graph | null>(null);
-    const co2_per_km_car = 0.192; // Kg CO2 per Km for car
-    const co2_per_km_flight = 0.255; // Kg CO2 per Km for flight
+    
 
     // Obtain circuits for the actual year
     const circuitsMemo = useMemo(() => {
@@ -110,7 +115,7 @@ const GraphPlayer: React.FC = () => {
         <div className="route-row">
             <div className="route-info">
                 <p>• TOT_KM : {graph ? graph.getOriginalPathDistance().carDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                <p>• CO2_EMISSION : {graph ? Math.round(graph.getOriginalPathDistance().carDistance * co2_per_km_car * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                <p>• CO2_EMISSION : {graph ? Math.round(graph.getOriginalPathDistance().carDistance * co2_emission_car * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
             </div>
             <div className="route-icon">🚗</div>
         </div>
@@ -119,7 +124,7 @@ const GraphPlayer: React.FC = () => {
         <div className="route-row">
             <div className="route-info">
                 <p>• TOT_KM : {graph ? graph.getOriginalPathDistance().flightDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                <p>• CO2_EMISSION : {graph ?  Math.round(graph.getOriginalPathDistance().flightDistance * co2_per_km_flight * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                <p>• CO2_EMISSION : {graph ?  Math.round(graph.getOriginalPathDistance().flightDistance * co2_emission_flight * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
             </div>
             <div className="route-icon">✈️</div>
         </div>
@@ -134,7 +139,7 @@ const GraphPlayer: React.FC = () => {
             <div className="route-row">
                 <div className="route-info">
                     <p>• TOT_KM : {graph ? graph.getOptimizedPathDistance().carDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                    <p>• CO2_EMISSION : {graph ? Math.round(graph.getOptimizedPathDistance().carDistance * co2_per_km_car * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                    <p>• CO2_EMISSION : {graph ? Math.round(graph.getOptimizedPathDistance().carDistance * co2_emission_car * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
                 </div>
                 <div className="route-icon">🚗</div>
             </div>
@@ -143,7 +148,7 @@ const GraphPlayer: React.FC = () => {
             <div className="route-row">
                 <div className="route-info">
                     <p>• TOT_KM : {graph ? graph.getOptimizedPathDistance().flightDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                    <p>• CO2_EMISSION : {graph ?  Math.round(graph.getOptimizedPathDistance().flightDistance * co2_per_km_flight * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                    <p>• CO2_EMISSION : {graph ?  Math.round(graph.getOptimizedPathDistance().flightDistance * co2_emission_flight * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
                 </div>
                 <div className="route-icon">✈️</div>
             </div>
@@ -152,7 +157,7 @@ const GraphPlayer: React.FC = () => {
             <div className="route-row">
                 <div className="route-info">
                     <p>• TOT_KM : {graph ? getKmSaved(graph) == 0 ? 'No improvement possible' : getKmSaved(graph) : "Loading..."} {graph ? "Km" : ""}</p>
-                    <p>• CO2_EMISSION : {graph ? getCO2Saved(graph, co2_per_km_car, co2_per_km_flight) == 0 ? 'No improvement possible' : Math.round(getCO2Saved(graph, co2_per_km_car, co2_per_km_flight) * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                    <p>• CO2_EMISSION : {graph ? getCO2Saved(graph, co2_emission_car, co2_emission_flight) == 0 ? 'No improvement possible' : Math.round(getCO2Saved(graph, co2_emission_car, co2_emission_flight) * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
                 </div>
                 <div className="route-icon">♻️</div>
             </div>

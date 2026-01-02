@@ -24,14 +24,22 @@ const SEGMENT_COLORS = [
     "#4DABF7", "#9775FA", "#F06595", "#63C5DA",
 ];
 
-const InteractiveMap: React.FC = () => {
+// Props passed to InteractiveMap component
+type props = {
+    co2_emission_car: number;
+    co2_emission_flight: number;
+    setCo2EmissionCar: React.Dispatch<React.SetStateAction<number>>;
+    setCo2EmissionFlight: React.Dispatch<React.SetStateAction<number>>;
+};
+
+const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight, setCo2EmissionCar, setCo2EmissionFlight }) => {
     const [races, setRaces] = useState<Circuit[]>([]);
     const [racesWithCircuit, setRacesWithCircuit] = useState<RaceWithCircuit[]>([]);
     const [activeSegmentOrders, setActiveSegmentOrders] = useState<number[]>([]);
     const [showOptimizedPath, setShowOptimizedPath] = useState<boolean>(false);
     const [showAllSelectedNotice, setShowAllSelectedNotice] = useState<boolean>(false);  // Deal the notification for uncorrect click
     const [baseGraph, setBaseGraph] = useState<Graph | null>(null);
-    const { year, setYear , selected_race, setSelectedRace  } = useSettings();
+    const { year , selected_race, setSelectedRace  } = useSettings();
     
 
     // marker UI / zoom refs
@@ -58,12 +66,6 @@ const InteractiveMap: React.FC = () => {
         .catch(console.error);
     }, []);
 
-    // List of years available for the dropdown
-    const yearOptions = useMemo(() => {
-        const years = Array.from(new Set(racesWithCircuit.map((race) => race.year)));
-        years.sort((a, b) => a - b);
-        return years;
-    }, [racesWithCircuit]);
 
     useEffect(() => {
         setActiveSegmentOrders([]);
@@ -235,19 +237,6 @@ const InteractiveMap: React.FC = () => {
         });
     }, [optimizedOrderedRaces]);
 
-    const originalOverlaySegments = useMemo<RouteSegment[]>(() => {
-        const baseSegments =
-            activeSegmentOrders.length > 0
-                ? routeSegments.filter((segment) =>
-                      activeSegmentOrders.includes(segment.order),
-                  )
-                : [];
-        return baseSegments.map((segment) => ({
-            ...segment,
-            color: "#F08C00",
-        }));
-    }, [routeSegments, activeSegmentOrders]);
-
     const handleSegmentClick = (segment: RouteSegment) => {
         const nextSelected = new Set(selected_race);
         nextSelected.add(segment.from.circuit.name);
@@ -312,6 +301,19 @@ const InteractiveMap: React.FC = () => {
             {/* Filter bar for year selection and buttons */}
             <div className="filterBar">
                 
+                {/* C02 EMISSION PLANE */}
+                <div className="height">
+                    <label htmlFor="C02">CO2<sup>✈︎</sup></label>
+                    <input onChange={(e) => setCo2EmissionFlight(Number(e.target.value))} value={co2_emission_flight} id="C02-plane" type="text" autoComplete="off" name="text" className="input" />
+                </div>
+
+                {/* C02 EMISSION CAR */}
+                <div className="height">
+                    <label htmlFor="C02">CO2<sup>🚗</sup></label>
+                    <input onChange={(e) => setCo2EmissionCar(Number(e.target.value))} value={co2_emission_car} id="C02-car" type="text" autoComplete="off" name="text" className="input" />
+                </div>
+
+
                 <button
                     type="button" onClick={handleToggleOptimizedPath} disabled={!hasSelectedPath} id="optimizedButton">
                     {showOptimizedPath ? "SHOW ORIGINAL PATH" : "SHOW OPTIMIZED PATH"}
