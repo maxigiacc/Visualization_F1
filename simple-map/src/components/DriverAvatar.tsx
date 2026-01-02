@@ -8,6 +8,7 @@ const DriverAvatar = ({ name, team }: { name: string; team?: string }) => {
     .slice(0, 2);
 
   return (
+    <>
     <div
       style={{
         width: 36,
@@ -24,6 +25,7 @@ const DriverAvatar = ({ name, team }: { name: string; team?: string }) => {
     >
       {initials}
     </div>
+    </>
   );
 };
 
