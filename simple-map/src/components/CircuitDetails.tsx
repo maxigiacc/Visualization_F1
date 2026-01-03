@@ -133,7 +133,7 @@ const CircuitDetails: React.FC<Props> = ({ circuit, onBack }) => {
               fontSize: 13,
             }}
           >
-            Official circuit page
+            Wikipedia circuit page
           </a>
         </>
       )}
