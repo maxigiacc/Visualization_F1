@@ -198,8 +198,10 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
 
     const optimizedRouteSegments = useMemo<RouteSegment[]>(() => {
         if (optimizedOrderedRaces.length <= 1) return [];
-        const OPTIMIZED_OFFSET = { lng: 1.2, lat: 0.8 };
-        const OPTIMIZED_LABEL_OFFSET_LAT = 5;
+        // If you want to visualize original vs optimized path, change here the offset values
+        const OPTIMIZED_OFFSET = { lng: 0, lat: 0 };
+        const OPTIMIZED_LABEL_OFFSET_LAT = 0;
+        
         return optimizedOrderedRaces.slice(0, -1).map((race, idx) => {
             const nextRace = optimizedOrderedRaces[idx + 1];
             const baseCoordinates = generateCurvedLine(
