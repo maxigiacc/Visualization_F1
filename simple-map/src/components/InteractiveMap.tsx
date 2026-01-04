@@ -430,8 +430,8 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
 
                     {/* Markers for circuits */}
                     {selectedYearRaces.map((circuit, idx) => {
-                        const BASE_MARKER_RADIUS_PX = 4;
-                        const BASE_FONT_PX = 15;
+                        const BASE_MARKER_RADIUS_PX = 3;
+                        const BASE_FONT_PX = 12;
                         const invZoom = markerScale;
 
                         const isHovered = hoveredCircuitId === circuit.circuitId;
