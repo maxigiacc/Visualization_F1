@@ -41,6 +41,7 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
     const [baseGraph, setBaseGraph] = useState<Graph | null>(null);
     const { year , selected_race, setSelectedRace  } = useSettings();
     
+    const [hoveredCircuitId, setHoveredCircuitId] = useState<string | null>(null);
 
     // marker UI / zoom refs
     const zoomRef = useRef<number>(1);
@@ -429,17 +430,16 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
 
                     {/* Markers for circuits */}
                     {selectedYearRaces.map((circuit, idx) => {
-                        const BASE_MARKER_RADIUS_PX = 3;
-                        const BASE_FONT_PX = 10;
+                        const BASE_MARKER_RADIUS_PX = 4;
+                        const BASE_FONT_PX = 15;
                         const invZoom = markerScale;
+
+                        const isHovered = hoveredCircuitId === circuit.circuitId;
 
                         return (
                             <Marker
                                 key={`${circuit.circuitId}-${idx}`}
-                                coordinates={createCoordinates(
-                                    circuit.lng,
-                                    circuit.lat,
-                                )}
+                                coordinates={createCoordinates(circuit.lng, circuit.lat)}
                             >
                                 <g
                                     transform={`scale(${invZoom})`}
@@ -448,27 +448,36 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                                         pointerEvents: "auto",
                                         cursor: "pointer",
                                     }}
+                                    onMouseEnter={() => setHoveredCircuitId(circuit.circuitId)}
+                                    onMouseLeave={() => setHoveredCircuitId(null)}
                                 >
+                                    {/* DOT */}
                                     <circle
                                         r={BASE_MARKER_RADIUS_PX}
-                                        fill="#F44174"
+                                        fill="#E10600" // F1 red
                                         stroke="#fff"
-                                        strokeWidth={Math.max(
-                                            0.5,
-                                            BASE_MARKER_RADIUS_PX * 0.08,
-                                        )}
+                                        strokeWidth={0.6}
                                     />
-                                    {showLabels && (
+
+                                    {/* LABEL — ONLY ON HOVER */}
+                                    {isHovered && (
                                         <text
                                             x={0}
-                                            y={-BASE_MARKER_RADIUS_PX - 4}
+                                            y={-BASE_MARKER_RADIUS_PX - 6}
                                             textAnchor="middle"
                                             style={{
                                                 fontSize: `${BASE_FONT_PX}px`,
-                                                fill: "#333",
+                                                fontWeight: 600,
+                                                fill: "#FFFFFF",
                                                 pointerEvents: "none",
                                                 userSelect: "none",
-                                                whiteSpace: "nowrap",
+
+                                                // F1-style readability
+                                                paintOrder: "stroke",
+                                                stroke: "rgba(0,0,0,0.85)",
+                                                strokeWidth: 3,
+                                                strokeLinecap: "round",
+                                                strokeLinejoin: "round",
                                             }}
                                         >
                                             {circuit.name}
@@ -478,6 +487,7 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                             </Marker>
                         );
                     })}
+
 
                     {/* If optimized path is clicked, draw OPTIMIZED overlays otherwise ORIGINAL */}
                     {showOptimizedPath ? (
