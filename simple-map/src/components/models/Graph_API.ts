@@ -364,7 +364,7 @@ export default class Graph {
         }
 
         const flowList: FlowList[] = optimized.map((node) => {
-            const circuitName = node.slice(0, -1);
+            const circuitName = node;
             const clusterId = parseInt(node.slice(-1), 10);
 
             return {
@@ -392,7 +392,7 @@ export default class Graph {
         }
 
         return nodes.map((node, index) => {
-            const circuitName = node.slice(0, -1);
+            const circuitName = node;
             const clusterId = parseInt(node.slice(-1), 10);
 
             return {

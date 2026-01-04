@@ -46,11 +46,23 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
     const [baseGraph, setBaseGraph] = useState<Graph | null>(null);
     
 
-    // Obtain circuits for the actual year
+    // Obtain all circuits for the actual year
     const circuitsMemo = useMemo(() => {
         if (!races.length) return [];
         return races.map(race => race.circuit);
     }, [races]);
+
+    // Obtain only filtered circuits
+    const filteredRaces = useMemo(() => {
+        if (!races.length) return [];
+        if (selected_race.length === 0) return races;
+        return races.filter((race) => selected_race.includes(race.circuit.name));
+    }, [races, selected_race]);
+
+    const circuitsSelectedMemo = useMemo(() => {
+        if (!filteredRaces.length) return [];
+        return filteredRaces.map((race) => race.circuit)
+    }, [filteredRaces]);
 
     // Update after year change
     useEffect(() => {
@@ -79,12 +91,6 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
             cancelled = true;
         };
     }, [year, setSelectedRace]);
-
-    const filteredRaces = useMemo(() => {
-        if (!races.length) return [];
-        if (selected_race.length === 0) return races;
-        return races.filter((race) => selected_race.includes(race.circuit.name));
-    }, [races, selected_race]);
 
     const graph = useMemo(() => {
         if (!baseGraph || baseGraph.isEmpty() || races.length === 0) return null;
@@ -161,6 +167,11 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
                 </div>
                 <div className="route-icon">♻️</div>
             </div>
+
+            {/* List of selected circuits */}
+            <div className="title" style={{color : "orange"}}>Selected circuits</div>
+            <CountryCircuitList circuits={circuitsSelectedMemo} onSelectCircuit={placeHolder}></CountryCircuitList>
+
             </>
         )}
 

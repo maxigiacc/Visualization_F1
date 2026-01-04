@@ -2,6 +2,7 @@
   position: relative;
   width: fit-content;
   padding: 40px 20px;
+  overflow: visible; 
 }
 
 .timeline-line {
@@ -16,6 +17,7 @@
 .timeline-steps {
   display: flex;
   gap: 5px;
+  overflow: visible; 
 }
 
 .step {
@@ -23,6 +25,7 @@
   flex-direction: column;
   align-items: center;
   position: relative;
+  overflow: visible; 
 }
 
 .step-number {
@@ -32,30 +35,31 @@
 
 .dot {
   width: 10px;
-  height: 10px   ;
+  height: 10px;
   border-radius: 50%;
   cursor: pointer;
   position: relative;
+  overflow: visible; 
 }
 
 /* Tooltip */
 .tooltip {
   position: absolute;
   bottom: 28px;
+  left: 50%; 
+  transform: translateX(-50%) translateY(4px);
   background: black;
   color: white;
   font-size: 12px;
-  padding: 4px 6px;
+  padding: 4px 7px; /* +1px right padding to avoid font clipping */
   border-radius: 4px;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(4px);
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .dot:hover .tooltip {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
 }
-
