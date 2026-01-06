@@ -10,7 +10,7 @@ const Toolbar = () => {
 
     return (
         <div className="Toolbar">
-            <h1>Visualisation Project</h1>
+            <h1>Analyzing Distance and Environmental Impact in the Formula 1 Calendar</h1>
             <select
                 value={year}
                 onChange={(e) => setYear(parseInt(e.target.value))}

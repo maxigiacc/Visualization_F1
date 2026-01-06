@@ -163,6 +163,7 @@ const CarbonPage = () => {
                                 bottom toolbar. Charts update automatically.
                             </p>
                         </div>
+                    </div>
                     <label className="year-toggle">
                         <input
                             type="checkbox"
