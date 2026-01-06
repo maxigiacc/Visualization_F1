@@ -10,7 +10,11 @@
 
 .carbon-filter {
     justify-content: flex-start;
+    justify-content: space-between;
+    align-items: center;
     margin-top: -4px;
+    max-width: 100%;
+    width: 100%;
 }
 
 .year-toggle {
@@ -20,6 +24,28 @@
     font-weight: 600;
     color: var(--color-ink-soft);
 }
+
+.year-context {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    max-width: 680px;
+}
+
+.year-context__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.year-context__hint {
+    margin: 0;
+    color: #4b5563;
+    font-size: 13px;
+}
+
 
 .carbon-header {
     display: flex;
@@ -330,6 +356,11 @@
         flex-direction: column;
     }
 
+    .carbon-filter {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
     .carbon-actions {
         width: 100%;
         justify-content: flex-start;

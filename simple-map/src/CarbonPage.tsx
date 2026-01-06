@@ -55,7 +55,7 @@ const CHARTS: CarbonChart[] = [
 const MAX_COMPARISON = 2;
 
 const CarbonPage = () => {
-    const { year, setYear } = useSettings();
+    const { year} = useSettings();
     const [showYearOnly, setShowYearOnly] = useState(false);
     const [selectedCharts, setSelectedCharts] = useState<string[]>([
         "emissions",
@@ -63,19 +63,14 @@ const CarbonPage = () => {
     ]);
     const [focusedChart, setFocusedChart] = useState<string | null>(null);
 
-    const yearOptions = useMemo(
-        () => Array.from({ length: 26 }, (_, idx) => 2000 + idx),
-        [],
-    );
-
     const allChartIds = CHARTS.map((c) => c.id);
     const isAllSelected = selectedCharts.length === allChartIds.length;
     const reachedLimit =
         selectedCharts.length >= MAX_COMPARISON &&
         !isAllSelected &&
         !focusedChart;
-    const effectiveFilterYear =
-        showYearOnly && Number.isFinite(year) ? Number(year) : null;
+    const hasYear = Number.isFinite(year);
+    const effectiveFilterYear = showYearOnly && hasYear ? year : null;
 
     // Auto-enable single-year filter when viewing top leg emissions (needs a year)
     const topLegVisible =
@@ -155,34 +150,25 @@ const CarbonPage = () => {
                 </div>
 
                 <div className="filterBar carbon-filter">
-                    <div className="year-select-wrapper">
-                        <label htmlFor="carbon-year-select">Season</label>
-                        <select
-                            id="carbon-year-select"
-                            value={year ?? ""}
-                            onChange={(event) =>
-                                setYear(
-                                    event.target.value
-                                        ? Number(event.target.value)
-                                        : Number.NaN,
-                                )
-                            }
-                        >
-                            <option value="">Select a year</option>
-                            {yearOptions.map((y) => (
-                                <option key={`carbon-year-${y}`} value={y}>
-                                    {y}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
+                    <div className="year-context">
+                        <p className="eyebrow">Season control</p>
+                        <div className="year-context__row">
+                            <span className="pill">
+                                {hasYear
+                                    ? `Season ${year}`
+                                    : "Choose a season below"}
+                            </span>
+                            <p className="year-context__hint">
+                                Change the season using the year selector in the
+                                bottom toolbar. Charts update automatically.
+                            </p>
+                        </div>
                     <label className="year-toggle">
                         <input
                             type="checkbox"
                             checked={showYearOnly && !!effectiveFilterYear}
                             onChange={(e) => setShowYearOnly(e.target.checked)}
-                            disabled={!Number.isFinite(year)}
+                            disabled={!hasYear}
                         />
                         <span>Show only selected year</span>
                     </label>
