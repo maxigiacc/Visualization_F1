@@ -195,7 +195,7 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
             {graph?.getOptimizedPath() && (<Flow flowList={graph.getOptimizedPath()} />)}
             
             {/* CAR */}
-            <div className="route-row route-row--savings">
+            <div className="route-row">
                 <div className="route-info">
                     <p>
                         Distance (truck):{" "}
@@ -247,7 +247,7 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
             </div>
 
             {/* SAVINGS */}
-            <div className="route-row">
+            <div className="route-row route-row--savings">
                 <div className="route-info">
                     <p>
                         Distance saved:{" "}
