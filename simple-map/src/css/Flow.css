@@ -1,23 +1,23 @@
 .timeline-wrapper {
   position: relative;
-  width: fit-content;
-  padding: 40px 20px;
-  overflow: visible; 
+  width: 100%;
+  max-width: 100%;
+  padding: 44px 20px 32px;
+  overflow: visible;
+  z-index: 3;
 }
 
 .timeline-line {
-  position: absolute;
-  top: 70px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--color-border-strong);
+  display: none;
 }
 
 .timeline-steps {
   display: flex;
-  gap: 5px;
-  overflow: visible; 
+  gap: 8px;
+  flex-wrap: wrap;
+  overflow: visible;
+  row-gap: 40px;
+  align-content: flex-start;
 }
 
 .step {
@@ -26,11 +26,13 @@
   align-items: center;
   position: relative;
   overflow: visible; 
+  padding-top: 6px;
 }
 
 .step-number {
-  margin-bottom: 8px;
-  font-size: 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1;
   color: var(--color-ink-soft);
 }
 
@@ -46,7 +48,7 @@
 /* Tooltip */
 .tooltip {
   position: absolute;
-  bottom: 28px;
+  bottom: 40px;
   left: 50%; 
   transform: translateX(-50%) translateY(4px);
   background: var(--color-surface-strong);
@@ -58,6 +60,7 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 2;
 }
 
 .dot:hover .tooltip {

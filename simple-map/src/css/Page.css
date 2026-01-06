@@ -1,5 +1,6 @@
 .Page {
-    overflow: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
     color: var(--color-ink);
 }
 

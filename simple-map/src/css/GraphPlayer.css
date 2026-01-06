@@ -25,6 +25,8 @@
     font-size: 1.05rem;
     background: var(--color-surface);
     border-radius: 6px;
+    position: relative;
+    z-index: 1;
 }
 
 .title--original {
