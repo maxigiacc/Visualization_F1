@@ -15,7 +15,7 @@ import type { RouteSegment } from "./models/RouteSegment";
 import { useSettings } from "../SettingsContext";
 import "../css/InteractiveMap.css";
 import geoUrl from "../assets/countries-50m.json";
-import { getRacesWithCircuits } from "./utils/dataLoader";
+import { getEmissionFactorsForYear, getRacesWithCircuits } from "./utils/dataLoader";
 import { RouteSegmentsLayer, generateCurvedLine } from "./RouteSegmentsLayer";
 import Graph from "./models/Graph_API";
 
@@ -68,6 +68,24 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
         })
         .catch(console.error);
     }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        if (!year || Number.isNaN(year)) return () => {};
+
+        getEmissionFactorsForYear(year)
+            .then(({ airFactor, truckFactor }) => {
+                if (cancelled) return;
+                setCo2EmissionFlight(airFactor);
+                setCo2EmissionCar(truckFactor);
+            })
+            .catch(console.error);
+
+        return () => {
+            cancelled = true;
+        };
+    }, [year, setCo2EmissionCar, setCo2EmissionFlight]);
 
 
     useEffect(() => {
@@ -309,13 +327,37 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                 {/* C02 EMISSION PLANE */}
                 <div className="height">
                     <label htmlFor="C02">CO2<sup>✈︎</sup></label>
-                    <input onChange={(e) => setCo2EmissionFlight(Number(e.target.value))} value={co2_emission_flight} id="C02-plane" type="text" autoComplete="off" name="text" className="input" />
+                    <input
+                        readOnly
+                        value={
+                            Number.isFinite(co2_emission_flight)
+                                ? co2_emission_flight.toFixed(3)
+                                : ""
+                        }
+                        id="C02-plane"
+                        type="text"
+                        autoComplete="off"
+                        name="text"
+                        className="input"
+                    />
                 </div>
 
                 {/* C02 EMISSION CAR */}
                 <div className="height">
                     <label htmlFor="C02">CO2<sup>🚗</sup></label>
-                    <input onChange={(e) => setCo2EmissionCar(Number(e.target.value))} value={co2_emission_car} id="C02-car" type="text" autoComplete="off" name="text" className="input" />
+                    <input
+                        readOnly
+                        value={
+                            Number.isFinite(co2_emission_car)
+                                ? co2_emission_car.toFixed(3)
+                                : ""
+                        }
+                        id="C02-car"
+                        type="text"
+                        autoComplete="off"
+                        name="text"
+                        className="input"
+                    />
                 </div>
 
 
@@ -430,6 +472,27 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                         }
                     </Geographies>
 
+                    {/* If optimized path is clicked, draw OPTIMIZED overlays otherwise ORIGINAL */}
+                    {showOptimizedPath ? (
+                        <>
+                            <RouteSegmentsLayer
+                                segments={optimizedRouteSegments}
+                                markerScale={markerScale}
+                                activeSegmentOrders={[]}
+                                showLabels={true}
+                                showArrows={true}
+                                interactive={false}
+                            />
+                        </>
+                    ) : (
+                        <RouteSegmentsLayer
+                            segments={routeSegments}
+                            markerScale={markerScale}
+                            onSegmentClick={handleSegmentClick}
+                            activeSegmentOrders={activeSegmentOrders}
+                        />
+                    )}
+
                     {/* Markers for circuits */}
                     {selectedYearRaces.map((circuit, idx) => {
                         const BASE_MARKER_RADIUS_PX = 3;
@@ -450,7 +513,9 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                                         pointerEvents: "auto",
                                         cursor: "pointer",
                                     }}
-                                    onMouseEnter={() => setHoveredCircuitId(circuit.circuitId)}
+                                    onMouseEnter={() =>
+                                        setHoveredCircuitId(circuit.circuitId)
+                                    }
                                     onMouseLeave={() => setHoveredCircuitId(null)}
                                 >
                                     {/* DOT */}
@@ -489,28 +554,6 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                             </Marker>
                         );
                     })}
-
-
-                    {/* If optimized path is clicked, draw OPTIMIZED overlays otherwise ORIGINAL */}
-                    {showOptimizedPath ? (
-                        <>
-                            <RouteSegmentsLayer
-                                segments={optimizedRouteSegments}
-                                markerScale={markerScale}
-                                activeSegmentOrders={[]}
-                                showLabels={true}
-                                showArrows={true}
-                                interactive={false}
-                            />
-                        </>
-                    ) : (
-                        <RouteSegmentsLayer
-                            segments={routeSegments}
-                            markerScale={markerScale}
-                            onSegmentClick={handleSegmentClick}
-                            activeSegmentOrders={activeSegmentOrders}
-                        />
-                    )}
                 </ZoomableGroup>
             </ComposableMap>
         </div>
