@@ -32,6 +32,12 @@ const getCO2Saved = (graph: Graph, co2_per_km_car: number, co2_per_km_flight: nu
     return 0;
 }
 
+const formatValue = (value: number, suffix: string) =>
+    `${value.toFixed(4)} ${suffix}`;
+
+const formatValueOrText = (value: number, suffix: string, emptyText: string) =>
+    value === 0 ? emptyText : formatValue(value, suffix);
+
 // Props passed to GraphPlayer component
 type props = {
     co2_emission_car: number;
@@ -136,8 +142,22 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
         {/* CAR */}
         <div className="route-row">
             <div className="route-info">
-                <p>• TOT_KM : {graph ? graph.getOriginalPathDistance().carDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                <p>• CO2_EMISSION : {graph ? Math.round(graph.getOriginalPathDistance().carDistance * co2_emission_car * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                <p>
+                    Distance (truck):{" "}
+                    {graph
+                        ? formatValue(graph.getOriginalPathDistance().carDistance, "km")
+                        : "Loading..."}
+                </p>
+                <p>
+                    CO2 (truck):{" "}
+                    {graph
+                        ? formatValue(
+                              graph.getOriginalPathDistance().carDistance *
+                                  co2_emission_car,
+                              "kg",
+                          )
+                        : "Loading..."}
+                </p>
             </div>
             <div className="route-icon">🚗</div>
         </div>
@@ -145,8 +165,25 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
         {/* PLANE */}
         <div className="route-row">
             <div className="route-info">
-                <p>• TOT_KM : {graph ? graph.getOriginalPathDistance().flightDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                <p>• CO2_EMISSION : {graph ?  Math.round(graph.getOriginalPathDistance().flightDistance * co2_emission_flight * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                <p>
+                    Distance (flight):{" "}
+                    {graph
+                        ? formatValue(
+                              graph.getOriginalPathDistance().flightDistance,
+                              "km",
+                          )
+                        : "Loading..."}
+                </p>
+                <p>
+                    CO2 (flight):{" "}
+                    {graph
+                        ? formatValue(
+                              graph.getOriginalPathDistance().flightDistance *
+                                  co2_emission_flight,
+                              "kg",
+                          )
+                        : "Loading..."}
+                </p>
             </div>
             <div className="route-icon">✈️</div>
         </div>
@@ -160,8 +197,25 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
             {/* CAR */}
             <div className="route-row route-row--savings">
                 <div className="route-info">
-                    <p>• TOT_KM : {graph ? graph.getOptimizedPathDistance().carDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                    <p>• CO2_EMISSION : {graph ? Math.round(graph.getOptimizedPathDistance().carDistance * co2_emission_car * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                    <p>
+                        Distance (truck):{" "}
+                        {graph
+                            ? formatValue(
+                                  graph.getOptimizedPathDistance().carDistance,
+                                  "km",
+                              )
+                            : "Loading..."}
+                    </p>
+                    <p>
+                        CO2 (truck):{" "}
+                        {graph
+                            ? formatValue(
+                                  graph.getOptimizedPathDistance().carDistance *
+                                      co2_emission_car,
+                                  "kg",
+                              )
+                            : "Loading..."}
+                    </p>
                 </div>
                 <div className="route-icon">🚗</div>
             </div>
@@ -169,8 +223,25 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
             {/* PLANE */}
             <div className="route-row">
                 <div className="route-info">
-                    <p>• TOT_KM : {graph ? graph.getOptimizedPathDistance().flightDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                    <p>• CO2_EMISSION : {graph ?  Math.round(graph.getOptimizedPathDistance().flightDistance * co2_emission_flight * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                    <p>
+                        Distance (flight):{" "}
+                        {graph
+                            ? formatValue(
+                                  graph.getOptimizedPathDistance().flightDistance,
+                                  "km",
+                              )
+                            : "Loading..."}
+                    </p>
+                    <p>
+                        CO2 (flight):{" "}
+                        {graph
+                            ? formatValue(
+                                  graph.getOptimizedPathDistance()
+                                      .flightDistance * co2_emission_flight,
+                                  "kg",
+                              )
+                            : "Loading..."}
+                    </p>
                 </div>
                 <div className="route-icon">✈️</div>
             </div>
@@ -178,8 +249,30 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
             {/* SAVINGS */}
             <div className="route-row">
                 <div className="route-info">
-                    <p>• TOT_KM : {graph ? getKmSaved(graph) == 0 ? 'No improvement possible' : getKmSaved(graph) : "Loading..."} {graph ? "Km" : ""}</p>
-                    <p>• CO2_EMISSION : {graph ? getCO2Saved(graph, co2_emission_car, co2_emission_flight) == 0 ? 'No improvement possible' : Math.round(getCO2Saved(graph, co2_emission_car, co2_emission_flight) * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                    <p>
+                        Distance saved:{" "}
+                        {graph
+                            ? formatValueOrText(
+                                  getKmSaved(graph),
+                                  "km",
+                                  "No improvement",
+                              )
+                            : "Loading..."}
+                    </p>
+                    <p>
+                        CO2 saved:{" "}
+                        {graph
+                            ? formatValueOrText(
+                                  getCO2Saved(
+                                      graph,
+                                      co2_emission_car,
+                                      co2_emission_flight,
+                                  ),
+                                  "kg",
+                                  "No improvement",
+                              )
+                            : "Loading..."}
+                    </p>
                 </div>
                 <div className="route-icon">♻️</div>
             </div>
