@@ -1,27 +1,21 @@
+import type { ReactNode } from "react";
+import "../css/StatCard.css";
+
 const StatCard = ({
   label,
   value,
   accent,
 }: {
   label: string;
-  value: React.ReactNode;
+  value: ReactNode;
   accent?: string;
 }) => (
   <div
-    style={{
-      background: "#111",
-      borderLeft: `4px solid ${accent ?? "#DC0000"}`,
-      borderRadius: 8,
-      padding: "12px 14px",
-      animation: "fadeUp 0.4s ease forwards",
-    }}
+    className="stat-card"
+    style={{ ["--accent-color" as const]: accent ?? "#e10600" }}
   >
-    <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase" }}>
-      {label}
-    </div>
-    <div style={{ fontSize: 18, fontWeight: 600, color: "#fff" }}>
-      {value}
-    </div>
+    <div className="stat-card__label">{label}</div>
+    <div className="stat-card__value">{value}</div>
   </div>
 );
 export default StatCard; 
@@ -32,7 +26,7 @@ export const TEAM_COLORS: Record<string, string> = {
   Ferrari: "#DC0000",
   Mercedes: "#00D2BE",
   "Red Bull": "#1E41FF",
-  McLaren: "#FF8700",
+  McLaren: "#ff8800ad",
   "Alpine F1 Team": "#0090FF",
   Williams: "#005AFF",
   Haas: "#B6BABD",

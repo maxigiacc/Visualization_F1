@@ -1,24 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
 *,
 ::before,
 ::after {
     box-sizing: border-box;
 }
 
+:root {
+    color-scheme: light;
+    --color-ink: #0b0b0c;
+    --color-ink-soft: #34363a;
+    --color-muted: #6b7280;
+    --color-border: #e3e5e8;
+    --color-border-strong: #c7cbd1;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f4f5f7;
+    --color-surface-strong: #0f1115;
+    --color-accent: #e10600;
+    --color-accent-dark: #9f0000;
+    --color-accent-warm: #ff8a00;
+    --color-accent-cool: #0ea5e9;
+    --color-accent-teal: #0f766e;
+    --color-warning: #f59e0b;
+    --color-success: #16a34a;
+    --color-graph-1: #b91c1c;
+    --color-graph-2: #dc2626;
+    --color-graph-3: #f97316;
+    --color-graph-4: #f59e0b;
+    --color-graph-optimized: #0f766e;
+    --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+    --shadow-card: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+@font-face {
+    font-family: "F1Display";
+    src: url("/fonts/Formula1-Display-Bold-Bold.ttf.woff") format("woff");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 body {
     margin: 0;
-    font-family: system-ui;
-
-    /*
-    --s: 100px;
-    --c1: #deddda;
-    --c2: #ffffff;
-
-    --_g: #0000 90deg, var(--c1) 0;
+    font-family: "Space Grotesk", "Segoe UI", sans-serif;
+    color: var(--color-ink);
     background:
-        conic-gradient(from 90deg at 2px 2px, var(--_g)),
-        conic-gradient(from 90deg at 1px 1px, var(--_g)), var(--c2);
-    background-size:
-        var(--s) var(--s),
-        calc(var(--s) / 5) calc(var(--s) / 5);
-    */
+        radial-gradient(circle at 10% 20%, rgba(255, 138, 0, 0.08), transparent 45%),
+        radial-gradient(circle at 90% 10%, rgba(14, 165, 233, 0.08), transparent 40%),
+        linear-gradient(120deg, #f8f7f4 0%, #eef1f5 100%);
+}
+
+h1,
+h2,
+h3,
+.display-font {
+    font-family: "F1Display", "Space Grotesk", "Segoe UI", sans-serif;
+    letter-spacing: 0.02em;
+}
+
+a {
+    color: inherit;
 }

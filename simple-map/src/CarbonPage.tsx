@@ -21,7 +21,7 @@ const CHARTS: CarbonChart[] = [
         title: "Logistics CO₂ (kt)",
         description: "Estimated air freight emissions per season",
         render: (filterYear) => <BarChartEmissions filterYear={filterYear} />,
-        accent: "#3b82f6",
+        accent: "#0ea5e9",
     },
     {
         id: "travel",
@@ -30,7 +30,7 @@ const CHARTS: CarbonChart[] = [
         render: (filterYear) => (
             <TravelKmPerYearChart filterYear={filterYear} />
         ),
-        accent: "#10b981",
+        accent: "#14b8a6",
     },
     {
         id: "factors",
@@ -39,7 +39,7 @@ const CHARTS: CarbonChart[] = [
         render: (filterYear) => (
             <ApexCsvRealtimeChart filterYear={filterYear} />
         ),
-        accent: "#f59e0b",
+        accent: "#2563eb",
     },
     {
         id: "leg-emissions",
@@ -48,7 +48,7 @@ const CHARTS: CarbonChart[] = [
         render: (filterYear) => (
             <TopLegEmissionsChart filterYear={filterYear} />
         ),
-        accent: "#ef4444",
+        accent: "#64748b",
     },
 ];
 

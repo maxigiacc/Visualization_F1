@@ -1,4 +1,5 @@
 import { TEAM_COLORS } from "./StatCard";
+import "../css/DriverAvatar.css";
 
 const DriverAvatar = ({ name, team }: { name: string; team?: string }) => {
   const initials = name
@@ -8,24 +9,12 @@ const DriverAvatar = ({ name, team }: { name: string; team?: string }) => {
     .slice(0, 2);
 
   return (
-    <>
     <div
-      style={{
-        width: 36,
-        height: 36,
-        borderRadius: "50%",
-        background: TEAM_COLORS[team ?? ""] ?? "#333",
-        color: "#fff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: 700,
-        fontSize: 13,
-      }}
+      className="driver-avatar"
+      style={{ ["--avatar-bg" as const]: TEAM_COLORS[team ?? ""] ?? "#333" }}
     >
       {initials}
     </div>
-    </>
   );
 };
 

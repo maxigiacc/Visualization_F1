@@ -81,10 +81,10 @@ export function buildChartAnnotations(series: CsvChartSeries[]): ChartAnnotation
   // Y-axis support line
   anns.yaxis.push({
     y: Math.round(0.9 * maxY * 100) / 100,
-    borderColor: "#00E396",
+    borderColor: "#0ea5e9",
     label: {
-      borderColor: "#00E396",
-      style: { color: "#fff", background: "#00E396" },
+      borderColor: "#0ea5e9",
+      style: { color: "#fff", background: "#0ea5e9" },
       text: "Support",
     },
   });
@@ -93,12 +93,12 @@ export function buildChartAnnotations(series: CsvChartSeries[]): ChartAnnotation
   anns.yaxis.push({
     y: Math.round(maxY * 0.98 * 100) / 100,
     y2: Math.round(maxY * 1.02 * 100) / 100,
-    borderColor: "#000",
-    fillColor: "#FEB019",
+    borderColor: "#0f172a",
+    fillColor: "#14b8a6",
     opacity: 0.2,
     label: {
-      borderColor: "#333",
-      style: { fontSize: "10px", color: "#333", background: "#FEB019" },
+      borderColor: "#0f766e",
+      style: { fontSize: "10px", color: "#0f3d35", background: "#14b8a6" },
       text: "Y-range",
     },
   });
@@ -107,10 +107,10 @@ export function buildChartAnnotations(series: CsvChartSeries[]): ChartAnnotation
   anns.xaxis.push({
     x: secondPoint.x,
     strokeDashArray: 0,
-    borderColor: "#775DD0",
+    borderColor: "#2563eb",
     label: {
-      borderColor: "#775DD0",
-      style: { color: "#fff", background: "#775DD0" },
+      borderColor: "#2563eb",
+      style: { color: "#fff", background: "#2563eb" },
       text: "Anno Test",
     },
   });
@@ -119,11 +119,11 @@ export function buildChartAnnotations(series: CsvChartSeries[]): ChartAnnotation
   anns.points.push({
     x: firstPoint.x,
     y: Number(firstPoint.y),
-    marker: { size: 8, fillColor: "#fff", strokeColor: "red", radius: 2 },
+    marker: { size: 8, fillColor: "#fff", strokeColor: "#0f766e", radius: 2 },
     label: {
-      borderColor: "#FF4560",
+      borderColor: "#0f766e",
       offsetY: 0,
-      style: { color: "#fff", background: "#FF4560" },
+      style: { color: "#fff", background: "#0f766e" },
       text: "Point Annotation",
     },
   });
@@ -340,7 +340,7 @@ export function buildEmissionsBarChartOptions(
           `${val.toFixed(2)} kt • ${(val * 1000).toLocaleString()} tonnes`,
       },
     },
-    colors: ["#008FFB"],
+    colors: ["#0ea5e9"],
     fill: {
       type: "solid",
       opacity: 0.9,
@@ -424,6 +424,7 @@ export function buildContinentPieOptions(
       type: "pie",
       height: 280,
     },
+    colors: ["#0ea5e9", "#14b8a6", "#2563eb", "#64748b", "#94a3b8"],
     labels,
     legend: {
       position: "bottom",

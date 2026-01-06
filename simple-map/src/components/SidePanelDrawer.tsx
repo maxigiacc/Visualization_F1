@@ -5,6 +5,7 @@ import CountryCircuitList from "./CountryCircuitList";
 import CircuitDetails from "./CircuitDetails";
 import ContinentPieChart from "./ContinentPieChart";
 import { sameCountry } from "./utils/countryUtils";
+import "../css/SidePanelDrawer.css";
 
 type Props = {
   country: string | null;
@@ -33,31 +34,22 @@ const SidePanelDrawer: React.FC<Props> = ({
   const circuitsForCountry = circuits.filter(c => sameCountry(c.country, country));
   
   return (
-    <div
-      style={{
-        position: "sticky",
-        top: 0,
-        height: "90vh",
-        background: "#fff",
-        boxShadow: "rgba(0,0,0,0.2) 0 4px 16px",
-        padding: 16,
-        overflowY: "auto",
-      }}
-      role="complementary"
-    >
+    <div className="side-panel" role="complementary">
       
-      <h3 style={{ marginTop: 6 }}>{country ?? "Select a country"}</h3>
+      <h3 className="side-panel__title">
+        {country ?? "Select a country"}
+      </h3>
       
       {/* First case: country not selected */}
       {!country && (
           <>
-            <div style={{ color: "#666", marginBottom: 12 }}>
+            <div className="side-panel__muted">
               All circuits worldwide
             </div>
 
             <ContinentPieChart circuits={circuits} />
 
-            <hr style={{ margin: "16px 0" }} />
+            <hr className="side-panel__divider" />
 
             <CountryCircuitList
               circuits={circuits}
@@ -71,15 +63,7 @@ const SidePanelDrawer: React.FC<Props> = ({
         <>
         <button
             onClick={() => onSelectCountry(null)}
-            style={{
-              marginTop: 8,
-              padding: "4px 12px",
-              background: "#f0f0f0",
-              border: "1px solid #ccc",
-              borderRadius: 4,
-              cursor: "pointer",
-              fontSize: 13
-            }}
+            className="side-panel__back-btn"
           >
             Back to circuits list
         </button>
@@ -96,15 +80,7 @@ const SidePanelDrawer: React.FC<Props> = ({
         <>
           <button
             onClick={() => onSelectCircuit(null)}
-            style={{
-              marginTop: 8,
-              padding: "4px 12px",
-              background: "#f0f0f0",
-              border: "1px solid #ccc",
-              borderRadius: 4,
-              cursor: "pointer",
-              fontSize: 13
-            }}
+            className="side-panel__back-btn"
           >
             ← Back to {country}
           </button>

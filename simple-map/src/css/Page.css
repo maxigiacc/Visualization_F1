@@ -1,5 +1,6 @@
 .Page {
     overflow: scroll;
+    color: var(--color-ink);
 }
 
 .Page.PageWithSidebar {
@@ -11,17 +12,19 @@
 }
 
 .MainContent {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--color-border);
     border-radius: 14px;
     padding: 16px 18px;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    box-shadow: var(--shadow-card);
+    background: var(--color-surface);
 }
 
 .Sidebar {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--color-border);
     border-radius: 14px;
     padding: 16px 18px;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    box-shadow: var(--shadow-card);
+    background: var(--color-surface);
     position: sticky;
     top: 18px;
     align-self: start;

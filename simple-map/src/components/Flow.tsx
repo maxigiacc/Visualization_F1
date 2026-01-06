@@ -3,7 +3,17 @@ import "../css/Flow.css";
 import type { FlowList } from "./models/Graph_API";
 
 
-const colorMap = ["#7b83eb", "#f2b176", "#e57373", "#81c784", "#64b5f6", "#ba68c8" , "#4db6ac", "#ffb74d" , "#90a4ae"];
+const colorMap = [
+  "#b91c1c",
+  "#dc2626",
+  "#f97316",
+  "#f59e0b",
+  "#ea580c",
+  "#be123c",
+  "#9f1239",
+  "#d97706",
+  "#fb923c",
+];
 
 export const Flow: React.FC<{ flowList: FlowList[] }> = ({ flowList }) => {
   return (

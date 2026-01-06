@@ -11,7 +11,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: #aaa;
+  background: var(--color-border-strong);
 }
 
 .timeline-steps {
@@ -31,6 +31,7 @@
 .step-number {
   margin-bottom: 8px;
   font-size: 14px;
+  color: var(--color-ink-soft);
 }
 
 .dot {
@@ -48,8 +49,8 @@
   bottom: 28px;
   left: 50%; 
   transform: translateX(-50%) translateY(4px);
-  background: black;
-  color: white;
+  background: var(--color-surface-strong);
+  color: #fff;
   font-size: 12px;
   padding: 4px 7px; /* +1px right padding to avoid font clipping */
   border-radius: 4px;

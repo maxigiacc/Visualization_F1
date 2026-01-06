@@ -1,0 +1,45 @@
+.country-circuit-list {
+    margin-top: 16px;
+}
+
+.country-circuit-list__title {
+    font-weight: 700;
+    color: var(--color-ink);
+}
+
+.country-circuit-list__empty {
+    color: var(--color-muted);
+    font-size: 13px;
+}
+
+.country-circuit-list__items {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    display: grid;
+    gap: 6px;
+}
+
+.country-circuit-list__item {
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.country-circuit-list__item:hover {
+    background: rgba(14, 165, 233, 0.08);
+    border-color: rgba(14, 165, 233, 0.3);
+    transform: translateY(-1px);
+}
+
+.country-circuit-list__name {
+    font-weight: 600;
+}
+
+.country-circuit-list__location {
+    font-size: 12px;
+    color: var(--color-muted);
+}

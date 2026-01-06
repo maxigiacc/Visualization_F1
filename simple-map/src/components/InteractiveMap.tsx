@@ -20,8 +20,10 @@ import { RouteSegmentsLayer, generateCurvedLine } from "./RouteSegmentsLayer";
 import Graph from "./models/Graph_API";
 
 const SEGMENT_COLORS = [
-    "#FF6B6B", "#FFA94D", "#FFD43B", "#69DB7C",
-    "#4DABF7", "#9775FA", "#F06595", "#63C5DA",
+    "#b91c1c",
+    "#dc2626",
+    "#f97316",
+    "#f59e0b",
 ];
 
 // Props passed to InteractiveMap component
@@ -232,7 +234,7 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                 from: race,
                 to: nextRace,
                 coordinates,
-                color: "#2F9E44",
+                color: "#0f766e",
                 order: idx + 1,
                 labelCoordinates,
                 arrowCoordinates,
@@ -407,19 +409,19 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                                     geography={geo}
                                     style={{
                                         default: {
-                                            fill: "#D6D6DA",
+                                            fill: "#e5e7eb",
                                             outline: "none",
-                                            stroke: "#fff",
+                                            stroke: "#f8fafc",
                                             strokeWidth: 0.5,
                                             userSelect: "none",
                                         },
                                         hover: {
-                                            fill: "#F53",
+                                            fill: "#ff8a00",
                                             cursor: "pointer",
                                             outline: "none",
                                         },
                                         pressed: {
-                                            fill: "#E42",
+                                            fill: "#e10600",
                                             outline: "none",
                                         },
                                     }}

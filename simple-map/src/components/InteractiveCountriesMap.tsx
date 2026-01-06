@@ -16,6 +16,7 @@ import type { Circuit } from "./models/Circuit";
 
 type Props = {
   circuits: Circuit[];
+  selectedCountry: string | null;
   selectedCircuit: Circuit | null;
   onCountrySelect: (country: string) => void;
   onCircuitSelect: (circuit: Circuit | null) => void;
@@ -24,6 +25,7 @@ type Props = {
 
 const InteractiveCountriesMap: React.FC<Props> = ({
   circuits,
+  selectedCountry,
   selectedCircuit,
   onCountrySelect,
   onCircuitSelect,
@@ -71,35 +73,38 @@ const InteractiveCountriesMap: React.FC<Props> = ({
                 >
                     <Geographies geography={GEO_URL}>
                     {({ geographies }) =>
-                        geographies.map((geo) => (
-                        <Geography
-                            key={geo.rsmKey}
-                            geography={geo}
-                            onClick={() =>
-                                onCountrySelect(
-                                    geo.properties?.name ?? "Unknown"
-                                )
-                            }
-                            style={{
-                                            default: { 
-                                                fill: "#D6D6DA", 
-                                                outline: "none", 
-                                                stroke: "#fff", 
-                                                strokeWidth: 0.5, 
-                                                userSelect: "none" 
-                                            },
-                                            hover: { 
-                                                fill: "#F53", 
-                                                cursor: "pointer", 
-                                                outline: "none" 
-                                            },
-                                            pressed: { 
-                                                fill: "#E42", 
-                                                outline: "none" 
-                                            },
-                                        }}
-                        />
-                        ))
+                        geographies.map((geo) => {
+                            const countryName = geo.properties?.name ?? "Unknown";
+                            const isSelected =
+                                selectedCountry !== null &&
+                                countryName === selectedCountry;
+
+                            return (
+                                <Geography
+                                    key={geo.rsmKey}
+                                    geography={geo}
+                                    onClick={() => onCountrySelect(countryName)}
+                                    style={{
+                                        default: {
+                                            fill: isSelected ? "#e10600" : "#e5e7eb",
+                                            outline: "none",
+                                            stroke: "#f8fafc",
+                                            strokeWidth: 0.5,
+                                            userSelect: "none",
+                                        },
+                                        hover: {
+                                            fill: "#ff8a00",
+                                            cursor: "pointer",
+                                            outline: "none",
+                                        },
+                                        pressed: {
+                                            fill: "#e10600",
+                                            outline: "none",
+                                        },
+                                    }}
+                                />
+                            );
+                        })
                     }
                     </Geographies>
 

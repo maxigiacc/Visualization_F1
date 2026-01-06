@@ -21,6 +21,7 @@ const CircuitsPage = () => {
             <div className="main-panel">
                 <InteractiveCountriesMap
                     circuits={circuits}
+                    selectedCountry={selectedCountry}
                     onCountrySelect={(country) => {
                         setSelectedCountry(country);
                         setSelectedCircuit(null);
