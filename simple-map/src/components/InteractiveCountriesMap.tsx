@@ -111,7 +111,6 @@ const InteractiveCountriesMap: React.FC<Props> = ({
                     <MapMarkers
                         circuits={circuits}
                         markerScale={markerScale}
-                        showLabels={showLabels}
                         selectedCircuit={selectedCircuit}
                         onSelectCircuit={onCircuitSelect}
                     />

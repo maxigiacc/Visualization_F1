@@ -42,9 +42,8 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
     const [showAllSelectedNotice, setShowAllSelectedNotice] = useState<boolean>(false);  // Deal the notification for uncorrect click
     const [baseGraph, setBaseGraph] = useState<Graph | null>(null);
     const { year , selected_race, setSelectedRace  } = useSettings();
-    
     const [hoveredCircuitId, setHoveredCircuitId] = useState<string | null>(null);
-
+    
     // marker UI / zoom refs
     const zoomRef = useRef<number>(1);
     const [markerScale, setMarkerScale] = useState<number>(1);
@@ -526,7 +525,6 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                                         strokeWidth={0.6}
                                     />
 
-                                    {/* LABEL — ONLY ON HOVER */}
                                     {isHovered && (
                                         <text
                                             x={0}

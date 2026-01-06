@@ -25,6 +25,11 @@
     font-weight: 600;
 }
 
+.Toolbar select option {
+    background: #ffffff;
+    color: #0b0b0c;
+}
+
 .Toolbar ul {
     display: flex;
     align-items: center;
