@@ -8,6 +8,7 @@ import { Flow } from "./Flow";
 import { useSettings } from "../SettingsContext";
 import ContinentPieChart from "./ContinentPieChart";
 import CountryCircuitList from "./CountryCircuitList";
+import CircuitDetails from "./CircuitDetails";
 
 // Return the Km saved between original and optimized path
 const getKmSaved = (graph: Graph): number => {
@@ -31,8 +32,11 @@ const getCO2Saved = (graph: Graph, co2_per_km_car: number, co2_per_km_flight: nu
     return 0;
 }
 
-// Placeholder function for onSelectCircuit prop
-const placeHolder = (circuit: Circuit | null) => void{};
+const formatValue = (value: number, suffix: string) =>
+    `${value.toFixed(4)} ${suffix}`;
+
+const formatValueOrText = (value: number, suffix: string, emptyText: string) =>
+    value === 0 ? emptyText : formatValue(value, suffix);
 
 // Props passed to GraphPlayer component
 type props = {
@@ -44,6 +48,7 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
     const { year , selected_race , setSelectedRace } = useSettings();
     const [races, setRaces] = useState<RaceWithCircuit[]>([]);
     const [baseGraph, setBaseGraph] = useState<Graph | null>(null);
+    const [selectedCircuit, setSelectedCircuit] = useState<Circuit | null>(null);
     
 
     // Obtain all circuits for the actual year
@@ -63,6 +68,16 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
         if (!filteredRaces.length) return [];
         return filteredRaces.map((race) => race.circuit)
     }, [filteredRaces]);
+
+    useEffect(() => {
+        if (!selectedCircuit) return;
+        const stillVisible = circuitsMemo.some(
+            (circuit) => circuit.circuitId === selectedCircuit.circuitId,
+        );
+        if (!stillVisible) {
+            setSelectedCircuit(null);
+        }
+    }, [circuitsMemo, selectedCircuit]);
 
     // Update after year change
     useEffect(() => {
@@ -109,19 +124,40 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
     <div className="graph-player">
         
         <div className="selected-route">
-            selected - route : <strong>{selected_race.length > 0 ? selected_race.length : graph ? graph.getNumberOfNodes() : ""} </strong>
+            Selected route:{" "}
+            <strong>
+                {selected_race.length > 0
+                    ? selected_race.length
+                    : graph
+                      ? graph.getNumberOfNodes()
+                      : ""}
+            </strong>
         </div>
 
         <br></br>
-        <div className="title" style={{color : "blue"}}>Original path</div>
+        <div className="title title--original">Original path</div>
 
         {graph?.getOriginalPath() && (<Flow flowList={graph.getOriginalPath()} />)}
         
         {/* CAR */}
         <div className="route-row">
             <div className="route-info">
-                <p>• TOT_KM : {graph ? graph.getOriginalPathDistance().carDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                <p>• CO2_EMISSION : {graph ? Math.round(graph.getOriginalPathDistance().carDistance * co2_emission_car * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                <p>
+                    Distance (truck):{" "}
+                    {graph
+                        ? formatValue(graph.getOriginalPathDistance().carDistance, "km")
+                        : "Loading..."}
+                </p>
+                <p>
+                    CO2 (truck):{" "}
+                    {graph
+                        ? formatValue(
+                              graph.getOriginalPathDistance().carDistance *
+                                  co2_emission_car,
+                              "kg",
+                          )
+                        : "Loading..."}
+                </p>
             </div>
             <div className="route-icon">🚗</div>
         </div>
@@ -129,8 +165,25 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
         {/* PLANE */}
         <div className="route-row">
             <div className="route-info">
-                <p>• TOT_KM : {graph ? graph.getOriginalPathDistance().flightDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                <p>• CO2_EMISSION : {graph ?  Math.round(graph.getOriginalPathDistance().flightDistance * co2_emission_flight * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                <p>
+                    Distance (flight):{" "}
+                    {graph
+                        ? formatValue(
+                              graph.getOriginalPathDistance().flightDistance,
+                              "km",
+                          )
+                        : "Loading..."}
+                </p>
+                <p>
+                    CO2 (flight):{" "}
+                    {graph
+                        ? formatValue(
+                              graph.getOriginalPathDistance().flightDistance *
+                                  co2_emission_flight,
+                              "kg",
+                          )
+                        : "Loading..."}
+                </p>
             </div>
             <div className="route-icon">✈️</div>
         </div>
@@ -138,14 +191,31 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
         {/* OPTIMIZED PATH */}
         {selected_race.length > 0 && (
             <>
-            <div className="title" style={{color : "green"}}>Optimized path</div>
+            <div className="title title--optimized">Optimized path</div>
             {graph?.getOptimizedPath() && (<Flow flowList={graph.getOptimizedPath()} />)}
             
             {/* CAR */}
             <div className="route-row">
                 <div className="route-info">
-                    <p>• TOT_KM : {graph ? graph.getOptimizedPathDistance().carDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                    <p>• CO2_EMISSION : {graph ? Math.round(graph.getOptimizedPathDistance().carDistance * co2_emission_car * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                    <p>
+                        Distance (truck):{" "}
+                        {graph
+                            ? formatValue(
+                                  graph.getOptimizedPathDistance().carDistance,
+                                  "km",
+                              )
+                            : "Loading..."}
+                    </p>
+                    <p>
+                        CO2 (truck):{" "}
+                        {graph
+                            ? formatValue(
+                                  graph.getOptimizedPathDistance().carDistance *
+                                      co2_emission_car,
+                                  "kg",
+                              )
+                            : "Loading..."}
+                    </p>
                 </div>
                 <div className="route-icon">🚗</div>
             </div>
@@ -153,38 +223,103 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
             {/* PLANE */}
             <div className="route-row">
                 <div className="route-info">
-                    <p>• TOT_KM : {graph ? graph.getOptimizedPathDistance().flightDistance : "Loading..."} {graph ? "Km" : ""}</p>
-                    <p>• CO2_EMISSION : {graph ?  Math.round(graph.getOptimizedPathDistance().flightDistance * co2_emission_flight * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                    <p>
+                        Distance (flight):{" "}
+                        {graph
+                            ? formatValue(
+                                  graph.getOptimizedPathDistance().flightDistance,
+                                  "km",
+                              )
+                            : "Loading..."}
+                    </p>
+                    <p>
+                        CO2 (flight):{" "}
+                        {graph
+                            ? formatValue(
+                                  graph.getOptimizedPathDistance()
+                                      .flightDistance * co2_emission_flight,
+                                  "kg",
+                              )
+                            : "Loading..."}
+                    </p>
                 </div>
                 <div className="route-icon">✈️</div>
             </div>
 
             {/* SAVINGS */}
-            <div className="route-row">
+            <div className="route-row route-row--savings">
                 <div className="route-info">
-                    <p>• TOT_KM : {graph ? getKmSaved(graph) == 0 ? 'No improvement possible' : getKmSaved(graph) : "Loading..."} {graph ? "Km" : ""}</p>
-                    <p>• CO2_EMISSION : {graph ? getCO2Saved(graph, co2_emission_car, co2_emission_flight) == 0 ? 'No improvement possible' : Math.round(getCO2Saved(graph, co2_emission_car, co2_emission_flight) * 100) / 100 : "Loading..."} {graph ? "Kg" : ""}</p>
+                    <p>
+                        Distance saved:{" "}
+                        {graph
+                            ? formatValueOrText(
+                                  getKmSaved(graph),
+                                  "km",
+                                  "No improvement",
+                              )
+                            : "Loading..."}
+                    </p>
+                    <p>
+                        CO2 saved:{" "}
+                        {graph
+                            ? formatValueOrText(
+                                  getCO2Saved(
+                                      graph,
+                                      co2_emission_car,
+                                      co2_emission_flight,
+                                  ),
+                                  "kg",
+                                  "No improvement",
+                              )
+                            : "Loading..."}
+                    </p>
                 </div>
                 <div className="route-icon">♻️</div>
             </div>
 
             {/* List of selected circuits */}
-            <div className="title" style={{color : "orange"}}>Selected circuits</div>
-            <CountryCircuitList circuits={circuitsSelectedMemo} onSelectCircuit={placeHolder}></CountryCircuitList>
+            {!selectedCircuit && (
+                <>
+                    <div className="title title--selected">Selected circuits</div>
+                    <CountryCircuitList
+                        circuits={circuitsSelectedMemo}
+                        onSelectCircuit={setSelectedCircuit}
+                    />
+                </>
+            )}
 
             </>
         )}
 
 
         {/* INFO IF THERE ARE NO SELECTED NODES */}
-        {selected_race.length === 0 && (
+        {selected_race.length === 0 && !selectedCircuit && (
             <>
                 {/* CONTINENT MAX CHART */}
-                <div className="title">continent distribution</div>
-                {circuitsMemo.length > 0 ? <ContinentPieChart circuits={circuitsMemo}></ContinentPieChart> : "Loading..." }
+                <div className="title">Continent distribution</div>
+                {circuitsMemo.length > 0 ? (
+                    <ContinentPieChart circuits={circuitsMemo} />
+                ) : (
+                    "Loading..."
+                )}
 
-                <CountryCircuitList circuits={circuitsMemo} onSelectCircuit={placeHolder}></CountryCircuitList>
+                <CountryCircuitList
+                    circuits={circuitsMemo}
+                    onSelectCircuit={setSelectedCircuit}
+                />
             </>
+        )}
+
+        <div className="title title--details">Circuit information</div>
+        {selectedCircuit ? (
+            <CircuitDetails
+                circuit={selectedCircuit}
+                onBack={() => setSelectedCircuit(null)}
+            />
+        ) : (
+            <div className="circuit-placeholder">
+                Select a circuit from the list to see its details here.
+            </div>
         )}
 
     </div>

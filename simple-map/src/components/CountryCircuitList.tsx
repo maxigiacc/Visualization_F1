@@ -1,7 +1,7 @@
 // src/components/CountryCircuitList.tsx
 import React from "react";
 import type { Circuit } from "./models/Circuit";
-import CircuitDetails from "./CircuitDetails";
+import "../css/CountryCircuitList.css";
 
 type Props = {
   circuits: Circuit[];
@@ -10,29 +10,30 @@ type Props = {
 
 
 const CountryCircuitList: React.FC<Props> = ({circuits, onSelectCircuit}) => {
-  if (!circuits.length) return <div style={{ color: "#666" }}>No circuits for this country.</div>;
+  if (!circuits.length) {
+    return (
+      <div className="country-circuit-list__empty">
+        No circuits for this country.
+      </div>
+    );
+  }
   
   return (
-    <div style={{ marginTop: 16 }}>
-      <strong>Circuits ({circuits.length})</strong>
-      <ul style={{ listStyle: "none", padding: 0, marginTop: 8 }}>
+    <div className="country-circuit-list">
+      <strong className="country-circuit-list__title">
+        Circuits ({circuits.length})
+      </strong>
+      <ul className="country-circuit-list__items">
         {circuits.map((circuit) => (
           <li
             key={circuit.circuitId}
             onClick={() => onSelectCircuit(circuit)}
-            style={{
-              padding: "8px 12px",
-              marginBottom: 6,
-              background: "#f9f9f9",
-              borderRadius: 4,
-              cursor: "pointer",
-              transition: "background 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#e8e8e8")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#f9f9f9")}
+            className="country-circuit-list__item"
           >
-            <div style={{ fontWeight: 500 }}>{circuit.name}</div>
-            <div style={{ fontSize: 12, color: "#666" }}>{circuit.location}</div>
+            <div className="country-circuit-list__name">{circuit.name}</div>
+            <div className="country-circuit-list__location">
+              {circuit.location}
+            </div>
           </li>
         ))}
       </ul>

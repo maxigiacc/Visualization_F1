@@ -1,0 +1,19 @@
+.stat-card {
+    background: var(--color-surface-strong);
+    border-left: 4px solid var(--accent-color, var(--color-accent));
+    border-radius: 8px;
+    padding: 12px 14px;
+    animation: fadeUp 0.4s ease forwards;
+}
+
+.stat-card__label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+}
+
+.stat-card__value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+}

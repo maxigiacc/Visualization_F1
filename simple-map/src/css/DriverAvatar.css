@@ -1,0 +1,12 @@
+.driver-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--avatar-bg, #333);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+}

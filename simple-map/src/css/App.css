@@ -3,6 +3,7 @@
     grid-template-rows: 1fr auto;
     height: 100vh;
     overflow: hidden;
+    background: transparent;
 }
 
 .Sidebar {
@@ -66,20 +67,20 @@
 
 .year-select-wrapper label {
     font-size: 12px;
-    color: #4b5563;
+    color: var(--color-ink-soft);
     font-weight: 600;
 }
 
 .year-select-wrapper select {
     appearance: none;
     -webkit-appearance: none;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: 10px 42px 10px 14px;
     font-size: 14px;
     font-weight: 600;
-    background: linear-gradient(135deg, #f9fafb, #edf2ff);
-    color: #111827;
+    background: linear-gradient(135deg, #f9fafb, #eef2f7);
+    color: var(--color-ink);
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
     transition:
         border 0.2s ease,
@@ -89,8 +90,8 @@
 
 .year-select-wrapper select:focus {
     outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 10px 24px rgba(99, 102, 241, 0.25);
+    border-color: var(--color-accent-cool);
+    box-shadow: 0 10px 24px rgba(14, 165, 233, 0.25);
     transform: translateY(-1px);
 }
 
@@ -100,6 +101,6 @@
     right: 16px;
     bottom: 16px;
     font-size: 14px;
-    color: #6b7280;
+    color: var(--color-muted);
     pointer-events: none;
 }

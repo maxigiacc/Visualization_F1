@@ -27,6 +27,7 @@ export type DataCache = {
   drivers: Driver[];
   constructors: Constructor[];
   emissionFactors: Map<number, number>;
+  truckEmissionFactors: Map<number, number>;
   countries: Country[];
 };
 
@@ -162,11 +163,18 @@ export async function loadAllData(): Promise<DataCache> {
       const countries = (countriesParsed as any[]).map(fromStringCountry);
 
       const emissionFactors = new Map<number, number>();
+      const truckEmissionFactors = new Map<number, number>();
       emissionsParsed.forEach((row: any) => {
         const year = parseInt(row.year ?? "", 10);
         const factor = parseFloat(row["air_factor (CO2_kg/tkm)"] ?? "");
+        const truckFactor = parseFloat(
+          row["truck_factor (CO2_kg/tkm)"] ?? "",
+        );
         if (Number.isFinite(year) && Number.isFinite(factor)) {
           emissionFactors.set(year, factor);
+        }
+        if (Number.isFinite(year) && Number.isFinite(truckFactor)) {
+          truckEmissionFactors.set(year, truckFactor);
         }
       });
 
@@ -177,6 +185,7 @@ export async function loadAllData(): Promise<DataCache> {
         drivers,
         constructors,
         emissionFactors,
+        truckEmissionFactors,
         countries
       };
 
@@ -187,6 +196,7 @@ export async function loadAllData(): Promise<DataCache> {
         drivers: drivers.length,
         constructors: constructors.length,
         emissionFactors: emissionFactors.size,
+        truckEmissionFactors: truckEmissionFactors.size,
         countries: countries.length
       });
 
@@ -241,6 +251,33 @@ export async function getEmissionFactors(): Promise<Map<number, number>> {
 export async function getCountries(): Promise<Country[]> {
   const data = await loadAllData();
   return data.countries;
+}
+
+function resolveFactorForYear(
+  factors: Map<number, number>,
+  year: number,
+): number {
+  if (factors.has(year)) return factors.get(year)!;
+  const factorYears = Array.from(factors.keys()).sort((a, b) => a - b);
+  if (!factorYears.length) return 0;
+  if (year <= factorYears[0]) return factors.get(factorYears[0])!;
+  if (year >= factorYears[factorYears.length - 1]) {
+    return factors.get(factorYears[factorYears.length - 1])!;
+  }
+  for (let i = factorYears.length - 1; i >= 0; i--) {
+    if (factorYears[i] <= year) return factors.get(factorYears[i])!;
+  }
+  return factors.get(factorYears[0])!;
+}
+
+export async function getEmissionFactorsForYear(
+  year: number,
+): Promise<{ airFactor: number; truckFactor: number }> {
+  const data = await loadAllData();
+  return {
+    airFactor: resolveFactorForYear(data.emissionFactors, year),
+    truckFactor: resolveFactorForYear(data.truckEmissionFactors, year),
+  };
 }
 
 // ============================================================================

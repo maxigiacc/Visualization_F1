@@ -7,7 +7,6 @@ import type { Circuit } from "./models/Circuit";
 type Props = {
   circuits: Circuit[];
   markerScale: number;
-  showLabels: boolean; // ora controlla SOLO se hover è attivo
   selectedCircuit: Circuit | null;
   onSelectCircuit: (circuit: Circuit) => void;
 };
@@ -56,8 +55,7 @@ const MapMarkers: React.FC<Props> = ({
         const isSelected =
           !isCluster && selectedCircuit?.circuitId === single.circuitId;
 
-        const showLabel =
-          !isCluster && (hovered === idx || isSelected);
+        const showLabel = !isCluster && (hovered === idx || isSelected);
 
         return (
           <Marker

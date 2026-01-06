@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./css/Toolbar.css";
 import { useSettings } from "./SettingsContext";
 
 const Toolbar = () => {
     const { year, setYear } = useSettings();
+
+    const linkClassName = ({ isActive }: { isActive: boolean }) =>
+        isActive ? "is-active" : undefined;
 
     return (
         <div className="Toolbar">
@@ -23,16 +26,29 @@ const Toolbar = () => {
             </select>
             <ul>
                 <li>
-                    <Link to="circuits">Circuits</Link>
+                    <NavLink to="/" end className={linkClassName}>
+                        Home
+                    </NavLink>
                 </li>
                 <li>
-                    <Link to="races">Races</Link>
+                    <NavLink to="/circuits" className={linkClassName}>
+                        Circuits
+                    </NavLink>
                 </li>
                 <li>
-                    <Link to="carbon">Carbon</Link>
+                    <NavLink to="/races" className={linkClassName}>
+                        Races
+                    </NavLink>
                 </li>
                 <li>
-                    <Link to="about">About</Link>
+                    <NavLink to="/carbon" className={linkClassName}>
+                        Carbon
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink to="/about" className={linkClassName}>
+                        About
+                    </NavLink>
                 </li>
             </ul>
         </div>

@@ -6,6 +6,7 @@ import { getCircuitStats } from "./utils/dataLoader";
 import { TEAM_COLORS } from "./StatCard";
 import StatCard from "./StatCard";
 import DriverAvatar from "./DriverAvatar";
+import "../css/CircuitDetails.css";
 
 type Props = {
   circuit: Circuit;
@@ -28,37 +29,25 @@ const CircuitDetails: React.FC<Props> = ({ circuit, onBack }) => {
   }, [circuit.circuitId]);
 
   return (
-    <div
-      style={{
-        marginTop: 16,
-        animation: "fadeSlideIn 0.4s ease",
-        color: "#fff",
-      }}
-    >
+    <div className="circuit-details">
       {/* HEADER */}
       <div style={{ marginBottom: 16 }}>
         <button
           onClick={onBack}
-          style={{
-            background: "none",
-            border: "none",
-            color: "#aaa",
-            cursor: "pointer",
-            marginBottom: 6,
-          }}
+          className="circuit-details__back"
         >
           ← Back
         </button>
 
-        <h2 style={{ margin: 0, color:"#301d1dff"}}>{circuit.name}</h2>
-        <div style={{ color: "#aaa", fontSize: 13 }}>
+        <h2 className="circuit-details__title">{circuit.name}</h2>
+        <div className="circuit-details__meta">
           {circuit.location} • {circuit.country}
         </div>
       </div>
 
       {/* LOADING */}
       {loading && (
-        <div style={{ color: "#aaa", fontStyle: "italic" }}>
+        <div className="circuit-details__meta">
           Loading circuit statistics…
         </div>
       )}
@@ -66,14 +55,7 @@ const CircuitDetails: React.FC<Props> = ({ circuit, onBack }) => {
       {/* STATS */}
       {!loading && stats && (
         <>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: 12,
-              marginBottom: 20,
-            }}
-          >
+          <div className="circuit-details__stats">
             <StatCard
               label="Most wins (driver)"
               value={`${stats.mostWinsDriver?.driver ?? "—"} (${stats.mostWinsDriver?.wins ?? 0})`}
@@ -93,21 +75,21 @@ const CircuitDetails: React.FC<Props> = ({ circuit, onBack }) => {
 
           {/* PODIUM */}
           <div>
-            <strong style={{ textTransform: "uppercase", fontSize: 12, color: "#301d1dff"}}>
+            <strong className="circuit-details__section-title">
               Last podium
             </strong>
 
             {stats.lastPodium.length === 0 ? (
-              <div style={{ color: "#777", marginTop: 6 }}>No data</div>
+              <div className="circuit-details__empty">No data</div>
             ) : (
-              <ol style={{ marginTop: 8, paddingLeft: 18 }}>
+              <ol className="circuit-details__podium">
                 {stats.lastPodium.map((p, i) => (
-                  <li key={i} style={{ marginBottom: 4 }}>
+                  <li key={i}>
                     <DriverAvatar name={p.driver} team={p.team} />
-                    <strong style={{ color: TEAM_COLORS[p.team] ?? "#fff" }}>
+                    <strong style={{ color: TEAM_COLORS[p.team] ?? "#111827" }}>
                       {p.driver}
                     </strong>{" "}
-                    <strong style={{ color: TEAM_COLORS[p.team] ?? "#fff" }}>
+                    <strong style={{ color: TEAM_COLORS[p.team] ?? "#111827" }}>
                       — {p.team}
                     </strong>
                     
@@ -122,16 +104,7 @@ const CircuitDetails: React.FC<Props> = ({ circuit, onBack }) => {
             href={circuit.url}
             target="_blank"
             rel="noreferrer"
-            style={{
-              display: "inline-block",
-              marginTop: 18,
-              padding: "8px 14px",
-              background: "#DC0000",
-              color: "#fff",
-              borderRadius: 6,
-              textDecoration: "none",
-              fontSize: 13,
-            }}
+            className="circuit-details__link"
           >
             Wikipedia circuit page
           </a>

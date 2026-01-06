@@ -15,13 +15,15 @@ import type { RouteSegment } from "./models/RouteSegment";
 import { useSettings } from "../SettingsContext";
 import "../css/InteractiveMap.css";
 import geoUrl from "../assets/countries-50m.json";
-import { getRacesWithCircuits } from "./utils/dataLoader";
+import { getEmissionFactorsForYear, getRacesWithCircuits } from "./utils/dataLoader";
 import { RouteSegmentsLayer, generateCurvedLine } from "./RouteSegmentsLayer";
 import Graph from "./models/Graph_API";
 
 const SEGMENT_COLORS = [
-    "#FF6B6B", "#FFA94D", "#FFD43B", "#69DB7C",
-    "#4DABF7", "#9775FA", "#F06595", "#63C5DA",
+    "#b91c1c",
+    "#dc2626",
+    "#f97316",
+    "#f59e0b",
 ];
 
 // Props passed to InteractiveMap component
@@ -40,9 +42,8 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
     const [showAllSelectedNotice, setShowAllSelectedNotice] = useState<boolean>(false);  // Deal the notification for uncorrect click
     const [baseGraph, setBaseGraph] = useState<Graph | null>(null);
     const { year , selected_race, setSelectedRace  } = useSettings();
-    
     const [hoveredCircuitId, setHoveredCircuitId] = useState<string | null>(null);
-
+    
     // marker UI / zoom refs
     const zoomRef = useRef<number>(1);
     const [markerScale, setMarkerScale] = useState<number>(1);
@@ -66,6 +67,24 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
         })
         .catch(console.error);
     }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        if (!year || Number.isNaN(year)) return () => {};
+
+        getEmissionFactorsForYear(year)
+            .then(({ airFactor, truckFactor }) => {
+                if (cancelled) return;
+                setCo2EmissionFlight(airFactor);
+                setCo2EmissionCar(truckFactor);
+            })
+            .catch(console.error);
+
+        return () => {
+            cancelled = true;
+        };
+    }, [year, setCo2EmissionCar, setCo2EmissionFlight]);
 
 
     useEffect(() => {
@@ -232,7 +251,7 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                 from: race,
                 to: nextRace,
                 coordinates,
-                color: "#2F9E44",
+                color: "#0f766e",
                 order: idx + 1,
                 labelCoordinates,
                 arrowCoordinates,
@@ -307,13 +326,37 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                 {/* C02 EMISSION PLANE */}
                 <div className="height">
                     <label htmlFor="C02">CO2<sup>✈︎</sup></label>
-                    <input onChange={(e) => setCo2EmissionFlight(Number(e.target.value))} value={co2_emission_flight} id="C02-plane" type="text" autoComplete="off" name="text" className="input" />
+                    <input
+                        readOnly
+                        value={
+                            Number.isFinite(co2_emission_flight)
+                                ? co2_emission_flight.toFixed(3)
+                                : ""
+                        }
+                        id="C02-plane"
+                        type="text"
+                        autoComplete="off"
+                        name="text"
+                        className="input"
+                    />
                 </div>
 
                 {/* C02 EMISSION CAR */}
                 <div className="height">
                     <label htmlFor="C02">CO2<sup>🚗</sup></label>
-                    <input onChange={(e) => setCo2EmissionCar(Number(e.target.value))} value={co2_emission_car} id="C02-car" type="text" autoComplete="off" name="text" className="input" />
+                    <input
+                        readOnly
+                        value={
+                            Number.isFinite(co2_emission_car)
+                                ? co2_emission_car.toFixed(3)
+                                : ""
+                        }
+                        id="C02-car"
+                        type="text"
+                        autoComplete="off"
+                        name="text"
+                        className="input"
+                    />
                 </div>
 
 
@@ -407,19 +450,19 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                                     geography={geo}
                                     style={{
                                         default: {
-                                            fill: "#D6D6DA",
+                                            fill: "#e5e7eb",
                                             outline: "none",
-                                            stroke: "#fff",
+                                            stroke: "#f8fafc",
                                             strokeWidth: 0.5,
                                             userSelect: "none",
                                         },
                                         hover: {
-                                            fill: "#F53",
+                                            fill: "#ff8a00",
                                             cursor: "pointer",
                                             outline: "none",
                                         },
                                         pressed: {
-                                            fill: "#E42",
+                                            fill: "#e10600",
                                             outline: "none",
                                         },
                                     }}
@@ -427,6 +470,27 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                             ))
                         }
                     </Geographies>
+
+                    {/* If optimized path is clicked, draw OPTIMIZED overlays otherwise ORIGINAL */}
+                    {showOptimizedPath ? (
+                        <>
+                            <RouteSegmentsLayer
+                                segments={optimizedRouteSegments}
+                                markerScale={markerScale}
+                                activeSegmentOrders={[]}
+                                showLabels={true}
+                                showArrows={true}
+                                interactive={false}
+                            />
+                        </>
+                    ) : (
+                        <RouteSegmentsLayer
+                            segments={routeSegments}
+                            markerScale={markerScale}
+                            onSegmentClick={handleSegmentClick}
+                            activeSegmentOrders={activeSegmentOrders}
+                        />
+                    )}
 
                     {/* Markers for circuits */}
                     {selectedYearRaces.map((circuit, idx) => {
@@ -448,7 +512,9 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                                         pointerEvents: "auto",
                                         cursor: "pointer",
                                     }}
-                                    onMouseEnter={() => setHoveredCircuitId(circuit.circuitId)}
+                                    onMouseEnter={() =>
+                                        setHoveredCircuitId(circuit.circuitId)
+                                    }
                                     onMouseLeave={() => setHoveredCircuitId(null)}
                                 >
                                     {/* DOT */}
@@ -459,7 +525,6 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                                         strokeWidth={0.6}
                                     />
 
-                                    {/* LABEL — ONLY ON HOVER */}
                                     {isHovered && (
                                         <text
                                             x={0}
@@ -487,28 +552,6 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                             </Marker>
                         );
                     })}
-
-
-                    {/* If optimized path is clicked, draw OPTIMIZED overlays otherwise ORIGINAL */}
-                    {showOptimizedPath ? (
-                        <>
-                            <RouteSegmentsLayer
-                                segments={optimizedRouteSegments}
-                                markerScale={markerScale}
-                                activeSegmentOrders={[]}
-                                showLabels={true}
-                                showArrows={true}
-                                interactive={false}
-                            />
-                        </>
-                    ) : (
-                        <RouteSegmentsLayer
-                            segments={routeSegments}
-                            markerScale={markerScale}
-                            onSegmentClick={handleSegmentClick}
-                            activeSegmentOrders={activeSegmentOrders}
-                        />
-                    )}
                 </ZoomableGroup>
             </ComposableMap>
         </div>
