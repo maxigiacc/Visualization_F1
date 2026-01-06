@@ -5,16 +5,20 @@
 .Page.PageWithSidebar {
     display: grid;
     grid-template-columns: minmax(0, 2.4fr) minmax(340px, 1fr);
-    gap: 18px;
-    padding: 18px 20px 24px;
-    align-items: start;
+    gap: 1em;
+    padding: 1em;
+
+    /* align-items: start; */
+    /* place-items: start; */
 }
 
 .MainContent {
     border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    padding: 16px 18px;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    border-radius: 1em;
+    padding: 1em;
+    /* box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08); */
+
+    height: 100%;
 }
 
 .Sidebar {
@@ -23,7 +27,7 @@
     padding: 16px 18px;
     box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
     position: sticky;
-    top: 18px;
+    /* top: 18px; */
     align-self: start;
     max-height: calc(100vh - 130px);
     overflow-y: auto;

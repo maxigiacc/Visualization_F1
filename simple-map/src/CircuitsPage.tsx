@@ -18,7 +18,7 @@ const CircuitsPage = () => {
 
     return (
         <div className="Page PageWithSidebar">
-            <div className="main-panel">
+            <div className="MainContent main-panel">
                 <InteractiveCountriesMap
                     circuits={circuits}
                     onCountrySelect={(country) => {
