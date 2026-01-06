@@ -604,10 +604,6 @@ export async function getCircuitStats(circuitId: number): Promise<CircuitStats> 
 export async function getEmissionFactorsChartData(
   selectedKeys?: string[]
 ): Promise<CsvChartData> {
-  const excludedKeys = new Set([
-    "fuel_g_tkm observation",
-    "fuel_g/tkm_ estimated",
-  ]);
   const rows = await csv("/emission_factors_2000_2025.csv");
   
   if (!rows || rows.length === 0) {
@@ -619,7 +615,6 @@ export async function getEmissionFactorsChartData(
   
   const numericKeys = firstRowKeys
     .filter(k => k !== yearKey)
-    .filter(k => !excludedKeys.has(k))
     .filter(k => {
       for (let i = 0; i < Math.min(rows.length, 5); i++) {
         const v = rows[i][k];
