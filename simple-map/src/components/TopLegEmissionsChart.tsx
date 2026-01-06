@@ -114,7 +114,19 @@ export default function TopLegEmissionsChart({
     () => ({
       chart: { type: "bar", height: 360, toolbar: { show: true } },
       plotOptions: { bar: { horizontal: true, borderRadius: 3, barHeight: "70%" } },
-      xaxis: { categories: legs.map((l) => l.label), title: { text: "kt CO₂ per leg" } },
+      xaxis: {
+        categories: legs.map((l) => l.label),
+        title: { text: "kt CO₂ per leg" },
+        min: 0,
+        tickAmount: 4,
+        labels: {
+          formatter: (val: string) => {
+            const num = Number(val);
+            if (Number.isNaN(num)) return val;
+            return num.toFixed(2).replace(/\.?0+$/, "");
+          },
+        },
+      },
       dataLabels: {
         enabled: true,
         formatter: (val: number, { dataPointIndex }: any) => {

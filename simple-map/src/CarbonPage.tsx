@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import ApexCsvRealtimeChart from "./components/ApexCsvRealtimeChart";
 import BarChartEmissions from "./components/BarChartEmissions";
+import IntercontinentalJumpsChart from "./components/IntercontinentalJumpsChart";
+import SeasonFootprintSplitChart from "./components/SeasonFootprintSplitChart";
 import TopLegEmissionsChart from "./components/TopLegEmissionsChart";
 import TravelKmPerYearChart from "./components/TravelKmPerYearChart";
 import { useSettings } from "./SettingsContext";
@@ -13,6 +15,7 @@ type CarbonChart = {
     description: string;
     render: (filterYear?: number | null) => JSX.Element;
     accent: string;
+    scope: "season" | "all";
 };
 
 const CHARTS: CarbonChart[] = [
@@ -22,6 +25,7 @@ const CHARTS: CarbonChart[] = [
         description: "Estimated air freight emissions per season",
         render: (filterYear) => <BarChartEmissions filterYear={filterYear} />,
         accent: "#0ea5e9",
+        scope: "all",
     },
     {
         id: "travel",
@@ -31,6 +35,7 @@ const CHARTS: CarbonChart[] = [
             <TravelKmPerYearChart filterYear={filterYear} />
         ),
         accent: "#14b8a6",
+        scope: "all",
     },
     {
         id: "factors",
@@ -40,6 +45,7 @@ const CHARTS: CarbonChart[] = [
             <ApexCsvRealtimeChart filterYear={filterYear} />
         ),
         accent: "#2563eb",
+        scope: "all",
     },
     {
         id: "leg-emissions",
@@ -49,21 +55,44 @@ const CHARTS: CarbonChart[] = [
             <TopLegEmissionsChart filterYear={filterYear} />
         ),
         accent: "#64748b",
+        scope: "season",
+    },
+    {
+        id: "footprint-split",
+        title: "Truck vs flight split",
+        description: "Season CO₂ split by transport mode",
+        render: (filterYear) => (
+            <SeasonFootprintSplitChart filterYear={filterYear} />
+        ),
+        accent: "#ef4444",
+        scope: "season",
+    },
+    {
+        id: "intercontinental",
+        title: "Intercontinental jumps",
+        description: "Continent switches per season",
+        render: () => <IntercontinentalJumpsChart />,
+        accent: "#f97316",
+        scope: "all",
     },
 ];
 
 const MAX_COMPARISON = 2;
+const DEFAULT_SCOPE: "season" | "all" = "season";
 
 const CarbonPage = () => {
     const { year} = useSettings();
     const [showYearOnly, setShowYearOnly] = useState(false);
-    const [selectedCharts, setSelectedCharts] = useState<string[]>([
-        "emissions",
-        "travel",
-    ]);
+    const [scope, setScope] = useState<"season" | "all">(DEFAULT_SCOPE);
+    const [selectedCharts, setSelectedCharts] = useState<string[]>(() =>
+        CHARTS.filter((chart) => chart.scope === DEFAULT_SCOPE).map(
+            (chart) => chart.id,
+        ),
+    );
     const [focusedChart, setFocusedChart] = useState<string | null>(null);
 
-    const allChartIds = CHARTS.map((c) => c.id);
+    const chartsInScope = CHARTS.filter((chart) => chart.scope === scope);
+    const allChartIds = chartsInScope.map((c) => c.id);
     const isAllSelected = selectedCharts.length === allChartIds.length;
     const reachedLimit =
         selectedCharts.length >= MAX_COMPARISON &&
@@ -72,7 +101,6 @@ const CarbonPage = () => {
     const hasYear = Number.isFinite(year);
     const effectiveFilterYear = showYearOnly && hasYear ? year : null;
 
-    // Auto-enable single-year filter when viewing top leg emissions (needs a year)
     const topLegVisible =
         focusedChart === "leg-emissions" ||
         (!focusedChart && selectedCharts.includes("leg-emissions"));
@@ -89,9 +117,11 @@ const CarbonPage = () => {
             return CHARTS.filter((c) => c.id === focusedChart);
         }
 
-        const picked = CHARTS.filter((c) => selectedCharts.includes(c.id));
-        return picked.length ? picked : [CHARTS[0]];
-    }, [selectedCharts, focusedChart]);
+        const picked = chartsInScope.filter((c) =>
+            selectedCharts.includes(c.id),
+        );
+        return picked.length ? picked : chartsInScope.slice(0, 1);
+    }, [selectedCharts, focusedChart, chartsInScope]);
 
     const toggleChart = (chartId: string) => {
         setFocusedChart((current) => (current === chartId ? null : current));
@@ -123,8 +153,17 @@ const CarbonPage = () => {
 
     const resetView = () => {
         setFocusedChart(null);
-        setSelectedCharts(["emissions", "travel"]);
+        setSelectedCharts(allChartIds);
     };
+
+    useEffect(() => {
+        const nextIds = CHARTS.filter((chart) => chart.scope === scope).map(
+            (chart) => chart.id,
+        );
+        setFocusedChart(null);
+        setSelectedCharts(nextIds);
+        setShowYearOnly(scope === "season");
+    }, [scope]);
 
     return (
         <div className="Page PageWithSidebar carbon-page">
@@ -164,6 +203,29 @@ const CarbonPage = () => {
                             </p>
                         </div>
                     </div>
+                    <div className="scope-toggle">
+                        <button
+                            type="button"
+                            className={`chip-btn chip-btn--ghost ${scope === "season" ? "chip-btn--active" : ""}`}
+                            onClick={() => setScope("season")}
+                        >
+                            Season charts
+                        </button>
+                        <button
+                            type="button"
+                            className={`chip-btn chip-btn--ghost ${scope === "all" ? "chip-btn--active" : ""}`}
+                            onClick={() => setScope("all")}
+                        >
+                            All seasons
+                        </button>
+                        <span className="scope-note">
+                            {scope === "season"
+                                ? hasYear
+                                    ? `Season ${year}`
+                                    : "Select a season"
+                                : "All seasons combined"}
+                        </span>
+                    </div>
                     <label className="year-toggle">
                         <input
                             type="checkbox"
@@ -176,7 +238,7 @@ const CarbonPage = () => {
                 </div>
 
                 <div
-                    className={`carbon-grid columns-${Math.min(visibleCharts.length, 3)}`}
+                    className={`carbon-grid columns-${visibleCharts.length === 1 ? 1 : 2}`}
                 >
                     {visibleCharts.map((chart) => (
                         <div className="chart-card" key={chart.id}>
@@ -228,7 +290,7 @@ const CarbonPage = () => {
                     </p>
 
                     <div className="chart-toggle-list">
-                        {CHARTS.map((chart) => {
+                        {chartsInScope.map((chart) => {
                             const isSelected = selectedCharts.includes(
                                 chart.id,
                             );
@@ -320,6 +382,11 @@ const CarbonPage = () => {
                         <li>
                             <strong>Select all</strong> keeps every chart
                             visible and adapts the grid.
+                        </li>
+                        <li>
+                            Switch between <strong>Season charts</strong> and{" "}
+                            <strong>All seasons</strong> to compare yearly
+                            trends or focus on a single calendar.
                         </li>
                     </ul>
                 </div>

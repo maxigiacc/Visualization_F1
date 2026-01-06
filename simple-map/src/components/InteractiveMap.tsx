@@ -322,54 +322,81 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
             
             {/* Filter bar for year selection and buttons */}
             <div className="filterBar">
-                
-                {/* C02 EMISSION PLANE */}
-                <div className="height">
-                    <label htmlFor="C02">CO2<sup>✈︎</sup></label>
-                    <input
-                        readOnly
-                        value={
-                            Number.isFinite(co2_emission_flight)
-                                ? co2_emission_flight.toFixed(3)
-                                : ""
+                <div className="filter-actions">
+                    <button
+                        type="button"
+                        onClick={handleToggleOptimizedPath}
+                        disabled={!hasSelectedPath}
+                        id="optimizedButton"
+                    >
+                        {showOptimizedPath
+                            ? "SHOW ORIGINAL PATH"
+                            : "SHOW OPTIMIZED PATH"}
+                    </button>
+                    <button
+                        type="button"
+                        id="EntiredButton"
+                        onClick={handleSelectEntirePath}
+                        disabled={
+                            selectedYearRaces.length > 0 &&
+                            selected_race.length === selectedYearRaces.length
                         }
-                        id="C02-plane"
-                        type="text"
-                        autoComplete="off"
-                        name="text"
-                        className="input"
-                    />
+                    >
+                        SELECT ALL
+                    </button>
+                    <button
+                        type="button"
+                        id="ResetButton"
+                        onClick={handleResetSelection}
+                        disabled={selected_race.length === 0}
+                    >
+                        RESET
+                    </button>
                 </div>
 
-                {/* C02 EMISSION CAR */}
-                <div className="height">
-                    <label htmlFor="C02">CO2<sup>🚗</sup></label>
-                    <input
-                        readOnly
-                        value={
-                            Number.isFinite(co2_emission_car)
-                                ? co2_emission_car.toFixed(3)
-                                : ""
-                        }
-                        id="C02-car"
-                        type="text"
-                        autoComplete="off"
-                        name="text"
-                        className="input"
-                    />
+                <div className="factor-row">
+                    {/* CO2 EMISSION PLANE */}
+                    <div className="height">
+                        <label htmlFor="C02-plane">
+                            Air factor
+                            <span>CO2 kg / t km</span>
+                        </label>
+                        <input
+                            readOnly
+                            value={
+                                Number.isFinite(co2_emission_flight)
+                                    ? co2_emission_flight.toFixed(3)
+                                    : ""
+                            }
+                            id="C02-plane"
+                            type="text"
+                            autoComplete="off"
+                            name="text"
+                            className="input"
+                        />
+                    </div>
+
+                    {/* CO2 EMISSION CAR */}
+                    <div className="height">
+                        <label htmlFor="C02-car">
+                            Truck factor
+                            <span>CO2 kg / t km</span>
+                        </label>
+                        <input
+                            readOnly
+                            value={
+                                Number.isFinite(co2_emission_car)
+                                    ? co2_emission_car.toFixed(3)
+                                    : ""
+                            }
+                            id="C02-car"
+                            type="text"
+                            autoComplete="off"
+                            name="text"
+                            className="input"
+                        />
+                    </div>
                 </div>
-
-
-                <button
-                    type="button" onClick={handleToggleOptimizedPath} disabled={!hasSelectedPath} id="optimizedButton">
-                    {showOptimizedPath ? "SHOW ORIGINAL PATH" : "SHOW OPTIMIZED PATH"}
-                </button>
-                <button type="button" id="EntiredButton" onClick={handleSelectEntirePath} disabled={selectedYearRaces.length > 0 && selected_race.length === selectedYearRaces.length} >
-                    SELECT ALL
-                </button>
-                <button type="button" id="ResetButton" onClick={handleResetSelection} disabled={selected_race.length === 0} >
-                    RESET
-                </button>
             </div>
             
             {/* Notification for selecting all */}

@@ -123,19 +123,12 @@ const GraphPlayer: React.FC<props> = ({ co2_emission_car, co2_emission_flight })
     return (
     <div className="graph-player">
         
-        <div className="selected-route">
-            Selected route:{" "}
-            <strong>
-                {selected_race.length > 0
-                    ? selected_race.length
-                    : graph
-                      ? graph.getNumberOfNodes()
-                      : ""}
-            </strong>
+        <div className="title title--original title--with-chip">
+            <span>Original path</span>
+            <span className="year-chip">
+                {Number.isFinite(year) ? `Season ${year}` : "Select a season"}
+            </span>
         </div>
-
-        <br></br>
-        <div className="title title--original">Original path</div>
 
         {graph?.getOriginalPath() && (<Flow flowList={graph.getOriginalPath()} />)}
         

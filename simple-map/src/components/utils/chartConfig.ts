@@ -232,6 +232,7 @@ export function buildEmissionFactorsChartOptions({
       },
     },
     yaxis: {
+      min: 0,
       labels: {
         formatter: function (val: any) {
           return formatNumber(Number(val));

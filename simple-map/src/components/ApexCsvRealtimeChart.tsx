@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Chart from "react-apexcharts";
 import type { CsvChartSeries } from './utils/dataLoader';
 import { getEmissionFactorsChartData } from './utils/dataLoader';
-import { 
-  buildChartAnnotations, 
+import {
   buildEmissionFactorsChartOptions 
 } from './utils/chartConfig';
 
@@ -13,6 +12,8 @@ type Props = {
 };
 
 export default function ApexCsvRealtimeChart({ filterYear }: Props) {
+  const formatLabel = (key: string) => key.replace(/_/g, " ");
+
   // all series
   const [fullSeries, setFullSeries] = useState<CsvChartSeries[]>([]);
   // effective series to show
@@ -22,34 +23,36 @@ export default function ApexCsvRealtimeChart({ filterYear }: Props) {
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const annotations = useMemo(
-    () => buildChartAnnotations(series), 
+  const displaySeries = useMemo(
+    () => series.map((s) => ({ ...s, name: formatLabel(s.name) })),
     [series]
   );
+
+  const filteredDisplaySeries = useMemo(() => {
+    if (!filterYear || !Number.isFinite(filterYear)) {
+      return displaySeries;
+    }
+    return displaySeries.map((s) => ({
+      ...s,
+      data: (s.data || []).filter((d) => {
+        const dYear = d?.x ? new Date(d.x).getFullYear() : NaN;
+        return dYear === filterYear;
+      }),
+    }));
+  }, [displaySeries, filterYear]);
 
   const options = useMemo(() => {
     const filteredCategories = filterYear && Number.isFinite(filterYear)
       ? categories.filter((c) => parseInt(String(c), 10) === filterYear)
       : categories;
 
-    const filteredSeries = filterYear && Number.isFinite(filterYear)
-      ? series.map((s) => ({
-          ...s,
-          data: (s.data || []).filter((d) => {
-            const dYear = d?.x ? new Date(d.x).getFullYear() : NaN;
-            return dYear === filterYear;
-          }),
-        }))
-      : series;
-
     return buildEmissionFactorsChartOptions({ 
-      series: filteredSeries, 
+      series: filteredDisplaySeries, 
       categories: filteredCategories, 
-      annotations, 
       chartId: "emission-factors-chart", 
       height: 350 
     });
-  }, [series, categories, annotations, filterYear]);
+  }, [filteredDisplaySeries, categories, filterYear]);
 
   // Initial load
   useEffect(() => {
@@ -112,7 +115,7 @@ export default function ApexCsvRealtimeChart({ filterYear }: Props) {
                 onChange={() => toggleKey(k)} 
                 disabled={loading}
               />{" "}
-              <span style={{ marginLeft: 6 }}>{k}</span>
+              <span style={{ marginLeft: 6 }}>{formatLabel(k)}</span>
             </label>
           ))}
         </div>
@@ -121,7 +124,7 @@ export default function ApexCsvRealtimeChart({ filterYear }: Props) {
       <div id="chart">
         <Chart
           options={options}
-          series={series as any}
+          series={filteredDisplaySeries as any}
           type="line"
           height={350}
         />

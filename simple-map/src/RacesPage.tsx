@@ -9,7 +9,7 @@ const RacesPage = () => {
     const [co2_emission_flight, setCo2EmissionFlight] = useState<number>(0.255); // Kg CO2 per Km for flight
 
     return (
-        <div className="Page PageWithSidebar">
+        <div className="Page PageWithSidebar PageNoScroll">
             <div className="MainContent">
                 <InteractiveMap 
                     co2_emission_car={co2_emission_car}
