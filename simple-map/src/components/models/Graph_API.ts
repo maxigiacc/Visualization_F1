@@ -455,9 +455,13 @@ export default class Graph {
                 currentNode = nearestNode;
             }
 
-            if (currentPath.length === nodes.length && totalDistance < bestDistance) {
-                bestDistance = totalDistance;
-                bestPath = currentPath;
+            if (currentPath.length === nodes.length) {
+                const improvedPath = this.twoOptImprove(currentPath);
+                const improvedDistance = this.pathDistance(improvedPath);
+                if (improvedDistance < bestDistance) {
+                    bestDistance = improvedDistance;
+                    bestPath = improvedPath;
+                }
             }
         }
 
@@ -487,5 +491,46 @@ export default class Graph {
         console.log("Optimized path generated: ", bestPath, " with distance ", bestDistance);
 
         return { path: bestPath, distance: bestDistance };
+    }
+
+    private pathDistance(path: string[]): number {
+        let total = 0;
+        for (let i = 0; i < path.length - 1; i++) {
+            const dist = this.getDistanceFrom(this.selected_path, path[i], path[i + 1]);
+            if (!dist) {
+                throw new Error(`No edge between ${path[i]} and ${path[i + 1]}`);
+            }
+            total += dist[0] + dist[1];
+        }
+        return total;
+    }
+
+    private twoOptImprove(path: string[]): string[] {
+        if (path.length < 4) return path;
+
+        let improved = true;
+        let best = [...path];
+        let bestDistance = this.pathDistance(best);
+
+        while (improved) {
+            improved = false;
+            for (let i = 1; i < best.length - 2; i++) {
+                for (let k = i + 1; k < best.length - 1; k++) {
+                    const candidate = [
+                        ...best.slice(0, i),
+                        ...best.slice(i, k + 1).reverse(),
+                        ...best.slice(k + 1),
+                    ];
+                    const candidateDistance = this.pathDistance(candidate);
+                    if (candidateDistance < bestDistance) {
+                        best = candidate;
+                        bestDistance = candidateDistance;
+                        improved = true;
+                    }
+                }
+            }
+        }
+
+        return best;
     }
 }
