@@ -33,13 +33,11 @@ const InteractiveCountriesMap: React.FC<Props> = ({
   
     const zoomRef = useRef<number>(1);
     const [markerScale, setMarkerScale] = useState<number>(1);
-    const [showLabels, setShowLabels] = useState(false);
     const debounceTimer = useRef<number | null>(null);
     
     const STEP = 0.05;
     const EPS = 0.002;
     const DEBOUNCE_MS = 50;
-    const SHOW_LABEL_ZOOM_THRESHOLD = 2;
 
   return (
     <>
@@ -65,7 +63,6 @@ const InteractiveCountriesMap: React.FC<Props> = ({
                                 }
                                 debounceTimer.current = window.setTimeout(() => {
                                     setMarkerScale(1 / Math.max(0.001, zoomRef.current));
-                                    setShowLabels(zoomRef.current >= SHOW_LABEL_ZOOM_THRESHOLD);
                                     debounceTimer.current = null;
                                 }, DEBOUNCE_MS);
                             }
@@ -73,7 +70,7 @@ const InteractiveCountriesMap: React.FC<Props> = ({
                 >
                     <Geographies geography={GEO_URL}>
                     {({ geographies }) =>
-                        geographies.map((geo) => {
+                        geographies.map((geo, idx) => {
                             const countryName = geo.properties?.name ?? "Unknown";
                             const isSelected =
                                 selectedCountry !== null &&
@@ -81,7 +78,7 @@ const InteractiveCountriesMap: React.FC<Props> = ({
 
                             return (
                                 <Geography
-                                    key={geo.rsmKey}
+                                    key={`${geo.id ?? "geo"}-${idx}`}
                                     geography={geo}
                                     onClick={() => onCountrySelect(countryName)}
                                     style={{

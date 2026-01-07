@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { TEAM_COLORS } from "./StatCard";
 import "../css/DriverAvatar.css";
 
@@ -11,7 +12,9 @@ const DriverAvatar = ({ name, team }: { name: string; team?: string }) => {
   return (
     <div
       className="driver-avatar"
-      style={{ ["--avatar-bg" as const]: TEAM_COLORS[team ?? ""] ?? "#333" }}
+      style={
+        { ["--avatar-bg" as string]: TEAM_COLORS[team ?? ""] ?? "#333" } as CSSProperties
+      }
     >
       {initials}
     </div>

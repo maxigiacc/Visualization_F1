@@ -12,7 +12,10 @@
  * Do not commit real keys in production; move them to environment variables later.
  */
 
-export function fetchFlightDistance( originCode: string, destinationCode: string ): number {
+export function fetchFlightDistance(
+  _originCode: string,
+  _destinationCode: string,
+): number {
   
   const minDistance = 1;
   const maxDistance = 5;
@@ -24,4 +27,3 @@ export function fetchFlightDistance( originCode: string, destinationCode: string
 }
 
 export default fetchFlightDistance;
-

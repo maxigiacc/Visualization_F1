@@ -12,7 +12,10 @@
  * Do not commit real keys in production; move them to environment variables later.
  */
 
-export async function fetchFlightDistance( originCode: string, destinationCode: string ): Promise<number> {
+export async function fetchFlightDistance(
+  _originCode: string,
+  _destinationCode: string,
+): Promise<number> {
   
   const minDistance = 1;
   const maxDistance = 5;
@@ -24,4 +27,3 @@ export async function fetchFlightDistance( originCode: string, destinationCode: 
 }
 
 export default fetchFlightDistance;
-

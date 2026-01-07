@@ -42,18 +42,18 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
     const [showAllSelectedNotice, setShowAllSelectedNotice] = useState<boolean>(false);  // Deal the notification for uncorrect click
     const [baseGraph, setBaseGraph] = useState<Graph | null>(null);
     const { year , selected_race, setSelectedRace  } = useSettings();
-    const [hoveredCircuitId, setHoveredCircuitId] = useState<string | null>(null);
+    const [hoveredCircuitId, setHoveredCircuitId] = useState<number | null>(
+        null,
+    );
     
     // marker UI / zoom refs
     const zoomRef = useRef<number>(1);
     const [markerScale, setMarkerScale] = useState<number>(1);
-    const [showLabels, setShowLabels] = useState<boolean>(false);
     const debounceTimer = useRef<number | null>(null);
 
     const STEP = 0.05;
     const EPS = 0.002;
     const DEBOUNCE_MS = 50;
-    const SHOW_LABEL_ZOOM_THRESHOLD = 2;
 
     // to center map on zoom/move end ? We need it
     const centerRef = useRef(createCoordinates(0, 0));
@@ -432,10 +432,6 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                             debounceTimer.current = window.setTimeout(() => {
                                 setMarkerScale(
                                     1 / Math.max(0.001, zoomRef.current),
-                                );
-                                setShowLabels(
-                                    zoomRef.current >=
-                                        SHOW_LABEL_ZOOM_THRESHOLD,
                                 );
                                 debounceTimer.current = null;
                             }, DEBOUNCE_MS);

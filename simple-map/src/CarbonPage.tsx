@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { ReactElement } from "react";
 import ApexCsvRealtimeChart from "./components/ApexCsvRealtimeChart";
 import BarChartEmissions from "./components/BarChartEmissions";
 import IntercontinentalJumpsChart from "./components/IntercontinentalJumpsChart";
@@ -13,7 +14,7 @@ type CarbonChart = {
     id: string;
     title: string;
     description: string;
-    render: (filterYear?: number | null) => JSX.Element;
+    render: (filterYear?: number | null) => ReactElement;
     accent: string;
     scope: "season" | "all";
 };

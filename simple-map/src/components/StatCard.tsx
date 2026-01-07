@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import "../css/StatCard.css";
 
 const StatCard = ({
@@ -12,7 +12,7 @@ const StatCard = ({
 }) => (
   <div
     className="stat-card"
-    style={{ ["--accent-color" as const]: accent ?? "#e10600" }}
+    style={{ ["--accent-color" as string]: accent ?? "#e10600" } as CSSProperties}
   >
     <div className="stat-card__label">{label}</div>
     <div className="stat-card__value">{value}</div>
