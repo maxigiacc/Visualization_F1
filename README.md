@@ -26,7 +26,6 @@ We use the Apiverve Airport Distance API to estimate flight distances between ai
 API key configuration (one of the following):
 - Environment variable: `APIVERVE_API_KEY`
 - `.env` file with `APIVERVE_API_KEY=...`
-- `~/.apiverve_key` file
 
 If the key is not available, the script falls back to haversine.
 
