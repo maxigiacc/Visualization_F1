@@ -35,7 +35,7 @@ export async function fetchFlightDistance(
 ): Promise<number> {
   // Hard-code your Apiverve key here while experimenting.
   // IMPORTANT: replace this placeholder with your real key.
-  const apiKey = "0c536a3d-5703-419b-8c0b-b6225f9ba661";
+  const apiKey = "YOUR_APIVERVE";
 
   // Build a URL like:
   // https://api.apiverve.com/v1/airportdistance?iata1=JFK&iata2=LHR
