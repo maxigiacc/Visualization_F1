@@ -93,7 +93,12 @@ const withBaseUrl = (path: string) => {
  * Auto-detect delimiter and parse CSV robustly
  */
 export async function fetchAndAutoParseCsv(path: string) {
-  const txt = await (await fetch(withBaseUrl(path))).text();
+  const url = withBaseUrl(path);
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to load ${url} (${response.status})`);
+  }
+  const txt = await response.text();
   
   // Detect delimiter from sample
   const sample = txt.slice(0, 2000);
@@ -120,7 +125,13 @@ export async function fetchAndAutoParseCsv(path: string) {
  * Simple CSV parsing using d3-fetch (for most cases)
  */
 async function fetchCsv(path: string) {
-  return await csv(withBaseUrl(path));
+  const url = withBaseUrl(path);
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to load ${url} (${response.status})`);
+  }
+  const txt = await response.text();
+  return csvParse(txt);
 }
 
 // ============================================================================
@@ -151,7 +162,6 @@ export async function loadAllData(): Promise<DataCache> {
         driversParsed,
         constructorsParsed,
         emissionsParsed,
-        countriesParsed,
       ] = await Promise.all([
         fetchAndAutoParseCsv("/circuits.csv"),
         fetchAndAutoParseCsv("/races.csv"),
@@ -159,8 +169,14 @@ export async function loadAllData(): Promise<DataCache> {
         fetchAndAutoParseCsv("/drivers.csv"),
         fetchAndAutoParseCsv("/constructors.csv"),
         fetchCsv("/emission_factors_2000_2025.csv"),
-        fetchCsv("f1db-countries.csv"),
       ]);
+
+      let countriesParsed: any[] = [];
+      try {
+        countriesParsed = await fetchCsv("/f1db-countries.csv");
+      } catch (error) {
+        console.warn("Failed to load countries CSV; continuing without it.", error);
+      }
 
       const circuits = (circuitsParsed as any[]).map(fromStringCircuit);
       const races = (racesParsed as any[]).map(fromStringRace);
