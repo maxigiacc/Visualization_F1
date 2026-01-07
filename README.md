@@ -1,77 +1,71 @@
 # Visualization_F1
 
-## How to run
+Visual analytics project on the Formula 1 calendar: we measure travel distances between races, estimate environmental impact (truck + air freight), and compare the official calendar with an optimized route. The application is described in `report/paper.tex` / `report/Final_Report.pdf`.
 
-1. `cd simple-map`
-2. `npm install`
-3. `npm run dev`
+## What it does
+- World map of circuits with the official season route.
+- Comparison with an optimized calendar (distance and CO2 reduction).
+- CO2 dashboard with truck/flight split and multi-year trends.
+- Additional metrics: intercontinental jumps, seasonal distances, top leg emissions.
 
-## Main idea
+## Stack
+- Frontend: React + TypeScript + Vite (`simple-map`).
+- Visualizations: D3 + ApexCharts.
+- Pre-processing: Python scripts for clusters, airports, distances.
 
-The main goal would be to visualize the unnecessary travel that F1 teams currently make during a world championship season. For instance, the calendar sometimes sends teams from Saudi Arabia to Miami and then back to Europe, which creates a lot of back-and-forth movement.
+## Data and sources
+- F1 dataset (circuits, races, results): `dataset/*.csv` and copies in `simple-map/public/*.csv`.
+- Emission factors (air + truck): `dataset/emission_factors_2000_2025.csv`.
+- Research documentation and sources: `paper_and_research/`.
 
-In this project, we could:
-- Map the current calendar using the geographic coordinates of each circuit.
+## API (airport distances)
+We use the Apiverve Airport Distance API to estimate flight distances between airports near circuits.
+- Main script: `scripts/generate_real_distances.py`.
+- Frontend utilities (optional): `simple-map/src/components/utils/AirportDistance.ts` and `simple-map/src/components/utils/API_distances.ts`.
 
+API key configuration (one of the following):
+- Environment variable: `APIVERVE_API_KEY`
+- `.env` file with `APIVERVE_API_KEY=...`
+- `~/.apiverve_key` file
 
-- Quantify travel distances between races, showing the total movement required.
+If the key is not available, the script falls back to haversine.
 
+## Quick start
+```bash
+cd simple-map
+npm install
+npm run dev
+```
 
-- Estimate environmental impact by combining distance with average logistics data from sustainability reports (e.g., air freight emissions). The estimates may not be perfect, but they can illustrate the scale of the issue.
+## Regenerate data (optional)
+Install Python dependencies:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
+Update circuit metadata:
+```bash
+python scripts/apply_airport_codes.py
+python scripts/apply_region_clusters.py
+```
 
-- Propose an optimized calendar by reordering the races to minimize total travel distance. Using a simple proportional model, we could then compare the environmental impact of the optimized route against the actual one.
+Regenerate `distances.csv` using the API:
+```bash
+python scripts/generate_real_distances.py --api-key "$APIVERVE_API_KEY"
+```
 
-## Extra-idea
+Expected output:
+- `simple-map/public/distances.csv`
 
-Game interactive map, in order to obtain the least environmental impact.
+## Repository structure (essentials)
+- `simple-map/`: web app (React + Vite).
+- `simple-map/public/`: CSVs loaded by the app.
+- `scripts/`: preprocessing and distance generation pipeline.
+- `dataset/`: original CSV sources.
+- `report/`: final paper and figures.
 
-## Main steps
-
-1. Find a lot of data about (championship logistics, travel solution , …)
-
-2. Define a database structure and technology (Relational DB, Spatial DB , Time series DB)
-
-3. Decide which type of visualization we want to create.
-
-4. Create a Demo (using HTML,CSS,...)
-
-5. Start to implement the final application/website.
-
-## INFORMATION
-
-Championship information:
-Logistics overview : F1 logistics involve moving cars, equipment, and staff across five continents using cargo planes, ships, and trucks, making it one of the most complex operations in sport. 
-
-Sources: https://corp.formula1.com/wp-content/uploads/2025/08/F1-Sustainability-Update.pdf
-
-
-Logistics specification: https://f1destinations.com/the-logistics-of-formula-1/
-Main partner : DHL
-50 tons of cargo estimated 
-DHL cargo travels upwards of 130,000km over the course of a season, in up to six or seven Boeing 747 cargo planes per event.
-Up to 300 trucks head from race to race. If you put them all together, they’d make a convoy longer than 5km!
-Over a season, teams ship 660 tons of air freight and 500 tons of sea freight (the equivalent of 165 elephants, if that’s your preferred scale of measurement).
-The cargo crates are specially designed to effectively fill all the space available in DHL’s planes.
-There’s around 100 people involved in the logistics overall, including people from DHL, team personnel and locals to each event who aid the operation.
-Each team has around three pallets worth of priority cargo. This will be the first cargo that arrives at the circuit, allowing teams to begin setting up their cars and garages. It’s up to the teams what equipment goes in these pallets.
-
-## Useful tools:
-
-1. Airplane carbon calculator: Website & Api
-2. ...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## Notes
+- The app loads CSVs from `simple-map/public/`. If you regenerate data, copy files there.
+- CO2 estimates are comparative and based on average factors, not exact measurements.
