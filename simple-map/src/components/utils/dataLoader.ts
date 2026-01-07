@@ -82,11 +82,18 @@ let loadPromise: Promise<DataCache> | null = null;
 // CSV PARSING UTILITIES
 // ============================================================================
 
+const withBaseUrl = (path: string) => {
+  if (/^https?:\/\//i.test(path)) return path;
+  const base = import.meta.env.BASE_URL || "/";
+  const normalized = path.replace(/^\/+/, "");
+  return `${base}${normalized}`;
+};
+
 /**
  * Auto-detect delimiter and parse CSV robustly
  */
 export async function fetchAndAutoParseCsv(path: string) {
-  const txt = await (await fetch(path)).text();
+  const txt = await (await fetch(withBaseUrl(path))).text();
   
   // Detect delimiter from sample
   const sample = txt.slice(0, 2000);
@@ -113,7 +120,7 @@ export async function fetchAndAutoParseCsv(path: string) {
  * Simple CSV parsing using d3-fetch (for most cases)
  */
 async function fetchCsv(path: string) {
-  return await csv(path);
+  return await csv(withBaseUrl(path));
 }
 
 // ============================================================================
@@ -641,7 +648,7 @@ export async function getCircuitStats(circuitId: number): Promise<CircuitStats> 
 export async function getEmissionFactorsChartData(
   selectedKeys?: string[]
 ): Promise<CsvChartData> {
-  const rows = await csv("/emission_factors_2000_2025.csv");
+  const rows = await csv(withBaseUrl("/emission_factors_2000_2025.csv"));
   
   if (!rows || rows.length === 0) {
     throw new Error("Emission factors CSV empty or invalid");
