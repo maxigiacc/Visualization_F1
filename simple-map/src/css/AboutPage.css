@@ -9,7 +9,7 @@
 
 .about-hero {
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: 14px;
@@ -57,16 +57,18 @@
 .about-highlight {
     display: grid;
     gap: 10px;
-    min-width: 200px;
+    width: fit-content;
+    max-width: 100%;
     align-self: flex-start;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 180px));
 }
 
 .about-highlight div {
+    min-width: 0;
     background: rgba(225, 6, 0, 0.08);
     border: 1px solid rgba(225, 6, 0, 0.2);
     border-radius: 10px;
-    padding: 8px 10px;
+    padding: 6px 10px;
     display: grid;
     gap: 4px;
     font-weight: 700;
