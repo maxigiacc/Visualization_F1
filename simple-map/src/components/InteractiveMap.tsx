@@ -25,6 +25,18 @@ const SEGMENT_COLORS = [
     "#f97316",
     "#f59e0b",
 ];
+const CLUSTER_COLORS: Record<string, string> = {
+    cluster_europe: "#1F4ED8",
+    cluster_americas: "#D62828",
+    cluster_asia_pacific: "#2A9D8F",
+    cluster_middle_east: "#E9C46A",
+    cluster_africa: "#264653",
+};
+const DEFAULT_CLUSTER_COLOR = "#94a3b8";
+
+const getClusterColor = (clusterId: string) => {
+    return CLUSTER_COLORS[clusterId] ?? DEFAULT_CLUSTER_COLOR;
+};
 
 // Props passed to InteractiveMap component
 type props = {
@@ -104,6 +116,25 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
         if (!year) return [];
         return racesWithCircuit.filter((race) => race.year === year).sort((a, b) => a.round - b.round);
     }, [racesWithCircuit, year]);
+
+    const { raceColors, circuitColors } = useMemo(() => {
+        const raceColors = new Map<number, string>();
+        const circuitColors = new Map<number, string>();
+        const clusterColors = new Map<string, string>();
+
+        selectedYearRacesWithCircuit.forEach((race) => {
+            const clusterId = race.circuit.clusterId || "cluster_unknown";
+            let color = clusterColors.get(clusterId);
+            if (!color) {
+                color = getClusterColor(clusterId);
+                clusterColors.set(clusterId, color);
+            }
+            raceColors.set(race.raceId, color);
+            circuitColors.set(race.circuit.circuitId, color);
+        });
+
+        return { raceColors, circuitColors };
+    }, [selectedYearRacesWithCircuit]);
 
     // Filter races+circuits based on selected circuits for optimization
     const selectedRacesForOptimization = useMemo(() => {
@@ -208,13 +239,15 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                 from: race,
                 to: nextRace,
                 coordinates,
-                color: SEGMENT_COLORS[idx % SEGMENT_COLORS.length],
+                color:
+                    raceColors.get(nextRace.raceId) ??
+                    SEGMENT_COLORS[idx % SEGMENT_COLORS.length],
                 order: idx + 1,
                 labelCoordinates,
                 arrowCoordinates,
             };
         });
-    }, [selectedYearRacesWithCircuit]);
+    }, [raceColors, selectedYearRacesWithCircuit]);
 
     const optimizedRouteSegments = useMemo<RouteSegment[]>(() => {
         if (optimizedOrderedRaces.length <= 1) return [];
@@ -251,13 +284,13 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                 from: race,
                 to: nextRace,
                 coordinates,
-                color: "#0f766e",
+                color: raceColors.get(nextRace.raceId) ?? "#0f766e",
                 order: idx + 1,
                 labelCoordinates,
                 arrowCoordinates,
             };
         });
-    }, [optimizedOrderedRaces]);
+    }, [optimizedOrderedRaces, raceColors]);
 
     const handleSegmentClick = (segment: RouteSegment) => {
         const nextSelected = new Set(selected_race);
@@ -410,7 +443,7 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
             {/* The Map itself */}
             <ComposableMap projection="geoEqualEarth" width={780} height={520}>
                 <ZoomableGroup
-                    minZoom={1}
+                    minZoom={-1}
                     maxZoom={8}
                     scaleExtent={createScaleExtent(1, 8)}
                     translateExtent={createTranslateExtent(
@@ -512,6 +545,7 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                             markerScale={markerScale}
                             onSegmentClick={handleSegmentClick}
                             activeSegmentOrders={activeSegmentOrders}
+                            showLabels={true}
                         />
                     )}
 
@@ -522,6 +556,8 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                         const invZoom = markerScale;
 
                         const isHovered = hoveredCircuitId === circuit.circuitId;
+                        const markerColor =
+                            circuitColors.get(circuit.circuitId) ?? "#E10600";
 
                         return (
                             <Marker
@@ -543,7 +579,7 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
                                     {/* DOT */}
                                     <circle
                                         r={BASE_MARKER_RADIUS_PX}
-                                        fill="#E10600" // F1 red
+                                        fill={markerColor}
                                         stroke="#fff"
                                         strokeWidth={0.6}
                                     />
