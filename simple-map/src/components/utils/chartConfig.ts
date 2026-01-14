@@ -321,7 +321,7 @@ export function buildEmissionsBarChartOptions(
     },
     dataLabels: {
       enabled: true,
-      formatter: (val: number) => `${val.toFixed(1)} kt`,
+      formatter: (val: number) => `${val.toFixed(2)} kt`,
     },
     xaxis: {
       categories,
