@@ -1,19 +1,7 @@
 import React from "react";
 import "../css/Flow.css";
 import type { FlowList } from "./models/Graph_API";
-
-
-const colorMap = [
-  "#b91c1c",
-  "#dc2626",
-  "#f97316",
-  "#f59e0b",
-  "#ea580c",
-  "#be123c",
-  "#9f1239",
-  "#d97706",
-  "#fb923c",
-];
+import { getClusterColor } from "./models/Circuit";
 
 export const Flow: React.FC<{ flowList: FlowList[] }> = ({ flowList }) => {
   return (
@@ -25,11 +13,16 @@ export const Flow: React.FC<{ flowList: FlowList[] }> = ({ flowList }) => {
       <div className="timeline-steps">
         {flowList.map((step) => (
           <div key={step.id} className="step">
-            <div className="step-number">{step.id}</div>
+            <div
+              className="step-number"
+              style={{ color: getClusterColor(step.clusterId) }}
+            >
+              {step.id}
+            </div>
 
             <div
               className="dot"
-              style={{ backgroundColor: colorMap[(step.id - 1) % colorMap.length] }}
+              style={{ backgroundColor: getClusterColor(step.clusterId) }}
             >
               <span className="tooltip">{step.circuit_name}</span>
             </div>

@@ -8,6 +8,12 @@ export interface Country {
     continentId: string;
 }
 
+const normalizeContinentId = (id?: string) => {
+    if (!id) return "";
+    const normalized = id.trim().toLowerCase();
+    return normalized === "australia" ? "oceania" : normalized;
+};
+
 export function fromStringCountry(obj: { [k: string]: string }): Country {
     return {
         countryId: obj.circuitId,
@@ -16,7 +22,6 @@ export function fromStringCountry(obj: { [k: string]: string }): Country {
         iocCode: obj.iocCode,
         name: obj.name,
         denomyn: obj.denomyn,
-        continentId: obj.continentId
-  } as Country;
+        continentId: normalizeContinentId(obj.continentId)
+    } as Country;
 }
-
