@@ -10,7 +10,6 @@ import {
     createTranslateExtent,
 } from "@vnedyalk0v/react19-simple-maps";
 import MapMarkers from "./MapMarkers";
-import { getClusterColor } from "./models/Circuit";
 
 import GEO_URL from "../assets/countries-50m.json";
 import type { Circuit } from "./models/Circuit";
