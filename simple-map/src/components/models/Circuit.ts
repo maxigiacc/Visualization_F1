@@ -33,3 +33,17 @@ export function fromStringCircuit(obj: { [k: string]: string }): Circuit {
   } as Circuit;
 }
 
+const CLUSTER_COLORS: Record<string, string> = {
+    cluster_europe: "#1F4ED8",
+    cluster_america_south : "#009200ff",
+    cluster_america_north: "#ec3838ff",
+    cluster_asia_pacific: "#2A9D8F",
+    cluster_middle_east: "#E9C46A",
+    cluster_africa: "#474d00ff",
+};
+const DEFAULT_CLUSTER_COLOR = "#94a3b8";
+
+export const getClusterColor = (clusterId: string) => {
+    return CLUSTER_COLORS[clusterId] ?? DEFAULT_CLUSTER_COLOR;
+};
+

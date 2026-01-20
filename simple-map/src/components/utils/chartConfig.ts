@@ -6,7 +6,7 @@
 
 import type { ApexOptions } from "apexcharts";
 import type { CsvChartSeries } from "./dataLoader";
-import type { Circuit } from "../models/Circuit";
+import { getClusterColor, type Circuit } from "../models/Circuit";
 import type { Country } from "../models/Country";
 
 // ============================================================================
@@ -394,6 +394,7 @@ export function buildContinentPieOptions(
   });
 
   const counts: Record<string, number> = {};
+  const clusterCounts: Record<string, Record<string, number>> = {};
   const unknown = new Set<string>();
 
   circuits.forEach(circuit => {
@@ -408,9 +409,14 @@ export function buildContinentPieOptions(
     }
 
     counts[continent] = (counts[continent] ?? 0) + 1;
+    const clusterId = circuit.clusterId || "cluster_unknown";
+    if (!clusterCounts[continent]) {
+      clusterCounts[continent] = {};
+    }
+    clusterCounts[continent][clusterId] =
+      (clusterCounts[continent][clusterId] ?? 0) + 1;
   });
 
-  // Debug utile (non rumore)
   if (unknown.size) {
     console.group("🌍 Countries still mapped to Unknown");
     unknown.forEach(c => console.warn(c));
@@ -419,13 +425,28 @@ export function buildContinentPieOptions(
 
   const labels = Object.keys(counts);
   const series = labels.map(l => counts[l]);
+  // Determine colors based on dominant cluster in each continent (TODO : Fix the labels about the continent ex : Australia)
+  const colors = labels.map((label) => {
+    const clusters = clusterCounts[label];
+    if (!clusters) return getClusterColor("cluster_unknown");
+
+    let bestClusterId = "cluster_unknown";
+    let bestCount = -1;
+    Object.entries(clusters).forEach(([clusterId, count]) => {
+      if (count > bestCount) {
+        bestClusterId = clusterId;
+        bestCount = count;
+      }
+    });
+    return getClusterColor(bestClusterId);
+  });
 
   const options: ApexOptions = {
     chart: {
       type: "pie",
       height: 280,
     },
-    colors: ["#0ea5e9", "#14b8a6", "#2563eb", "#64748b", "#94a3b8"],
+    colors,
     labels,
     legend: {
       position: "bottom",

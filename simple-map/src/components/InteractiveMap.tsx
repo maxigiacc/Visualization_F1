@@ -9,7 +9,7 @@ import {
     createScaleExtent,
     createTranslateExtent,
 } from "@vnedyalk0v/react19-simple-maps";
-import {type Circuit } from "./models/Circuit";
+import {type Circuit , getClusterColor} from "./models/Circuit";
 import type { RaceWithCircuit } from "./models/RaceWithCircuit";
 import type { RouteSegment } from "./models/RouteSegment";
 import { useSettings } from "../SettingsContext";
@@ -25,18 +25,6 @@ const SEGMENT_COLORS = [
     "#f97316",
     "#f59e0b",
 ];
-const CLUSTER_COLORS: Record<string, string> = {
-    cluster_europe: "#1F4ED8",
-    cluster_americas: "#D62828",
-    cluster_asia_pacific: "#2A9D8F",
-    cluster_middle_east: "#E9C46A",
-    cluster_africa: "#264653",
-};
-const DEFAULT_CLUSTER_COLOR = "#94a3b8";
-
-const getClusterColor = (clusterId: string) => {
-    return CLUSTER_COLORS[clusterId] ?? DEFAULT_CLUSTER_COLOR;
-};
 
 // Props passed to InteractiveMap component
 type props = {
