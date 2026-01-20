@@ -22,6 +22,25 @@ type CircuitGroup = {
   circuits: Circuit[];
 };
 
+const getGroupClusterId = (circuits: Circuit[]) => {
+  const counts = new Map<string, number>();
+  circuits.forEach((c) => {
+    const clusterId = c.clusterId || "cluster_unknown";
+    counts.set(clusterId, (counts.get(clusterId) ?? 0) + 1);
+  });
+
+  let bestId = "cluster_unknown";
+  let bestCount = -1;
+  counts.forEach((count, clusterId) => {
+    if (count > bestCount) {
+      bestId = clusterId;
+      bestCount = count;
+    }
+  });
+
+  return bestId;
+};
+
 function groupCircuits(circuits: Circuit[]): CircuitGroup[] {
   const map = new Map<string, CircuitGroup>();
 
@@ -54,7 +73,8 @@ const MapMarkers: React.FC<Props> = ({
         const single = group.circuits[0];
         const isSelected =
           !isCluster && selectedCircuit?.circuitId === single.circuitId;
-        const markerColor = getClusterColor(single.clusterId || "cluster_unknown");
+        const groupClusterId = getGroupClusterId(group.circuits);
+        const markerColor = getClusterColor(groupClusterId);
 
         const showLabel = !isCluster && (hovered === idx || isSelected);
 
@@ -87,8 +107,15 @@ const MapMarkers: React.FC<Props> = ({
                   textAnchor="middle"
                   fontSize={8}
                   fontWeight={700}
-                  fill="#111"
+                  fill={markerColor}
                   pointerEvents="none"
+                  style={{
+                    paintOrder: "stroke",
+                    stroke: "#fff",
+                    strokeWidth: 2,
+                    strokeLinecap: "round",
+                    strokeLinejoin: "round",
+                  }}
                 >
                   {group.circuits.length}
                 </text>

@@ -121,8 +121,20 @@ const InteractiveMap: React.FC<props> = ({ co2_emission_car, co2_emission_flight
             circuitColors.set(race.circuit.circuitId, color);
         });
 
+        if (circuitColors.size === 0) {
+            selectedYearRaces.forEach((circuit) => {
+                const clusterId = circuit.clusterId || "cluster_unknown";
+                let color = clusterColors.get(clusterId);
+                if (!color) {
+                    color = getClusterColor(clusterId);
+                    clusterColors.set(clusterId, color);
+                }
+                circuitColors.set(circuit.circuitId, color);
+            });
+        }
+
         return { raceColors, circuitColors };
-    }, [selectedYearRacesWithCircuit]);
+    }, [selectedYearRaces, selectedYearRacesWithCircuit]);
 
     // Filter races+circuits based on selected circuits for optimization
     const selectedRacesForOptimization = useMemo(() => {
