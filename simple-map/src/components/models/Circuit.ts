@@ -13,6 +13,13 @@ export interface Circuit {
     nearest_airport_icao?: string; // optional, ICAO code of nearest airport
 }
 
+const normalizeClusterId = (obj: { [k: string]: string }) => {
+    if (obj.cluster_sub_id === "cluster_asia_pacific_australia") {
+        return obj.cluster_sub_id;
+    }
+    return obj.cluster_id || "";
+};
+
 /**
  * When Circuits are imported from the CSV file, all fields are of type string;
  * This method converts number into their number representation (int or float);
@@ -20,17 +27,17 @@ export interface Circuit {
  */
 export function fromStringCircuit(obj: { [k: string]: string }): Circuit {
     return {
-    circuitId: parseInt(String(obj.circuitId || "0"), 10),
-    circuitRef: obj.circuitRef || "",
-    name: obj.name || "",
-    location: obj.location || "",
-    country: obj.country || "",
-    lat: parseFloat(obj.lat),
-    lng: parseFloat(obj.lng),
-    alt: Number.isNaN(parseInt(obj.alt, 10)) ? 0 : parseInt(String(obj.alt || "0"), 10),
-    url: obj.url || "",
-    clusterId: obj.cluster_id || "",
-  } as Circuit;
+        circuitId: parseInt(String(obj.circuitId || "0"), 10),
+        circuitRef: obj.circuitRef || "",
+        name: obj.name || "",
+        location: obj.location || "",
+        country: obj.country || "",
+        lat: parseFloat(obj.lat),
+        lng: parseFloat(obj.lng),
+        alt: Number.isNaN(parseInt(obj.alt, 10)) ? 0 : parseInt(String(obj.alt || "0"), 10),
+        url: obj.url || "",
+        clusterId: normalizeClusterId(obj),
+    } as Circuit;
 }
 
 const CLUSTER_COLORS: Record<string, string> = {
@@ -38,6 +45,7 @@ const CLUSTER_COLORS: Record<string, string> = {
     cluster_america_south : "#009200ff",
     cluster_america_north: "#ec3838ff",
     cluster_asia_pacific: "#2A9D8F",
+    cluster_asia_pacific_australia: "#7c3aed",
     cluster_middle_east: "#E9C46A",
     cluster_africa: "#474d00ff",
 };
@@ -46,4 +54,3 @@ const DEFAULT_CLUSTER_COLOR = "#94a3b8";
 export const getClusterColor = (clusterId: string) => {
     return CLUSTER_COLORS[clusterId] ?? DEFAULT_CLUSTER_COLOR;
 };
-

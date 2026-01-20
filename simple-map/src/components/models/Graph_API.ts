@@ -5,7 +5,7 @@ import { fetchAndAutoParseCsv, getRacesWithCircuitsByYear } from "../utils/dataL
 export type FlowList = {
     id: number;
     circuit_name: string;
-    clusted_id: number;
+    clusterId: string;
 };
 
 export default class Graph {
@@ -16,6 +16,7 @@ export default class Graph {
     private bestPath: string[] = [];
     private bestDistance: number = Infinity;
     private year : number = 2021;
+    private locationCluster: Map<string, string> = new Map();
 
     // ============ Constructor ======================    
     constructor(other?: Graph , year?: number) {
@@ -30,6 +31,7 @@ export default class Graph {
             this.bestPath = [];
             this.year = year || 2021;
             this.bestDistance = Infinity;
+            this.locationCluster = new Map();
             return;
         }
 
@@ -39,6 +41,7 @@ export default class Graph {
 
         this.bestPath = [...other.bestPath];
         this.bestDistance = other.bestDistance;
+        this.locationCluster = new Map(other.locationCluster);
     }
 
     private static cloneGraphMap(
@@ -185,6 +188,7 @@ export default class Graph {
             this.optimized_path.clear();
             this.bestPath = [];
             this.bestDistance = Infinity;
+            this.locationCluster.clear();
             return;
         }
 
@@ -197,6 +201,14 @@ export default class Graph {
         this.optimized_path.clear();
         this.bestPath = [];
         this.bestDistance = Infinity;
+        this.locationCluster.clear();
+
+        selectedCircuits.forEach((race) => {
+            const loc = race.circuit.location;
+            if (!this.locationCluster.has(loc)) {
+                this.locationCluster.set(loc, race.circuit.clusterId || "cluster_unknown");
+            }
+        });
 
         // Ensure nodes exist even if only 1 selected circuit
         for (const loc of selectedLocations) {
@@ -328,12 +340,12 @@ export default class Graph {
 
         const flowList: FlowList[] = optimized.map((node) => {
             const circuitName = node;
-            const clusterId = parseInt(node.slice(-1), 10);
+            const clusterId = this.locationCluster.get(node) ?? "cluster_unknown";
 
             return {
                 id: originalPath.indexOf(node) + 1,
                 circuit_name: circuitName,
-                clusted_id: clusterId
+                clusterId
             };
         });
 
@@ -356,12 +368,12 @@ export default class Graph {
 
         return nodes.map((node, index) => {
             const circuitName = node;
-            const clusterId = parseInt(node.slice(-1), 10);
+            const clusterId = this.locationCluster.get(node) ?? "cluster_unknown";
 
             return {
                 id: index + 1,
                 circuit_name: circuitName,
-                clusted_id: clusterId
+                clusterId
             };
         });
         
