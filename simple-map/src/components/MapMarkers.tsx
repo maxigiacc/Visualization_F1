@@ -1,7 +1,7 @@
 // src/components/MapMarkers.tsx
 import React, { useMemo, useState } from "react";
 import { Marker, createCoordinates } from "@vnedyalk0v/react19-simple-maps";
-import type { Circuit } from "./models/Circuit";
+import { getClusterColor, type Circuit } from "./models/Circuit";
 
 
 type Props = {
@@ -54,6 +54,7 @@ const MapMarkers: React.FC<Props> = ({
         const single = group.circuits[0];
         const isSelected =
           !isCluster && selectedCircuit?.circuitId === single.circuitId;
+        const markerColor = getClusterColor(single.clusterId || "cluster_unknown");
 
         const showLabel = !isCluster && (hovered === idx || isSelected);
 
@@ -74,15 +75,9 @@ const MapMarkers: React.FC<Props> = ({
               {/* Marker */}
               <circle
                 r={isCluster ? CLUSTER_RADIUS : BASE_RADIUS}
-                fill={
-                  isCluster
-                    ? "#DC0000"
-                    : isSelected
-                    ? "#1E88E5"
-                    : "#F44174"
-                }
-                stroke="#fff"
-                strokeWidth={0.6}
+                fill={markerColor}
+                stroke={isSelected ? "#1E88E5" : "#fff"}
+                strokeWidth={isSelected ? 1.4 : 0.6}
               />
 
               {/* Cluster count */}
