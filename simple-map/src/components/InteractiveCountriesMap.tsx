@@ -10,6 +10,7 @@ import {
     createTranslateExtent,
 } from "@vnedyalk0v/react19-simple-maps";
 import MapMarkers from "./MapMarkers";
+import "../css/InteractiveCountriesMap.css";
 
 import GEO_URL from "../assets/countries-50m.json";
 import type { Circuit } from "./models/Circuit";
@@ -41,7 +42,7 @@ const InteractiveCountriesMap: React.FC<Props> = ({
 
   return (
     <>
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative" }} className="InteractiveCountriesMap">
             <ComposableMap projection="geoEqualEarth" width={780} height={520}>
                 <ZoomableGroup
                     minZoom={1}
